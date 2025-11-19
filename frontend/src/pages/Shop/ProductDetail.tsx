@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import api from '../../services/api';
 import ImageCarousel from '../../components/ui/ImageCarousel';
 import Toast from '../../components/ui/Toast';
+import { useCart } from '../../context/CartContext';
 
 interface Product {
   id: number;
@@ -24,9 +25,13 @@ interface ToastState {
 const ProductDetail: React.FC = () => {
   const { storeSlug, productId } = useParams();
   const navigate = useNavigate();
+  const { addToCart: addToCartContext } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
+  const [quantity, setQuantity] = useState<number>(1);
+  const context = useOutletContext<{ storeInfo: any }>();
+  const primaryColor = context?.storeInfo?.primary_color || '#7c3aed';
   
   // Toast State
   const [toast, setToast] = useState<ToastState>({
@@ -51,6 +56,10 @@ const ProductDetail: React.FC = () => {
     setToast({ isVisible: true, message, type });
   };
 
+  const handleQuantityChange = (delta: number) => {
+      setQuantity(prev => Math.max(1, prev + delta));
+  };
+
   const addToCart = () => {
       if (!product) return;
       
@@ -60,26 +69,19 @@ const ProductDetail: React.FC = () => {
       }
 
       if (!selectedColor && product.colors && product.colors.length > 0) {
-          // Optional: Force color selection if colors exist? 
-          // Assuming colors might be optional if not strictly enforced, 
-          // but usually if listed, user should pick one. 
-          // Let's warn if colors exist.
           showToast('Por favor, selecione uma cor.', 'warning');
           return;
       }
 
-      // Logic to add to cart (LocalStorage)
-      const cartKey = `cart_${storeSlug}`;
-      const cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
-      cart.push({
+      addToCartContext({
           product_id: product.id,
           name: product.name,
           price: parseFloat(product.price),
           size: selectedSize,
           color: selectedColor,
-          quantity: 1
+          quantity: quantity,
+          main_image_url: product.main_image_url || undefined
       });
-      localStorage.setItem(cartKey, JSON.stringify(cart));
 
       showToast('Produto adicionado ao carrinho!', 'success');
       
@@ -172,10 +174,33 @@ const ProductDetail: React.FC = () => {
                         <p className="text-gray-600 leading-relaxed">{product.description}</p>
                     </div>
 
+                    {/* Quantity Selector */}
+                    <div className="mb-6">
+                        <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">Quantidade</p>
+                        <div className="flex items-center border border-gray-300 rounded-lg w-max">
+                            <button 
+                                onClick={() => handleQuantityChange(-1)}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg transition-colors"
+                            >
+                                -
+                            </button>
+                            <span className="px-4 py-2 font-semibold text-gray-900 min-w-[3rem] text-center">
+                                {quantity}
+                            </span>
+                            <button 
+                                onClick={() => handleQuantityChange(1)}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg transition-colors"
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
+
                     {/* Add to Cart Button */}
                     <button 
                         onClick={addToCart} 
-                        className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-green-600/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        className="w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 hover:opacity-90"
+                        style={{ backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}40` }}
                     >
                         <span>🛒</span> Adicionar ao Carrinho
                     </button>

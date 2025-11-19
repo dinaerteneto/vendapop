@@ -16,8 +16,8 @@ class TenantSeeder extends Seeder
                 'name' => 'Moda Chic',
                 'whatsapp_number' => '5511999999999',
                 'description' => 'A melhor moda feminina da região!',
-                'primary_color' => '#7e22ce',
-                'secondary_color' => '#f3e8ff',
+                'primary_color' => '#6A040F', // Maroon
+                'secondary_color' => '#FFF0F3',
                 'address' => 'Rua da Moda, 123 - Centro, São Paulo/SP',
                 'email_contact' => 'contato@modachic.com',
             ]

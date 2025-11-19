@@ -1,21 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../services/api';
+import { useCart } from '../../context/CartContext';
 
 const Checkout: React.FC = () => {
   const { storeSlug } = useParams();
-  const [cart, setCart] = useState<any[]>([]);
+  const { cart, clearCart, totalValue } = useCart();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-      const cartKey = `cart_${storeSlug}`;
-      setCart(JSON.parse(localStorage.getItem(cartKey) || '[]'));
-  }, [storeSlug]);
-
-  const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   const handleFinish = async () => {
       if (!name) { alert('Nome obrigatório'); return; }
@@ -36,7 +30,7 @@ const Checkout: React.FC = () => {
           const { data } = await api.post(`/${storeSlug}/checkout`, payload);
 
           // Limpar carrinho
-          localStorage.removeItem(`cart_${storeSlug}`);
+          clearCart();
 
           // Redirecionar WhatsApp
           window.location.href = data.whatsapp_link;
@@ -65,7 +59,7 @@ const Checkout: React.FC = () => {
               ))}
               <div className="flex justify-between py-4 font-bold text-lg">
                   <span>Total</span>
-                  <span>R$ {total.toFixed(2)}</span>
+                  <span>R$ {totalValue.toFixed(2)}</span>
               </div>
           </div>
 

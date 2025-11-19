@@ -27,7 +27,6 @@ const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
         
         {/* Contact Section */}
         <div>
-          <h3 className="text-gray-500 font-semibold mb-4 uppercase text-sm">Fale com o vendedor</h3>
           <div className="flex items-center mb-4">
              <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-700 hover:text-green-600">
                 <div className="w-8 h-8 mr-3 text-green-500">
@@ -58,10 +57,6 @@ const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
                     {storeInfo.address}
                  </div>
              )}
-             <div className="flex items-center cursor-pointer hover:text-purple-600">
-                 <span className="mr-2">⚠️</span>
-                 Reclamações
-             </div>
           </div>
         </div>
 
@@ -79,20 +74,6 @@ const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
                 {(!storeInfo.socials || storeInfo.socials.length === 0) && (
                     <span className="text-gray-400 italic text-sm">Sem redes sociais cadastradas.</span>
                 )}
-            </div>
-
-            <h3 className="text-gray-500 font-semibold mb-4 uppercase text-sm">Formas de pagamento aceitas</h3>
-            <div className="flex items-center mb-6">
-                 <div className="text-emerald-600 font-bold flex items-center">
-                    <span className="text-2xl mr-1">❖</span> PIX
-                 </div>
-            </div>
-
-            <div className="space-y-2 text-sm font-medium text-red-600">
-                <p className="cursor-pointer hover:underline">Página Inicial</p>
-                <p className="cursor-pointer hover:underline">Políticas de devolução</p>
-                <p className="cursor-pointer hover:underline">Busca</p>
-                <p className="cursor-pointer hover:underline">Categorias</p>
             </div>
 
             <div className="mt-8 flex items-center text-green-600 font-bold">

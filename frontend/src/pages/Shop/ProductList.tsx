@@ -79,15 +79,9 @@ const ProductList: React.FC = () => {
                 placeholder="Faça sua busca" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-4 pr-10 py-3 rounded-full bg-gray-100 border-none focus:ring-2 focus:ring-purple-200 text-gray-700 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-full bg-gray-100 border-none focus:ring-2 focus:ring-purple-200 text-gray-700 outline-none transition-all"
              />
-             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                 🔍
-             </div>
          </div>
-         <button className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-900 text-white shadow-md hover:bg-purple-800 transition-colors">
-             <span className="text-xl">⚙️</span> {/* Filter Icon */}
-         </button>
       </div>
 
       <h2 className="text-lg font-bold text-red-600 mb-4 flex items-center">
@@ -128,12 +122,18 @@ const ProductList: React.FC = () => {
                             <span className="text-xs text-gray-400 line-through mr-2">
                                 R$ {(parseFloat(p.price) * 1.2).toFixed(2).replace('.',',')}
                             </span>
-                            <span className="text-lg font-extrabold text-red-600 block sm:inline">
+                            <span 
+                                className="text-lg font-extrabold block sm:inline"
+                                style={{ color: 'var(--theme-primary)' }}
+                            >
                                 R$ {parseFloat(p.price).toFixed(2).replace('.',',')}
                             </span>
                         </div>
 
-                        <button className="w-full rounded-full bg-red-600 py-2 text-sm font-bold text-white shadow hover:bg-red-700 transition-colors uppercase tracking-wide">
+                        <button 
+                            className="w-full rounded-full py-2 text-sm font-bold text-white shadow hover:opacity-90 transition-colors uppercase tracking-wide"
+                            style={{ backgroundColor: 'var(--theme-primary)' }}
+                        >
                             Comprar
                         </button>
                     </div>
@@ -141,13 +141,6 @@ const ProductList: React.FC = () => {
             ))}
         </div>
       )}
-
-      {/* Floating Cart Button (Bottom Left or adjusted) */}
-      <div className="fixed bottom-4 right-4 z-40">
-          <Link to={`/${storeSlug}/cart`} className="flex h-14 w-14 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-600/30 hover:scale-110 transition-transform">
-              <span className="text-2xl">🛒</span>
-          </Link>
-      </div>
     </div>
   );
 };
