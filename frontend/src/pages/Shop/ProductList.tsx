@@ -85,7 +85,7 @@ const ProductList: React.FC = () => {
          </div>
          <button 
              onClick={() => setIsOneColumn(!isOneColumn)}
-             className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 shadow-sm hover:bg-gray-200 transition-colors"
+             className="md:hidden w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 shadow-sm hover:bg-gray-200 transition-colors"
              aria-label="Alternar visualização"
          >
              {isOneColumn ? (
