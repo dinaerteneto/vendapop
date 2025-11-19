@@ -47,14 +47,23 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories, onSelectCategor
             className="flex flex-col items-center min-w-[80px] cursor-pointer group"
           >
             <div 
-                className={`w-16 h-16 rounded-full overflow-hidden mb-2 border-2 transition-all ${selectedCategoryId === cat.id ? '' : 'border-transparent group-hover:border-gray-300'}`}
+                className={`w-16 h-16 rounded-full overflow-hidden mb-2 border-2 transition-all flex items-center justify-center bg-gray-100 text-gray-500 text-lg font-bold uppercase ${selectedCategoryId === cat.id ? '' : 'border-transparent group-hover:border-gray-300'}`}
                 style={{ borderColor: selectedCategoryId === cat.id ? 'var(--theme-primary)' : undefined }}
             >
-              <img 
-                src={cat.image_url || `https://ui-avatars.com/api/?name=${cat.name}&background=random&color=fff`} 
-                alt={cat.name} 
-                className="w-full h-full object-cover"
-              />
+              {cat.image_url ? (
+                  <img 
+                    src={cat.image_url} 
+                    alt={cat.name} 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.parentElement?.classList.add('bg-gray-200');
+                        e.currentTarget.parentElement!.innerText = cat.name.substring(0, 2);
+                    }}
+                  />
+              ) : (
+                  <span>{cat.name.substring(0, 2)}</span>
+              )}
             </div>
             <span 
                 className={`text-xs text-center font-medium`}
