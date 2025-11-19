@@ -1,0 +1,55 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: moda-backend
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: base64:dummykey=
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: moda_whatsapp_saas
+      DB_USERNAME: moda_user
+      DB_PASSWORD: moda_pass
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: moda-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      # URL da API vista DE FORA (browser)
+      VITE_API_BASE_URL: "http://localhost:8000/api"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:8.0
+    container_name: moda-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: moda_whatsapp_saas
+      MYSQL_USER: moda_user
+      MYSQL_PASSWORD: moda_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - moda_db_data:/var/lib/mysql
+
+volumes:
+  moda_db_data:
