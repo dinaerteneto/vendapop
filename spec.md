@@ -31,6 +31,83 @@ Use como **referência visual de UI/UX** o Figma abaixo (não precisa ser idênt
 - Toda a experiência do cliente (catálogo, carrinho, checkout) é feita no React.
 - O checkout gera um pedido e redireciona para o WhatsApp da loja com a mensagem pré-preenchida.
 
+## 1.1. Arquitetura SOLID Implementada
+
+O backend segue os princípios SOLID com separação clara de responsabilidades:
+
+### Camadas de Arquitetura
+
+#### **Use Cases** (`app/UseCases/`)
+- **Responsabilidade**: Casos de uso da aplicação (lógica de alto nível)
+- **Exemplos**:
+  - `CreateOrderUseCase` - Orquestra criação de pedidos
+  - `GetProductsUseCase` - Busca produtos com filtros
+  - `GetStoreInfoUseCase` - Obtém informações da loja
+  - `AuthenticateUserUseCase` - Autenticação de usuários
+
+#### **Services** (`app/Services/`)
+- **Responsabilidade**: Regras de negócio reutilizáveis
+- **Implementados**:
+  - `OrderService` - Lógica de criação e processamento de pedidos
+  - `CustomerService` - Gerenciamento de clientes
+  - `WhatsAppService` - Geração de mensagens e links WhatsApp
+
+#### **Repositories** (`app/Repositories/`)
+- **Responsabilidade**: Acesso a dados (padrão Repository)
+- **Estrutura**:
+  ```txt
+  Interfaces/          # Contratos (ProductRepositoryInterface, etc.)
+  Eloquent/           # Implementações concretas
+  ```
+- **Benefícios**: Abstração de dados, testabilidade, facilidade de troca de ORM
+
+#### **Controllers** (`app/Http/Controllers/`)
+- **Responsabilidade**: Apenas orquestrar respostas HTTP
+- **Padrão**: Controllers finos que delegam para Use Cases
+
+### Benefícios da Arquitetura
+
+- **Testabilidade**: Cada camada pode ser testada isoladamente
+- **Manutenibilidade**: Mudanças são localizadas em camadas específicas
+- **Reutilização**: Services e Use Cases podem ser reutilizados
+- **Separação de Preocupações**: UI, negócio e dados completamente isolados
+- **Extensibilidade**: Fácil adicionar novas funcionalidades seguindo o padrão
+
+### Exemplo de Fluxo: Checkout
+
+```php
+// Controller (apenas orquestra)
+public function checkout(Request $request, $storeSlug) {
+    // Validação básica
+    $validated = $request->validate([...]);
+
+    // Delega para Use Case
+    $result = $this->createOrderUseCase->execute(
+        $tenant, $customerData, $items
+    );
+
+    return response()->json($result);
+}
+
+// Use Case (orquestra Services)
+public function execute($tenant, $customerData, $items) {
+    $customer = $this->customerService->findOrCreate($tenant, $customerData);
+    $order = $this->orderService->createOrder($tenant, $customer, $items);
+    $whatsAppLink = $this->orderService->generateWhatsAppLink($tenant, $order, $customer);
+
+    return ['order' => $order, 'whatsapp_link' => $whatsAppLink];
+}
+
+// Service (lógica de negócio)
+public function createOrder($tenant, $customer, $items) {
+    return DB::transaction(function () use ($tenant, $customer, $items) {
+        // Lógica de criação do pedido
+        $order = $this->orderRepository->create([...]);
+        // Cria items, etc.
+    });
+}
+```
+
 ## 2. Stack técnica
 
 ### Backend (Laravel)
@@ -38,15 +115,15 @@ Use como **referência visual de UI/UX** o Figma abaixo (não precisa ser idênt
 - Laravel (versão estável atual, ex.: 11 ou 10)
 - PHP 8.2+
 - MySQL ou PostgreSQL
-- Autenticação de lojista (pode usar Laravel Sanctum ou auth padrão com tokens/JWT)
-- Estrutura em camadas:
-  - `App\Http\Controllers` (controllers finos, apenas orquestram)
-  - `App\Http\Requests` (validações)
-  - `App\Services` (regras de negócio)
-  - `App\Repositories` (acesso a dados)
-  - `App\Models` (modelos Eloquent)
-  - Opcional: `App\DTOs` para transportar dados
-- Aplicar princípios SOLID e boa separação de responsabilidades.
+- Autenticação de lojista (Laravel Sanctum com tokens API)
+- **Arquitetura SOLID implementada:**
+  - `App\Http\Controllers` (controllers finos, apenas orquestram respostas HTTP)
+  - `App\UseCases` (casos de uso da aplicação - lógica de alto nível)
+  - `App\Services` (regras de negócio reutilizáveis)
+  - `App\Repositories` (acesso a dados com interfaces)
+  - `App\Models` (modelos Eloquent com traits para multi-tenancy)
+- Estrutura de injeção de dependência via service container
+- Middleware para resolução de tenants por URL slug
 
 ### Frontend (React SPA + PWA)
 
@@ -309,7 +386,12 @@ cd backend
 # Instalar pacotes necessários (ex.: autenticação API, se desejar Sanctum)
 composer require laravel/sanctum
 
-# Criar migrations, models, controllers, services, repositories
+# A arquitetura SOLID já está implementada com:
+# - Use Cases em app/UseCases/
+# - Services em app/Services/
+# - Repositories com interfaces em app/Repositories/
+# - Controllers finos delegando para Use Cases
+
 php artisan migrate
 ```
 
@@ -359,24 +441,28 @@ Define os serviços, redes e volumes. O frontend possui variável `VITE_API_BASE
 - Base: `node:20-alpine`
 - Exposição de host `0.0.0.0` para funcionar corretamente no container.
 
-## 10. Como a IA deve trabalhar
+## 10. Status da Implementação
 
-1. Ler este SPEC.md.
-2. Criar:
-   - Toda a estrutura de pastas do Laravel com:
-     - Models
-     - Migrations
-     - Controllers
-     - Requests
-     - Services
-     - Repositories
-     - Middleware de tenant
-   - Toda a estrutura do React SPA com:
-     - Rotas
-     - Páginas públicas (loja)
-     - Páginas admin
-     - Contexto de carrinho
-3. Implementar as migrations exatamente com os campos definidos.
-4. Implementar as validações de checkout (Nome obrigatório + E-mail ou Celular obrigatório).
-5. Implementar endpoint de checkout e lógica de criação de pedido.
-6. No frontend, após criar o pedido, redirecionar para o WhatsApp da loja usando o texto retornado pela API.
+### ✅ Concluído
+- **Arquitetura SOLID**: Use Cases, Services, Repositories implementados
+- **Backend Laravel**: API completa com multi-tenancy
+- **Frontend React**: SPA + PWA básica estruturada
+- **Docker**: Ambiente de desenvolvimento configurado
+- **Migrations**: Todas as tabelas criadas com relacionamentos
+- **Checkout**: Funcional com geração de pedidos e WhatsApp
+- **Autenticação**: Laravel Sanctum implementado
+- **Seeders**: Dados de exemplo para desenvolvimento
+
+### 📋 Próximos Passos Sugeridos
+1. **Frontend Completo**: Implementar todas as páginas React seguindo o padrão TailAdmin
+2. **Painel Admin**: CRUD completo de produtos, categorias, pedidos
+3. **Testes**: Criar testes unitários e de integração
+4. **Validações**: Implementar Form Requests para validações robustas
+5. **Documentação API**: Swagger/OpenAPI para documentar endpoints
+6. **Deploy**: Configurar produção com Docker e CI/CD
+
+### 🎯 Como Contribuir
+- Seguir os padrões de arquitetura SOLID já estabelecidos
+- Usar conventional commits para mensagens
+- Manter a separação clara entre camadas
+- Adicionar testes para novas funcionalidades
