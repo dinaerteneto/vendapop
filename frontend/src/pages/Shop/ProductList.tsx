@@ -27,6 +27,7 @@ const ProductList: React.FC = () => {
   // Filters
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isOneColumn, setIsOneColumn] = useState(false);
 
   // Fetch Initial Data (Categories Only)
   useEffect(() => {
@@ -82,6 +83,21 @@ const ProductList: React.FC = () => {
                 className="w-full px-4 py-3 rounded-full bg-gray-100 border-none focus:ring-2 focus:ring-purple-200 text-gray-700 outline-none transition-all"
              />
          </div>
+         <button 
+             onClick={() => setIsOneColumn(!isOneColumn)}
+             className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 shadow-sm hover:bg-gray-200 transition-colors"
+             aria-label="Alternar visualização"
+         >
+             {isOneColumn ? (
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                 </svg>
+             ) : (
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+                 </svg>
+             )}
+         </button>
       </div>
 
       <h2 className="text-lg font-bold text-red-600 mb-4 flex items-center">
@@ -89,7 +105,7 @@ const ProductList: React.FC = () => {
       </h2>
 
       {loading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className={`grid gap-4 ${isOneColumn ? 'grid-cols-1' : 'grid-cols-2'} md:grid-cols-3 lg:grid-cols-4`}>
               {[1,2,3,4].map(i => (
                   <div key={i} className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>
               ))}
@@ -97,7 +113,7 @@ const ProductList: React.FC = () => {
       ) : products.length === 0 ? (
           <p className="text-center text-gray-500 py-10">Nenhum produto encontrado.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className={`grid gap-4 ${isOneColumn ? 'grid-cols-1' : 'grid-cols-2'} md:grid-cols-3 lg:grid-cols-4`}>
             {products.map((p) => (
                 <Link to={`/${storeSlug}/product/${p.id}`} key={p.id} className="group block overflow-hidden rounded-xl bg-gray-50 shadow-sm hover:shadow-md transition-all">
                     <div className="aspect-[3/4] w-full overflow-hidden bg-gray-200 relative">
