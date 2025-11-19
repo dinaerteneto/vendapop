@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import Footer from '../components/common/Footer';
 
@@ -32,7 +32,9 @@ const PublicLayout: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-           <h1 className="text-xl font-bold text-purple-600 capitalize">{storeInfo?.name || storeSlug?.replace('-', ' ')}</h1>
+           <Link to={`/${storeSlug}`} className="hover:opacity-80 transition-opacity">
+               <h1 className="text-xl font-bold text-purple-600 capitalize">{storeInfo?.name || storeSlug?.replace('-', ' ')}</h1>
+           </Link>
            {/* Carrinho Widget poderia vir aqui */}
         </div>
       </header>

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Category;
 use App\Models\Tenant;
+use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
@@ -26,6 +26,16 @@ class CategorySeeder extends Seeder
             Category::firstOrCreate(
                 ['slug' => 'calcas', 'tenant_id' => $tenant->id],
                 ['name' => 'Calças', 'is_active' => true]
+            );
+
+            Category::firstOrCreate(
+                ['slug' => 'conjuntos', 'tenant_id' => $tenant->id],
+                ['name' => 'Conjuntos', 'is_active' => true]
+            );
+
+            Category::firstOrCreate(
+                ['slug' => 'macaquinhos', 'tenant_id' => $tenant->id],
+                ['name' => 'Macaquinhos', 'is_active' => true]
             );
         }
     }

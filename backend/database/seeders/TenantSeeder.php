@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Tenant;
 use App\Models\TenantSocial;
+use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
 {
@@ -25,12 +25,12 @@ class TenantSeeder extends Seeder
 
         TenantSocial::firstOrCreate(
             ['tenant_id' => $tenant->id, 'name' => 'Instagram'],
-            ['url' => 'https://instagram.com/modachic', 'icon' => 'instagram']
+            ['url' => 'https://instagram.com/modachic', 'icon' => 'https://cdn-icons-png.flaticon.com/512/2111/2111463.png']
         );
 
         TenantSocial::firstOrCreate(
             ['tenant_id' => $tenant->id, 'name' => 'Facebook'],
-            ['url' => 'https://facebook.com/modachic', 'icon' => 'facebook']
+            ['url' => 'https://facebook.com/modachic', 'icon' => 'https://cdn-icons-png.flaticon.com/512/733/733547.png']
         );
     }
 }

@@ -179,6 +179,25 @@ const ProductDetail: React.FC = () => {
                     >
                         <span>🛒</span> Adicionar ao Carrinho
                     </button>
+
+                    {/* Share Button */}
+                    <button 
+                        onClick={() => {
+                            if (navigator.share) {
+                                navigator.share({
+                                    title: product.name,
+                                    text: product.description,
+                                    url: window.location.href,
+                                }).catch(console.error);
+                            } else {
+                                navigator.clipboard.writeText(window.location.href);
+                                showToast('Link copiado!', 'success');
+                            }
+                        }}
+                        className="w-full mt-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 py-3 rounded-xl font-medium text-md transition-all flex items-center justify-center gap-2"
+                    >
+                        <span>🔗</span> Compartilhar
+                    </button>
                 </div>
             </div>
         </div>

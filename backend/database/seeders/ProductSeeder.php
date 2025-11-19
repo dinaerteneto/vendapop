@@ -18,41 +18,73 @@ class ProductSeeder extends Seeder
         $catVestidos = Category::where('slug', 'vestidos')->where('tenant_id', $tenant->id)->first();
         $catBlusas = Category::where('slug', 'blusas')->where('tenant_id', $tenant->id)->first();
         $catCalcas = Category::where('slug', 'calcas')->where('tenant_id', $tenant->id)->first();
+        $catConjuntos = Category::where('slug', 'conjuntos')->where('tenant_id', $tenant->id)->first();
+        $catMacaquinhos = Category::where('slug', 'macaquinhos')->where('tenant_id', $tenant->id)->first();
 
+        // Vestidos
         if ($catVestidos) {
-            Product::firstOrCreate(
+            Product::updateOrCreate(
                 ['slug' => 'vestido-longo-floral', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catVestidos->id,
                     'name' => 'Vestido Longo Floral',
                     'short_description' => 'Vestido perfeito para o verão.',
-                    'description' => 'Vestido longo com estampa floral, tecido leve e confortável.',
+                    'description' => 'Vestido longo com estampa floral, tecido leve e confortável. Ideal para dias quentes e passeios ao ar livre.',
                     'price' => 129.90,
                     'sizes' => ['P', 'M', 'G'],
                     'colors' => ['Rosa', 'Azul'],
                     'main_image_url' => 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1583336663277-620dc1996580?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop'
+                    ],
                     'is_active' => true,
                 ]
             );
 
-            Product::firstOrCreate(
+            Product::updateOrCreate(
                 ['slug' => 'vestido-midi-preto', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catVestidos->id,
                     'name' => 'Vestido Midi Preto',
                     'short_description' => 'Elegância para a noite.',
-                    'description' => 'Vestido midi preto básico, tecido encorpado.',
+                    'description' => 'Vestido midi preto básico, tecido encorpado. Perfeito para jantares e eventos sociais.',
                     'price' => 159.90,
                     'sizes' => ['M', 'G'],
                     'colors' => ['Preto'],
                     'main_image_url' => 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?q=80&w=600&auto=format&fit=crop'
+                    ],
+                    'is_active' => true,
+                ]
+            );
+
+            Product::updateOrCreate(
+                ['slug' => 'vestido-festa-paete', 'tenant_id' => $tenant->id],
+                [
+                    'category_id' => $catVestidos->id,
+                    'name' => 'Vestido de Festa Paetê',
+                    'short_description' => 'Brilhe muito nas festas!',
+                    'description' => 'Vestido curto todo em paetê, alças finas e decote v. Disponível em diversas cores.',
+                    'price' => 299.90,
+                    'sizes' => ['P', 'M', 'G'],
+                    'colors' => ['Dourado', 'Prata', 'Preto'],
+                    'main_image_url' => 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                         'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop',
+                         'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop'
+                    ],
                     'is_active' => true,
                 ]
             );
         }
 
+        // Blusas
         if ($catBlusas) {
-            Product::firstOrCreate(
+            Product::updateOrCreate(
                 ['slug' => 'blusa-basica-branca', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catBlusas->id,
@@ -63,27 +95,114 @@ class ProductSeeder extends Seeder
                     'sizes' => ['P', 'M', 'G', 'GG'],
                     'colors' => ['Branco', 'Preto', 'Off-white'],
                     'main_image_url' => 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=600&auto=format&fit=crop'
+                    ],
+                    'is_active' => true,
+                ]
+            );
+
+             Product::updateOrCreate(
+                ['slug' => 'cropped-estampado', 'tenant_id' => $tenant->id],
+                [
+                    'category_id' => $catBlusas->id,
+                    'name' => 'Cropped Estampado',
+                    'short_description' => 'Estilo e frescor.',
+                    'description' => 'Cropped com estampa tropical, tecido viscose.',
+                    'price' => 59.90,
+                    'sizes' => ['P', 'M'],
+                    'colors' => ['Verde', 'Laranja'],
+                    'main_image_url' => 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=600&auto=format&fit=crop'
+                    ],
                     'is_active' => true,
                 ]
             );
         }
 
+        // Calças
         if ($catCalcas) {
-            Product::firstOrCreate(
+            Product::updateOrCreate(
                 ['slug' => 'calca-jeans-skinny', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catCalcas->id,
                     'name' => 'Calça Jeans Skinny',
                     'short_description' => 'Jeans confortável com elastano.',
-                    'description' => 'Calça jeans modelagem skinny, lavagem escura.',
+                    'description' => 'Calça jeans modelagem skinny, lavagem escura. Cintura alta.',
                     'price' => 89.90,
                     'sizes' => ['36', '38', '40', '42', '44'],
                     'colors' => ['Jeans Escuro'],
                     'main_image_url' => 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1475178626620-a4d074967452?q=80&w=600&auto=format&fit=crop'
+                    ],
+                    'is_active' => true,
+                ]
+            );
+
+            Product::updateOrCreate(
+                ['slug' => 'calca-pantalona-bege', 'tenant_id' => $tenant->id],
+                [
+                    'category_id' => $catCalcas->id,
+                    'name' => 'Calça Pantalona Bege',
+                    'short_description' => 'Elegância e conforto.',
+                    'description' => 'Calça pantalona em linho misto, cor bege. Ótima para look office.',
+                    'price' => 139.90,
+                    'sizes' => ['38', '40', '42'],
+                    'colors' => ['Bege'],
+                    'main_image_url' => 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1551488852-0801758cb63f?q=80&w=600&auto=format&fit=crop'
+                    ],
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // Conjuntos
+        if ($catConjuntos) {
+            Product::updateOrCreate(
+                ['slug' => 'conjunto-alfaiataria-rosa', 'tenant_id' => $tenant->id],
+                [
+                    'category_id' => $catConjuntos->id,
+                    'name' => 'Conjunto Alfaiataria Rosa',
+                    'short_description' => 'Moderno e sofisticado.',
+                    'description' => 'Conjunto de blazer cropped e short saia em alfaiataria rosa.',
+                    'price' => 219.90,
+                    'sizes' => ['P', 'M'],
+                    'colors' => ['Rosa'],
+                    'main_image_url' => 'https://images.unsplash.com/photo-1591369822096-35c938988a51?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?q=80&w=600&auto=format&fit=crop'
+                    ],
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // Macaquinhos
+        if ($catMacaquinhos) {
+            Product::updateOrCreate(
+                ['slug' => 'macaquinho-estampado', 'tenant_id' => $tenant->id],
+                [
+                    'category_id' => $catMacaquinhos->id,
+                    'name' => 'Macaquinho Estampado',
+                    'short_description' => 'Leveza para o dia a dia.',
+                    'description' => 'Macaquinho soltinho com estampa floral.',
+                    'price' => 89.90,
+                    'sizes' => ['U'],
+                    'colors' => ['Estampado'],
+                    'main_image_url' => 'https://images.unsplash.com/photo-1495385794356-15371f348c31?q=80&w=600&auto=format&fit=crop',
+                    'images' => [
+                        'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=600&auto=format&fit=crop',
+                        'https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=600&auto=format&fit=crop'
+                    ],
                     'is_active' => true,
                 ]
             );
         }
     }
 }
-
