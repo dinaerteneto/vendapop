@@ -13,6 +13,15 @@ interface CategoryListProps {
   selectedCategoryId: number | null;
 }
 
+const stringToColor = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const c = (hash & 0x00ffffff).toString(16).toUpperCase();
+  return '#' + '00000'.substring(0, 6 - c.length) + c;
+};
+
 const CategoryList: React.FC<CategoryListProps> = ({ categories, onSelectCategory, selectedCategoryId }) => {
   return (
     <div className="mb-8">
@@ -47,8 +56,11 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories, onSelectCategor
             className="flex flex-col items-center min-w-[80px] cursor-pointer group"
           >
             <div 
-                className={`w-16 h-16 rounded-full overflow-hidden mb-2 border-2 transition-all flex items-center justify-center bg-gray-100 text-gray-500 text-lg font-bold uppercase ${selectedCategoryId === cat.id ? '' : 'border-transparent group-hover:border-gray-300'}`}
-                style={{ borderColor: selectedCategoryId === cat.id ? 'var(--theme-primary)' : undefined }}
+                className={`w-16 h-16 rounded-full overflow-hidden mb-2 border-2 transition-all flex items-center justify-center text-white text-lg font-bold uppercase ${selectedCategoryId === cat.id ? '' : 'border-transparent group-hover:border-gray-300'}`}
+                style={{ 
+                    borderColor: selectedCategoryId === cat.id ? 'var(--theme-primary)' : undefined,
+                    backgroundColor: cat.image_url ? '#f3f4f6' : stringToColor(cat.name)
+                }}
             >
               {cat.image_url ? (
                   <img 
@@ -57,8 +69,11 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories, onSelectCategor
                     className="w-full h-full object-cover"
                     onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement?.classList.add('bg-gray-200');
-                        e.currentTarget.parentElement!.innerText = cat.name.substring(0, 2);
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                            parent.style.backgroundColor = stringToColor(cat.name);
+                            parent.innerText = cat.name.substring(0, 2);
+                        }
                     }}
                   />
               ) : (
