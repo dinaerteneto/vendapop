@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
@@ -29,6 +31,7 @@ Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
 
 // Rotas Admin
 Route::prefix('admin')->group(function () {
+    Route::post('/register', [RegistrationController::class, 'store']); // Nova rota de registro
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
@@ -43,6 +46,9 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
+
+        Route::get('/customers', [AdminCustomerController::class, 'index']);
+        Route::get('/customers/{customer}', [AdminCustomerController::class, 'show']);
 
         Route::get('/store', [StoreSettingsController::class, 'show']);
         Route::put('/store', [StoreSettingsController::class, 'update']);
