@@ -3,39 +3,56 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Product;
+use App\UseCases\Store\CreateOrderUseCase;
+use App\UseCases\Store\GetProductDetailsUseCase;
+use App\UseCases\Store\GetProductsUseCase;
+use App\UseCases\Store\GetStoreInfoUseCase;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
+    private GetStoreInfoUseCase $getStoreInfoUseCase;
+    private GetProductsUseCase $getProductsUseCase;
+    private GetProductDetailsUseCase $getProductDetailsUseCase;
+    private CreateOrderUseCase $createOrderUseCase;
 
-    public function storeInfo(Request $request)
+    public function __construct(
+        GetStoreInfoUseCase $getStoreInfoUseCase,
+        GetProductsUseCase $getProductsUseCase,
+        GetProductDetailsUseCase $getProductDetailsUseCase,
+        CreateOrderUseCase $createOrderUseCase
+    ) {
+        $this->getStoreInfoUseCase = $getStoreInfoUseCase;
+        $this->getProductsUseCase = $getProductsUseCase;
+        $this->getProductDetailsUseCase = $getProductDetailsUseCase;
+        $this->createOrderUseCase = $createOrderUseCase;
+    }
+
+    public function storeInfo(Request $request, $storeSlug)
     {
-        // Retorna dados da loja + redes sociais
-        $tenant = $this->tenantService->getTenant();
-        $tenant->load('socials'); // Eager load socials
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
         return response()->json($tenant);
     }
 
-    public function products(Request $request)
+    public function products(Request $request, $storeSlug)
     {
-        // TenantScope is applied automatically via Trait
-        $query = Product::where('is_active', true);
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
 
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
         }
 
-        if ($request->has('search')) {
-            $term = $request->search;
-            $query->where('name', 'like', "%{$term}%");
-        }
+        $search = $request->get('search');
+        $categoryId = $request->get('category_id');
 
-        return response()->json($query->with('category')->get());
+        $products = $this->getProductsUseCase->execute($tenant, $search, $categoryId);
+
+        return response()->json($products);
     }
 
     // ... rest of the controller (productDetail, checkout) remain the same
@@ -43,9 +60,20 @@ class StoreController extends Controller
     // Since write tool overwrites the file, I MUST include the full content.
     // Let me copy the rest of the methods from previous context.
 
-    public function productDetail($storeSlug, $productId)
+    public function productDetail(Request $request, $storeSlug, $productId)
     {
-        $product = Product::where('is_active', true)->findOrFail($productId);
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
+        $product = $this->getProductDetailsUseCase->execute($tenant->id, (int) $productId);
+
+        if (!$product || !$product->is_active) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         return response()->json($product);
     }
 
@@ -68,119 +96,28 @@ class StoreController extends Controller
             ], 422);
         }
 
-        // Buscar tenant diretamente do slug (middleware já validou, mas vamos garantir)
-        $tenant = \App\Models\Tenant::where('slug', $storeSlug)->first();
+        // Buscar tenant diretamente do slug
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
 
         try {
-            return DB::transaction(function () use ($request, $customerData, $tenant) {
-                $customer = null;
-                if (!empty($customerData['email'])) {
-                    $customer = Customer::where('email', $customerData['email'])->first();
-                }
+            $result = $this->createOrderUseCase->execute(
+                $tenant,
+                $customerData,
+                $request->input('items'),
+                $request->input('notes')
+            );
 
-                if (!$customer) {
-                    $customer = Customer::create([
-                        'tenant_id' => $tenant->id, // Definir explicitamente o tenant_id
-                        'name' => $customerData['name'],
-                        'email' => $customerData['email'] ?? null,
-                        'phone' => $customerData['phone'] ?? null,
-                    ]);
-                }
-
-                $totalAmount = 0;
-                $orderItemsData = [];
-
-                foreach ($request->input('items') as $item) {
-                    // Buscar produto sem o Global Scope, verificando tenant_id explicitamente
-                    $product = Product::where('id', $item['product_id'])
-                                    ->where('tenant_id', $tenant->id)
-                                    ->where('is_active', true)
-                                    ->firstOrFail();
-
-                    $subtotal = $product->price * $item['quantity'];
-                    $totalAmount += $subtotal;
-
-                    $orderItemsData[] = [
-                        'product' => $product,
-                        'quantity' => $item['quantity'],
-                        'size' => $item['size'] ?? null,
-                        'color' => $item['color'] ?? null,
-                        'subtotal' => $subtotal,
-                    ];
-                }
-
-                $count = Order::count() + 1;
-                $orderNumber = sprintf('PED-%s-%06d', date('Y'), $count);
-
-                $order = Order::create([
-                    'tenant_id' => $tenant->id, // Definir explicitamente o tenant_id
-                    'customer_id' => $customer->id,
-                    'order_number' => $orderNumber,
-                    'total_amount' => $totalAmount,
-                    'status' => 'novo',
-                ]);
-
-                if ($request->has('notes')) {
-                    $order->notes = $request->input('notes');
-                    $order->save();
-                }
-
-                foreach ($orderItemsData as $data) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'product_id' => $data['product']->id,
-                        'product_name' => $data['product']->name,
-                        'unit_price' => $data['product']->price,
-                        'quantity' => $data['quantity'],
-                        'size' => $data['size'],
-                        'color' => $data['color'],
-                        'subtotal' => $data['subtotal'],
-                    ]);
-                }
-
-                $whatsappLink = $this->generateWhatsappLink($tenant, $order, $customer, $orderItemsData);
-
-                return response()->json([
-                    'message' => 'Order created successfully',
-                    'order_number' => $order->order_number,
-                    'total_amount' => $order->total_amount,
-                    'whatsapp_link' => $whatsappLink,
-                ], 201);
-            });
+            return response()->json([
+                'message' => 'Order created successfully',
+                'order_number' => $result['order']->order_number,
+                'total_amount' => $result['order']->total_amount,
+                'whatsapp_link' => $result['whatsapp_link'],
+            ], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error processing order', 'error' => $e->getMessage()], 500);
         }
-    }
-
-    private function generateWhatsappLink($tenant, $order, $customer, $items)
-    {
-        $msg = "Olá, gostaria de confirmar meu pedido nº *{$order->order_number}* na loja *{$tenant->name}*:\n\n";
-        $msg .= "*Itens:*\n";
-
-        foreach ($items as $item) {
-            $pName = $item['product']->name;
-            $size = $item['size'] ? "Tam: {$item['size']}" : "";
-            $color = $item['color'] ? "Cor: {$item['color']}" : "";
-            $qty = $item['quantity'];
-            $details = implode(' - ', array_filter([$size, $color]));
-
-            $msg .= "- {$pName} ({$details}) x{$qty}\n";
-        }
-
-        $totalFormatted = number_format($order->total_amount, 2, ',', '.');
-        $msg .= "\n*Total: R$ {$totalFormatted}*\n\n";
-
-        $msg .= "*Meus dados:*\n";
-        $msg .= "Nome: {$customer->name}\n";
-        if ($customer->email) $msg .= "E-mail: {$customer->email}\n";
-        if ($customer->phone) $msg .= "Celular: {$customer->phone}\n";
-
-        $phone = preg_replace('/[^0-9]/', '', $tenant->whatsapp_number);
-        $encodedMsg = urlencode($msg);
-
-        return "https://wa.me/{$phone}?text={$encodedMsg}";
     }
 }
