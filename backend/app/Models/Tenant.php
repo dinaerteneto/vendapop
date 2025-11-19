@@ -18,6 +18,10 @@ class Tenant extends Model
         'primary_color',
         'secondary_color',
         'description',
+        'banner_message',
+        'banner_text_color_1',
+        'banner_text_color_2',
+        'banner_background_color',
         'address',
         'email_contact',
     ];

@@ -4,6 +4,7 @@ import api from '../services/api';
 import Footer from '../components/common/Footer';
 import { CartProvider } from '../context/CartContext';
 import Header from '../components/common/Header';
+import PromotionalBanner from '../components/common/PromotionalBanner';
 
 interface StoreInfo {
   name: string;
@@ -12,6 +13,10 @@ interface StoreInfo {
   address?: string;
   primary_color?: string;
   secondary_color?: string;
+  banner_message?: string;
+  banner_text_color_1?: string;
+  banner_text_color_2?: string;
+  banner_background_color?: string;
   socials?: {
     name: string;
     url: string;
@@ -46,6 +51,15 @@ const PublicLayout: React.FC = () => {
             } as React.CSSProperties}
         >
         <Header storeName={storeInfo?.name} storeSlug={storeSlug} primaryColor={primaryColor} />
+        
+        {storeInfo?.banner_message && (
+            <PromotionalBanner
+                message={storeInfo.banner_message}
+                textColor1={storeInfo.banner_text_color_1 || '#ffffff'}
+                textColor2={storeInfo.banner_text_color_2 || '#ffff00'}
+                backgroundColor={storeInfo.banner_background_color || '#000000'}
+            />
+        )}
         
         <main className="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
             <Outlet context={{ storeInfo }} />

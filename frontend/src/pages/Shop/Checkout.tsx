@@ -49,17 +49,24 @@ const Checkout: React.FC = () => {
 
           <div className="mb-6">
               {cart.map((item, idx) => (
-                  <div key={idx} className="flex justify-between py-2 border-b">
-                      <div>
-                          <div className="font-medium">{item.name}</div>
-                          <div className="text-xs text-gray-500">{item.size} {item.color} x{item.quantity}</div>
+                  <div key={idx} className="flex items-center justify-between py-4 border-b border-gray-100">
+                      <div className="flex items-center gap-3">
+                          {item.main_image_url ? (
+                              <img src={item.main_image_url} alt={item.name} className="w-12 h-12 object-cover rounded-md bg-gray-100" />
+                          ) : (
+                              <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400">Sem foto</div>
+                          )}
+                          <div>
+                              <div className="font-medium text-gray-800">{item.name}</div>
+                              <div className="text-xs text-gray-500">{item.size && `Tam: ${item.size}`} {item.color && `Cor: ${item.color}`} <span className="font-semibold">x{item.quantity}</span></div>
+                          </div>
                       </div>
-                      <div>R$ {(item.price * item.quantity).toFixed(2)}</div>
+                      <div className="font-bold text-gray-700">R$ {(item.price * item.quantity).toFixed(2).replace('.',',')}</div>
                   </div>
               ))}
-              <div className="flex justify-between py-4 font-bold text-lg">
+              <div className="flex justify-between py-4 font-extrabold text-lg border-t border-gray-200 mt-2">
                   <span>Total</span>
-                  <span>R$ {totalValue.toFixed(2)}</span>
+                  <span>R$ {totalValue.toFixed(2).replace('.',',')}</span>
               </div>
           </div>
 

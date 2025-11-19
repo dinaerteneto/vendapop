@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import api from '../../services/api';
 import ImageCarousel from '../../components/ui/ImageCarousel';
 import Toast from '../../components/ui/Toast';
@@ -24,7 +24,6 @@ interface ToastState {
 
 const ProductDetail: React.FC = () => {
   const { storeSlug, productId } = useParams();
-  const navigate = useNavigate();
   const { addToCart: addToCartContext } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -84,11 +83,6 @@ const ProductDetail: React.FC = () => {
       });
 
       showToast('Produto adicionado ao carrinho!', 'success');
-      
-      // Delay navigation slightly for better UX
-      setTimeout(() => {
-          navigate(`/${storeSlug}/cart`);
-      }, 1000);
   };
 
   if (!product) return <div className="p-8 text-center">Carregando...</div>;

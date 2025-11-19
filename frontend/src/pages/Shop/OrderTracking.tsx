@@ -10,6 +10,9 @@ interface OrderItem {
   subtotal: string;
   size?: string;
   color?: string;
+  product?: {
+    main_image_url: string | null;
+  };
 }
 
 interface Order {
@@ -79,13 +82,26 @@ const OrderTracking: React.FC = () => {
           <div className="space-y-4">
             {order.items.map(item => (
               <div key={item.id} className="flex justify-between items-center">
-                <div>
-                    <p className="font-medium text-gray-900">{item.product_name}</p>
-                    <p className="text-xs text-gray-500">
-                        {item.size && `Tam: ${item.size} `} 
-                        {item.color && `Cor: ${item.color} `}
-                        x{item.quantity}
-                    </p>
+                <div className="flex items-center gap-3">
+                    {item.product?.main_image_url ? (
+                        <img 
+                            src={item.product.main_image_url} 
+                            alt={item.product_name} 
+                            className="w-16 h-16 object-cover rounded-md bg-gray-100 border border-gray-200" 
+                        />
+                    ) : (
+                        <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-400 border border-gray-200">
+                            Sem foto
+                        </div>
+                    )}
+                    <div>
+                        <p className="font-medium text-gray-900">{item.product_name}</p>
+                        <p className="text-xs text-gray-500">
+                            {item.size && `Tam: ${item.size} `} 
+                            {item.color && `Cor: ${item.color} `}
+                            x{item.quantity}
+                        </p>
+                    </div>
                 </div>
                 <p className="font-bold text-gray-700">R$ {parseFloat(item.subtotal).toFixed(2).replace('.', ',')}</p>
               </div>

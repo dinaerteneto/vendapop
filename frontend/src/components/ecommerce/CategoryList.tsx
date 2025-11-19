@@ -23,10 +23,19 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories, onSelectCategor
           onClick={() => onSelectCategory(null)}
           className="flex flex-col items-center min-w-[80px] cursor-pointer"
         >
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 transition-all border-2 ${selectedCategoryId === null ? 'border-purple-600 bg-purple-50' : 'border-gray-200 bg-gray-100'}`}>
+          <div 
+            className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 transition-all border-2 ${selectedCategoryId === null ? 'border-current bg-opacity-10' : 'border-gray-200 bg-gray-100'}`}
+            style={{ 
+                color: selectedCategoryId === null ? 'var(--theme-primary)' : 'inherit',
+                backgroundColor: selectedCategoryId === null ? 'var(--theme-secondary)' : undefined
+            }}
+          >
              <span className="text-2xl">✨</span>
           </div>
-          <span className={`text-xs text-center font-medium ${selectedCategoryId === null ? 'text-purple-600' : 'text-gray-600'}`}>
+          <span 
+            className={`text-xs text-center font-medium`}
+            style={{ color: selectedCategoryId === null ? 'var(--theme-primary)' : '#4b5563' }}
+          >
             Tudo
           </span>
         </div>
@@ -37,14 +46,20 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories, onSelectCategor
             onClick={() => onSelectCategory(cat.id)}
             className="flex flex-col items-center min-w-[80px] cursor-pointer group"
           >
-            <div className={`w-16 h-16 rounded-full overflow-hidden mb-2 border-2 transition-all ${selectedCategoryId === cat.id ? 'border-purple-600' : 'border-transparent group-hover:border-gray-300'}`}>
+            <div 
+                className={`w-16 h-16 rounded-full overflow-hidden mb-2 border-2 transition-all ${selectedCategoryId === cat.id ? '' : 'border-transparent group-hover:border-gray-300'}`}
+                style={{ borderColor: selectedCategoryId === cat.id ? 'var(--theme-primary)' : undefined }}
+            >
               <img 
                 src={cat.image_url || `https://ui-avatars.com/api/?name=${cat.name}&background=random&color=fff`} 
                 alt={cat.name} 
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className={`text-xs text-center font-medium ${selectedCategoryId === cat.id ? 'text-purple-600' : 'text-gray-600'}`}>
+            <span 
+                className={`text-xs text-center font-medium`}
+                style={{ color: selectedCategoryId === cat.id ? 'var(--theme-primary)' : '#4b5563' }}
+            >
               {cat.name}
             </span>
           </div>

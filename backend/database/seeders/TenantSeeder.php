@@ -17,6 +17,10 @@ class TenantSeeder extends Seeder
                 'store_url' => 'http://localhost:5173', // Default dev URL
                 'whatsapp_number' => '5511999999999',
                 'description' => 'A melhor moda feminina da região!',
+                'banner_message' => '🔥 PROMOÇÃO BLACK FRIDAY - 50% OFF EM TODA A LOJA! 🔥',
+                'banner_text_color_1' => '#ffffff',
+                'banner_text_color_2' => '#fbbf24', // Amber/Gold
+                'banner_background_color' => '#000000',
                 'primary_color' => '#6A040F', // Maroon
                 'secondary_color' => '#FFF0F3',
                 'address' => 'Rua da Moda, 123 - Centro, São Paulo/SP',
