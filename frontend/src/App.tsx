@@ -15,6 +15,7 @@ import ProductList from './pages/Shop/ProductList';
 import ProductDetail from './pages/Shop/ProductDetail';
 import Cart from './pages/Shop/Cart';
 import Checkout from './pages/Shop/Checkout';
+import OrderTracking from './pages/Shop/OrderTracking';
 
 // Proteção de Rota Admin
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -48,6 +49,7 @@ function App() {
             <Route path="product/:productId" element={<ProductDetail />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path="order/:orderUuid" element={<OrderTracking />} />
         </Route>
 
         {/* Rota Default */}

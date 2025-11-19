@@ -12,6 +12,7 @@ class Tenant extends Model
     protected $fillable = [
         'name',
         'slug',
+        'store_url',
         'whatsapp_number',
         'logo_url',
         'primary_color',

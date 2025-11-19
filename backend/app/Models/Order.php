@@ -12,12 +12,23 @@ class Order extends Model
 
     protected $fillable = [
         'tenant_id',
+        'uuid',
         'customer_id',
         'order_number',
         'total_amount',
         'status',
         'notes',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
 
     public function customer()
     {

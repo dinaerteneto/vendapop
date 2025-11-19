@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\UseCases\Store\CreateOrderUseCase;
 use App\UseCases\Store\GetCategoriesUseCase;
+use App\UseCases\Store\GetOrderUseCase;
 use App\UseCases\Store\GetProductDetailsUseCase;
 use App\UseCases\Store\GetProductsUseCase;
 use App\UseCases\Store\GetStoreInfoUseCase;
@@ -17,19 +18,22 @@ class StoreController extends Controller
     private GetProductsUseCase $getProductsUseCase;
     private GetProductDetailsUseCase $getProductDetailsUseCase;
     private CreateOrderUseCase $createOrderUseCase;
+    private GetOrderUseCase $getOrderUseCase;
 
     public function __construct(
         GetStoreInfoUseCase $getStoreInfoUseCase,
         GetCategoriesUseCase $getCategoriesUseCase,
         GetProductsUseCase $getProductsUseCase,
         GetProductDetailsUseCase $getProductDetailsUseCase,
-        CreateOrderUseCase $createOrderUseCase
+        CreateOrderUseCase $createOrderUseCase,
+        GetOrderUseCase $getOrderUseCase
     ) {
         $this->getStoreInfoUseCase = $getStoreInfoUseCase;
         $this->getCategoriesUseCase = $getCategoriesUseCase;
         $this->getProductsUseCase = $getProductsUseCase;
         $this->getProductDetailsUseCase = $getProductDetailsUseCase;
         $this->createOrderUseCase = $createOrderUseCase;
+        $this->getOrderUseCase = $getOrderUseCase;
     }
 
     public function storeInfo(Request $request, $storeSlug)
@@ -135,6 +139,21 @@ class StoreController extends Controller
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error processing order', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getOrder(Request $request, $storeSlug, $uuid)
+    {
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
+        try {
+            $order = $this->getOrderUseCase->execute($tenant, $uuid);
+            return response()->json($order);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Order not found'], 404);
         }
     }
 }

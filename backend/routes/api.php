@@ -22,6 +22,7 @@ Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
     Route::get('/products', [StoreController::class, 'products']);
     Route::get('/products/{product}', [StoreController::class, 'productDetail']);
     Route::post('/checkout', [StoreController::class, 'checkout']);
+    Route::get('/order/{uuid}', [StoreController::class, 'getOrder']);
 });
 
 // Rotas Admin
