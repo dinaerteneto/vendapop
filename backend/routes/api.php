@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Admin\StoreSettingsController;
 // Rotas Públicas da Loja (Tenant)
 Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
     Route::get('/', [StoreController::class, 'storeInfo']); // Nova rota para info da loja
+    Route::get('/categories', [StoreController::class, 'categories']);
     Route::get('/products', [StoreController::class, 'products']);
     Route::get('/products/{product}', [StoreController::class, 'productDetail']);
     Route::post('/checkout', [StoreController::class, 'checkout']);
@@ -36,10 +37,10 @@ Route::prefix('admin')->group(function () {
 
         Route::apiResource('products', AdminProductController::class);
         Route::apiResource('categories', AdminCategoryController::class);
-        
+
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
-        
+
         Route::get('/store', [StoreSettingsController::class, 'show']);
         Route::put('/store', [StoreSettingsController::class, 'update']);
     });

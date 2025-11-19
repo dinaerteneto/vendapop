@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\UseCases\Store\CreateOrderUseCase;
+use App\UseCases\Store\GetCategoriesUseCase;
 use App\UseCases\Store\GetProductDetailsUseCase;
 use App\UseCases\Store\GetProductsUseCase;
 use App\UseCases\Store\GetStoreInfoUseCase;
@@ -12,17 +13,20 @@ use Illuminate\Http\Request;
 class StoreController extends Controller
 {
     private GetStoreInfoUseCase $getStoreInfoUseCase;
+    private GetCategoriesUseCase $getCategoriesUseCase;
     private GetProductsUseCase $getProductsUseCase;
     private GetProductDetailsUseCase $getProductDetailsUseCase;
     private CreateOrderUseCase $createOrderUseCase;
 
     public function __construct(
         GetStoreInfoUseCase $getStoreInfoUseCase,
+        GetCategoriesUseCase $getCategoriesUseCase,
         GetProductsUseCase $getProductsUseCase,
         GetProductDetailsUseCase $getProductDetailsUseCase,
         CreateOrderUseCase $createOrderUseCase
     ) {
         $this->getStoreInfoUseCase = $getStoreInfoUseCase;
+        $this->getCategoriesUseCase = $getCategoriesUseCase;
         $this->getProductsUseCase = $getProductsUseCase;
         $this->getProductDetailsUseCase = $getProductDetailsUseCase;
         $this->createOrderUseCase = $createOrderUseCase;
@@ -37,6 +41,19 @@ class StoreController extends Controller
         }
 
         return response()->json($tenant);
+    }
+
+    public function categories(Request $request, $storeSlug)
+    {
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
+        $categories = $this->getCategoriesUseCase->execute($tenant);
+
+        return response()->json($categories);
     }
 
     public function products(Request $request, $storeSlug)
