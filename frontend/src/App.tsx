@@ -14,6 +14,10 @@ import AdminProductList from './pages/Dashboard/Products/ProductList';
 import ProductForm from './pages/Dashboard/Products/ProductForm';
 import CategoryList from './pages/Dashboard/Categories/CategoryList';
 import CategoryForm from './pages/Dashboard/Categories/CategoryForm';
+import OrderList from './pages/Dashboard/Orders/OrderList';
+import OrderDetail from './pages/Dashboard/Orders/OrderDetail';
+import CustomerList from './pages/Dashboard/Customers/CustomerList';
+import CustomerForm from './pages/Dashboard/Customers/CustomerForm';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -51,7 +55,12 @@ function App() {
             <Route path="categories/new" element={<CategoryForm />} />
             <Route path="categories/:id" element={<CategoryForm />} />
 
-            <Route path="orders" element={<div>Gestão de Pedidos (Em Breve)</div>} />
+            <Route path="orders" element={<OrderList />} />
+            <Route path="orders/:id" element={<OrderDetail />} />
+            
+            <Route path="customers" element={<CustomerList />} />
+            <Route path="customers/:id" element={<CustomerForm />} />
+            
             <Route path="store-settings" element={<div>Configurações da Loja (Em Breve)</div>} />
         </Route>
 
