@@ -6,12 +6,23 @@ interface ImageCropperProps {
   imageSrc: string;
   onCropComplete: (croppedImage: Blob) => void;
   onCancel: () => void;
+  targetWidth?: number; // Default: 600
+  targetHeight?: number; // Default: 900
 }
 
-const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onCropComplete, onCancel }) => {
+const ImageCropper: React.FC<ImageCropperProps> = ({ 
+  imageSrc, 
+  onCropComplete, 
+  onCancel,
+  targetWidth = 600,
+  targetHeight = 900
+}) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  
+  // Calculate aspect ratio from target dimensions
+  const aspectRatio = targetWidth / targetHeight;
 
   const onCropChange = (crop: { x: number; y: number }) => {
     setCrop(crop);
@@ -27,12 +38,12 @@ const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onCropComplete, o
 
   const showCroppedImage = useCallback(async () => {
     try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, targetWidth, targetHeight);
       onCropComplete(croppedImage);
     } catch (e) {
       console.error(e);
     }
-  }, [imageSrc, croppedAreaPixels, onCropComplete]);
+  }, [imageSrc, croppedAreaPixels, onCropComplete, targetWidth, targetHeight]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4">
@@ -42,7 +53,7 @@ const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onCropComplete, o
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={1} // Square aspect ratio
+            aspect={aspectRatio}
             onCropChange={onCropChange}
             onCropComplete={onCropCompleteHandler}
             onZoomChange={onZoomChange}

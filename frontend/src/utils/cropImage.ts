@@ -1,29 +1,17 @@
-const MAX_WIDTH = 800;
-const MAX_HEIGHT = 600;
+const DEFAULT_WIDTH = 600;
+const DEFAULT_HEIGHT = 900;
 
 /**
- * Calcula as dimensões finais respeitando o máximo de 800x600 mantendo a proporção
+ * Retorna as dimensões alvo (customizáveis ou padrão 600x900)
  */
-const calculateFinalDimensions = (width: number, height: number): { width: number; height: number } => {
-  // Se já está dentro do limite, retorna as dimensões originais
-  if (width <= MAX_WIDTH && height <= MAX_HEIGHT) {
-    return { width, height };
-  }
-
-  // Calcula a proporção para redimensionar mantendo aspect ratio
-  const widthRatio = MAX_WIDTH / width;
-  const heightRatio = MAX_HEIGHT / height;
-  
-  // Usa o menor ratio para garantir que ambas as dimensões fiquem dentro do limite
-  const ratio = Math.min(widthRatio, heightRatio);
-
+const calculateFinalDimensions = (width: number = DEFAULT_WIDTH, height: number = DEFAULT_HEIGHT): { width: number; height: number } => {
   return {
-    width: Math.round(width * ratio),
-    height: Math.round(height * ratio),
+    width,
+    height,
   };
 };
 
-export const getCroppedImg = (imageSrc: string, pixelCrop: any): Promise<Blob> => {
+export const getCroppedImg = (imageSrc: string, pixelCrop: any, targetWidth: number = DEFAULT_WIDTH, targetHeight: number = DEFAULT_HEIGHT): Promise<Blob> => {
   const createImage = (url: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image();
@@ -42,13 +30,13 @@ export const getCroppedImg = (imageSrc: string, pixelCrop: any): Promise<Blob> =
       return reject(new Error('No 2d context'));
     }
 
-    // Calcula as dimensões finais respeitando o máximo de 800x600
-    const finalDimensions = calculateFinalDimensions(pixelCrop.width, pixelCrop.height);
+    // Redimensiona para as dimensões alvo especificadas
+    const finalDimensions = calculateFinalDimensions(targetWidth, targetHeight);
     
     canvas.width = finalDimensions.width;
     canvas.height = finalDimensions.height;
 
-    // Desenha a imagem redimensionada
+    // Desenha a imagem redimensionada para as dimensões alvo
     ctx.drawImage(
       image,
       pixelCrop.x,
