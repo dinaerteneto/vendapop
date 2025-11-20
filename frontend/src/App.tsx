@@ -18,6 +18,7 @@ import OrderList from './pages/Dashboard/Orders/OrderList';
 import OrderDetail from './pages/Dashboard/Orders/OrderDetail';
 import CustomerList from './pages/Dashboard/Customers/CustomerList';
 import CustomerForm from './pages/Dashboard/Customers/CustomerForm';
+import StoreSettings from './pages/Dashboard/StoreSettings/StoreSettings';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -61,7 +62,7 @@ function App() {
             <Route path="customers" element={<CustomerList />} />
             <Route path="customers/:id" element={<CustomerForm />} />
             
-            <Route path="store-settings" element={<div>Configurações da Loja (Em Breve)</div>} />
+            <Route path="store-settings" element={<StoreSettings />} />
         </Route>
 
         {/* Rotas Públicas (Loja) */}
