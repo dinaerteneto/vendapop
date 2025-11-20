@@ -35,9 +35,11 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
+        Route::put('/orders/{order}', [AdminOrderController::class, 'update']);
 
         Route::get('/customers', [AdminCustomerController::class, 'index']);
         Route::get('/customers/{customer}', [AdminCustomerController::class, 'show']);
+        Route::put('/customers/{customer}', [AdminCustomerController::class, 'update']);
 
         Route::get('/store', [StoreSettingsController::class, 'show']);
         Route::put('/store', [StoreSettingsController::class, 'update']);

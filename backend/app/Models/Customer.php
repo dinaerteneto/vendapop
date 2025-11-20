@@ -10,7 +10,7 @@ class Customer extends Model
 {
     use HasFactory, BelongsToTenant;
 
-    protected $fillable = ['tenant_id', 'name', 'email', 'phone'];
+    protected $fillable = ['tenant_id', 'name', 'email', 'phone', 'notes'];
 
     public function orders()
     {
