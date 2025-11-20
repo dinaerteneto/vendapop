@@ -12,6 +12,7 @@ interface ProductRepositoryInterface
     public function findByIdAndTenant(int $id, int $tenantId): ?Product;
     public function findActiveByTenant(int $tenantId): Collection;
     public function findActiveByTenantWithPagination(int $tenantId, int $perPage = 15): LengthAwarePaginator;
+    public function findByTenantWithPagination(int $tenantId, int $perPage = 20, ?string $sortBy = 'id', ?string $sortDirection = 'desc'): LengthAwarePaginator;
     public function searchByTenant(int $tenantId, string $searchTerm): Collection;
     public function filterByCategory(int $tenantId, int $categoryId): Collection;
     public function create(array $data): Product;

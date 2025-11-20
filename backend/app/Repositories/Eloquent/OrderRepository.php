@@ -29,12 +29,23 @@ class OrderRepository implements OrderRepositoryInterface
                    ->get();
     }
 
-    public function findByTenantWithPagination(int $tenantId, int $perPage = 20): LengthAwarePaginator
+    public function findByTenantWithPagination(int $tenantId, int $perPage = 20, ?string $sortBy = 'id', ?string $sortDirection = 'desc', ?string $status = null): LengthAwarePaginator
     {
-        return Order::where('tenant_id', $tenantId)
-                   ->with(['customer', 'items.product'])
-                   ->orderBy('created_at', 'desc')
-                   ->paginate($perPage);
+        $query = Order::where('tenant_id', $tenantId)
+                   ->with(['customer', 'items.product']);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $allowedSorts = ['id', 'order_number', 'status', 'total_amount', 'created_at', 'updated_at'];
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function findByTenantAndStatus(int $tenantId, string $status): Collection

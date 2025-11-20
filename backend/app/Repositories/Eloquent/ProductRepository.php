@@ -37,6 +37,29 @@ class ProductRepository implements ProductRepositoryInterface
                      ->paginate($perPage);
     }
 
+    public function findByTenantWithPagination(int $tenantId, int $perPage = 20, ?string $sortBy = 'id', ?string $sortDirection = 'desc'): LengthAwarePaginator
+    {
+        $query = Product::where('tenant_id', $tenantId)
+                     ->with(['category', 'images']);
+
+        // Ordenação especial para categoria
+        if ($sortBy === 'category') {
+            $query->join('categories', 'products.category_id', '=', 'categories.id')
+                  ->select('products.*')
+                  ->orderBy('categories.name', $sortDirection)
+                  ->groupBy('products.id');
+        } else {
+            $allowedSorts = ['id', 'name', 'price', 'created_at', 'updated_at'];
+            if (in_array($sortBy, $allowedSorts)) {
+                $query->orderBy($sortBy, $sortDirection);
+            } else {
+                $query->orderBy('id', 'desc');
+            }
+        }
+
+        return $query->paginate($perPage);
+    }
+
     public function searchByTenant(int $tenantId, string $searchTerm): Collection
     {
         return Product::where('tenant_id', $tenantId)
