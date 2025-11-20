@@ -8,11 +8,16 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [tenantSlug, setTenantSlug] = useState<string | null>(null);
 
   useEffect(() => {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
           setUser(JSON.parse(storedUser));
+      }
+      const storedSlug = localStorage.getItem('tenant_slug');
+      if (storedSlug) {
+          setTenantSlug(storedSlug);
       }
   }, []);
 
@@ -84,6 +89,23 @@ const AppLayout: React.FC = () => {
                   </Link>
                 </li>
               ))}
+              {tenantSlug && (
+                <li className="mt-4 pt-4 border-t border-gray-700">
+                  <a
+                    href={`/${tenantSlug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded text-gray-200 hover:bg-gray-700 transition-colors"
+                    title="Ver minha loja"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>Ver Loja</span>
+                  </a>
+                </li>
+              )}
             </ul>
           </nav>
         </div>
@@ -103,6 +125,21 @@ const AppLayout: React.FC = () => {
               </svg>
             </button>
             <div className="flex items-center gap-3 2xl:gap-7">
+              {tenantSlug && (
+                <a
+                  href={`/${tenantSlug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Ver minha loja"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <span className="hidden sm:inline">Ver Loja</span>
+                </a>
+              )}
               {user && <UserDropdown userName={user.name} userEmail={user.email} />}
             </div>
           </div>

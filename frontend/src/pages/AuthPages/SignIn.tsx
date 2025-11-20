@@ -15,6 +15,11 @@ const SignIn: React.FC = () => {
       const { data } = await api.post('/admin/login', { email, password });
       localStorage.setItem('admin_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.tenant_slug) {
+        localStorage.setItem('tenant_slug', data.tenant_slug);
+      }
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('localStorageChange'));
       navigate('/admin');
     } catch (err: any) {
         console.error(err);

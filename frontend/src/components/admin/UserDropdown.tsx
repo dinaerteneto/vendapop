@@ -30,6 +30,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ userName, userEmail }) => {
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('tenant_slug');
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('localStorageChange'));
     navigate('/admin/login');
   };
 

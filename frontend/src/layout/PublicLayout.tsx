@@ -39,15 +39,31 @@ const PublicLayout: React.FC = () => {
                console.log('PublicLayout: Logo URL from API:', response.data?.logo_url);
                setStoreInfo(response.data);
                
-               // Dynamically update manifest link
+               // Dynamically update manifest link for tenant-specific PWA
                const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
                if (manifestLink) {
-                   // Point to our backend dynamic manifest
-                   // We need the full API URL or proxy it. 
-                   // Assuming VITE_API_BASE_URL is configured in api service
-                   // Ideally, we use the same domain for best PWA scope results, but for now let's point to the API.
-                   // Note: For best results, the API should serve the manifest with CORS allowed.
-                   manifestLink.href = `${import.meta.env.VITE_API_BASE_URL}/${storeSlug}/manifest.json`;
+                   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+                   manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
+               }
+               
+               // Update theme-color meta tag
+               const themeColorMeta = document.querySelector("meta[name='theme-color']");
+               if (themeColorMeta && response.data?.primary_color) {
+                   themeColorMeta.setAttribute('content', response.data.primary_color);
+               }
+               
+               // Update apple-mobile-web-app-title
+               const appleTitleMeta = document.querySelector("meta[name='apple-mobile-web-app-title']");
+               if (appleTitleMeta && response.data?.name) {
+                   appleTitleMeta.setAttribute('content', response.data.name);
+               }
+               
+               // Service Worker será registrado automaticamente pelo vite-plugin-pwa
+               // Mas podemos verificar se está ativo
+               if ('serviceWorker' in navigator) {
+                   navigator.serviceWorker.ready.then((registration) => {
+                       console.log('Service Worker ready:', registration);
+                   });
                }
            })
            .catch(err => console.error("Error fetching store info", err));
@@ -92,7 +108,7 @@ const PublicLayout: React.FC = () => {
         {/* Floating WhatsApp Button */}
         {storeInfo?.whatsapp_number && (
             <a 
-            href={`https://wa.me/${storeInfo.whatsapp_number.replace(/[^0-9]/g, '')}`}
+            href={`https://wa.me/${storeInfo.whatsapp_number.replace(/[^0-9]/g, '')}${storeInfo.whatsapp_message ? '?text=' + encodeURIComponent(storeInfo.whatsapp_message) : ''}`}
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-20 right-4 z-40 text-white p-3 rounded-full shadow-lg hover:opacity-90 transition-all hover:scale-110"
