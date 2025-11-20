@@ -14,15 +14,25 @@ class ManifestController extends Controller
 
         // Default values if tenant doesn't have specific branding
         $primaryColor = $tenant->primary_color ?? '#7c3aed';
-        $backgroundColor = $tenant->banner_background_color ?? '#ffffff';
+        $backgroundColor = $tenant->secondary_color ?? '#ffffff';
 
-        // Use tenant logo or a default placeholder
-        $iconUrl = $tenant->logo_url ?? 'https://via.placeholder.com/512x512.png?text=' . urlencode($tenant->name);
+        // Use tenant logo or generate a default
+        $iconUrl = $tenant->logo_url;
+        
+        // Se não tiver logo, criar um placeholder com as iniciais
+        if (!$iconUrl) {
+            $initials = strtoupper(substr($tenant->name, 0, 2));
+            $iconUrl = "https://ui-avatars.com/api/?name={$initials}&size=512&background=" . str_replace('#', '', $primaryColor) . "&color=ffffff&bold=true";
+        }
 
+        $baseUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        
         return response()->json([
             'name' => $tenant->name,
             'short_name' => substr($tenant->name, 0, 12),
+            'description' => $tenant->description ?? "Catálogo digital de {$tenant->name}",
             'start_url' => "/{$storeSlug}",
+            'scope' => "/{$storeSlug}",
             'display' => 'standalone',
             'background_color' => $backgroundColor,
             'theme_color' => $primaryColor,
@@ -32,7 +42,7 @@ class ManifestController extends Controller
                     'src' => $iconUrl,
                     'sizes' => '192x192',
                     'type' => 'image/png',
-                    'purpose' => 'any maskable'
+                    'purpose' => 'any'
                 ],
                 [
                     'src' => $iconUrl,
@@ -40,8 +50,17 @@ class ManifestController extends Controller
                     'type' => 'image/png',
                     'purpose' => 'any maskable'
                 ]
-            ]
-        ]);
+            ],
+            'categories' => ['shopping', 'business'],
+            'screenshots' => [],
+            'prefer_related_applications' => false
+        ];
+        
+        return response()->json($manifest)
+            ->header('Content-Type', 'application/manifest+json')
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET')
+            ->header('Access-Control-Allow-Headers', 'Content-Type');
     }
 }
 

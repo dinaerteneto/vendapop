@@ -9,22 +9,35 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-      manifest: {
-        name: 'VesteZap - Sua Loja no WhatsApp',
-        short_name: 'VesteZap',
-        description: 'Catálogo Digital e Pedidos via WhatsApp',
-        theme_color: '#ffffff',
-        icons: [
+      // Manifest será gerado dinamicamente pelo backend por tenant
+      manifest: false,
+      // Service worker customizado para suportar push notifications
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
+      },
+      workbox: {
+        // Configurações para cache
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Não cachear requisições de API
+        runtimeCaching: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            urlPattern: ({ url }) => {
+              // Não cachear API ou manifest
+              return !url.pathname.startsWith('/api/') && 
+                     !url.pathname.includes('manifest.json');
+            },
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'app-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 // 24 hours
+              },
+              networkTimeoutSeconds: 10
+            }
           }
         ]
       }
