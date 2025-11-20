@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\EmailVerificationController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Api\Admin\PasswordResetController;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\Admin\ProductImageController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
@@ -24,6 +26,10 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->group(function () {
     Route::post('/register', [RegistrationController::class, 'store']); // Nova rota de registro
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+    Route::post('/verify-email', [EmailVerificationController::class, 'verify']);
+    Route::post('/resend-verification', [EmailVerificationController::class, 'resend']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
     // Rotas protegidas do Admin
