@@ -1,3 +1,28 @@
+const MAX_WIDTH = 800;
+const MAX_HEIGHT = 600;
+
+/**
+ * Calcula as dimensões finais respeitando o máximo de 800x600 mantendo a proporção
+ */
+const calculateFinalDimensions = (width: number, height: number): { width: number; height: number } => {
+  // Se já está dentro do limite, retorna as dimensões originais
+  if (width <= MAX_WIDTH && height <= MAX_HEIGHT) {
+    return { width, height };
+  }
+
+  // Calcula a proporção para redimensionar mantendo aspect ratio
+  const widthRatio = MAX_WIDTH / width;
+  const heightRatio = MAX_HEIGHT / height;
+  
+  // Usa o menor ratio para garantir que ambas as dimensões fiquem dentro do limite
+  const ratio = Math.min(widthRatio, heightRatio);
+
+  return {
+    width: Math.round(width * ratio),
+    height: Math.round(height * ratio),
+  };
+};
+
 export const getCroppedImg = (imageSrc: string, pixelCrop: any): Promise<Blob> => {
   const createImage = (url: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
@@ -17,9 +42,13 @@ export const getCroppedImg = (imageSrc: string, pixelCrop: any): Promise<Blob> =
       return reject(new Error('No 2d context'));
     }
 
-    canvas.width = pixelCrop.width;
-    canvas.height = pixelCrop.height;
+    // Calcula as dimensões finais respeitando o máximo de 800x600
+    const finalDimensions = calculateFinalDimensions(pixelCrop.width, pixelCrop.height);
+    
+    canvas.width = finalDimensions.width;
+    canvas.height = finalDimensions.height;
 
+    // Desenha a imagem redimensionada
     ctx.drawImage(
       image,
       pixelCrop.x,
@@ -28,8 +57,8 @@ export const getCroppedImg = (imageSrc: string, pixelCrop: any): Promise<Blob> =
       pixelCrop.height,
       0,
       0,
-      pixelCrop.width,
-      pixelCrop.height
+      finalDimensions.width,
+      finalDimensions.height
     );
 
     canvas.toBlob((blob) => {
@@ -38,7 +67,7 @@ export const getCroppedImg = (imageSrc: string, pixelCrop: any): Promise<Blob> =
         return;
       }
       resolve(blob);
-    }, 'image/jpeg');
+    }, 'image/jpeg', 0.9); // Qualidade 90% para JPEG
   });
 };
 
