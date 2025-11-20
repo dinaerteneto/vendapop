@@ -11,6 +11,14 @@ interface Category {
   name: string;
 }
 
+interface ProductImage {
+  id?: number;
+  url: string;
+  is_main: boolean;
+  is_external: boolean;
+  path?: string | null;
+}
+
 const ProductForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -27,9 +35,10 @@ const ProductForm: React.FC = () => {
   const [showCropper, setShowCropper] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
 
-  // Gallery
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  // All product images (main + gallery)
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -45,54 +54,87 @@ const ProductForm: React.FC = () => {
   });
 
   useEffect(() => {
-    loadCategories();
-    if (isEditMode) {
-      loadProduct(id);
-    }
+    console.log('ProductForm useEffect - isEditMode:', isEditMode, 'id:', id);
+    const fetchData = async () => {
+      try {
+        await loadCategories();
+        if (isEditMode && id) {
+          console.log('Carregando produto com ID:', id);
+          await loadProduct(id);
+        }
+      } catch (error) {
+        console.error('Erro ao inicializar formulário', error);
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadCategories = async () => {
     try {
       const { data } = await api.get('/admin/categories');
-      setCategories(data);
+      // Handle paginated response
+      if (data.data && Array.isArray(data.data)) {
+        setCategories(data.data);
+      } else if (Array.isArray(data)) {
+        setCategories(data);
+      } else {
+        setCategories([]);
+      }
     } catch (error) {
       console.error('Erro ao carregar categorias', error);
+      toast.error('Erro ao carregar categorias.');
     }
   };
 
-  const loadProduct = async (productId: string) => {
+  const loadProduct = async (productId: string | undefined) => {
+    if (!productId) {
+      console.error('ID do produto não fornecido');
+      return;
+    }
+    
     setLoading(true);
     try {
       const { data } = await api.get(`/admin/products/${productId}`);
       
-      // Extract images from relationship
-      const mainImage = data.images?.find((img: any) => img.is_main);
-      const gallery = data.images?.filter((img: any) => !img.is_main).map((img: any) => img.url) || [];
+      // Load all images as objects
+      const allImages: ProductImage[] = (data.images || []).map((img: any) => ({
+        id: img.id,
+        url: img.url,
+        is_main: img.is_main || false,
+        is_external: img.is_external || false,
+        path: img.path || null,
+      }));
+
+      // Sort: main image first, then others
+      const sortedImages = allImages.sort((a, b) => (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0));
+      setProductImages(sortedImages);
+
+      const mainImage = sortedImages.find(img => img.is_main);
 
       setFormData({
-        name: data.name,
-        price: data.price,
-        promotional_price: data.promotional_price || '',
-        category_id: data.category_id || '',
-        sizes: Array.isArray(data.sizes) ? data.sizes.join(', ') : data.sizes,
+        name: data.name || '',
+        price: data.price?.toString() || '',
+        promotional_price: data.promotional_price?.toString() || '',
+        category_id: data.category_id?.toString() || '',
+        sizes: Array.isArray(data.sizes) ? data.sizes.join(', ') : (data.sizes || ''),
         colors: Array.isArray(data.colors) ? data.colors.join(', ') : (data.colors || ''),
         description: data.description || '',
         main_image_url: mainImage ? mainImage.url : '',
-        is_active: !!data.is_active,
-        is_hot: !!data.is_hot,
+        is_active: data.is_active !== undefined ? !!data.is_active : true,
+        is_hot: data.is_hot !== undefined ? !!data.is_hot : false,
       });
       
       if (mainImage) {
         setPreviewUrl(mainImage.url);
-        setImageMode('url'); // Default to URL mode for editing existing images
+        setImageMode('url');
       }
-      
-      setGalleryImages(gallery);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao carregar produto', error);
-      toast.error('Erro ao carregar detalhes do produto.');
-      navigate('/admin/products');
+      const errorMessage = error.response?.data?.message || 'Erro ao carregar detalhes do produto.';
+      toast.error(errorMessage);
+      // Não navegar automaticamente, deixar o usuário ver o erro
     } finally {
       setLoading(false);
     }
@@ -139,17 +181,112 @@ const ProductForm: React.FC = () => {
       multiple: false
   });
 
-  // Gallery Handlers
+  // Image Handlers
   const addGalleryImage = () => {
-      if (!newGalleryUrl) return;
-      setGalleryImages([...galleryImages, newGalleryUrl]);
+      if (!newGalleryUrl.trim()) return;
+      const newImage: ProductImage = {
+        url: newGalleryUrl.trim(),
+        is_main: false,
+        is_external: true,
+      };
+      setProductImages([...productImages, newImage]);
       setNewGalleryUrl('');
   };
 
-  const removeGalleryImage = (index: number) => {
-      const newImages = [...galleryImages];
-      newImages.splice(index, 1);
-      setGalleryImages(newImages);
+  const removeImage = async (image: ProductImage) => {
+      if (!image.id) {
+          // New image not saved yet, just remove from state
+          setProductImages(productImages.filter(img => img.url !== image.url));
+          if (image.is_main) {
+              setPreviewUrl(null);
+              setFormData(prev => ({ ...prev, main_image_url: '' }));
+          }
+          return;
+      }
+
+      // Existing image - delete from backend
+      try {
+          await api.delete(`/admin/product-images/${image.id}`);
+          toast.success('Imagem removida com sucesso!');
+          
+          // Remove from state
+          const updated = productImages.filter(img => img.id !== image.id);
+          setProductImages(updated);
+          
+          // If it was the main image, update preview
+          if (image.is_main && updated.length > 0) {
+              // Make first image main
+              const newMain = updated[0];
+              newMain.is_main = true;
+              setPreviewUrl(newMain.url);
+              setFormData(prev => ({ ...prev, main_image_url: newMain.url }));
+          } else if (image.is_main) {
+              setPreviewUrl(null);
+              setFormData(prev => ({ ...prev, main_image_url: '' }));
+          }
+      } catch (error: any) {
+          console.error('Erro ao remover imagem', error);
+          toast.error(error.response?.data?.message || 'Erro ao remover imagem.');
+      }
+  };
+
+  const setAsMain = async (image: ProductImage) => {
+      if (image.is_main) return;
+
+      if (!image.id) {
+          // New image - just update state
+          const updated = productImages.map(img => ({
+              ...img,
+              is_main: img.url === image.url,
+          }));
+          // Sort: main first
+          const sorted = updated.sort((a, b) => (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0));
+          setProductImages(sorted);
+          setPreviewUrl(image.url);
+          setFormData(prev => ({ ...prev, main_image_url: image.url }));
+          return;
+      }
+
+      // Existing image - update in backend
+      try {
+          await api.put(`/admin/product-images/${image.id}/set-as-main`);
+          toast.success('Imagem principal atualizada!');
+          
+          // Update state and sort
+          const updated = productImages.map(img => ({
+              ...img,
+              is_main: img.id === image.id,
+          }));
+          const sorted = updated.sort((a, b) => (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0));
+          setProductImages(sorted);
+          setPreviewUrl(image.url);
+          setFormData(prev => ({ ...prev, main_image_url: image.url }));
+      } catch (error: any) {
+          console.error('Erro ao definir imagem principal', error);
+          toast.error(error.response?.data?.message || 'Erro ao definir imagem principal.');
+      }
+  };
+
+  // Drag and Drop handlers
+  const handleDragStart = (index: number) => {
+      setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+      e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+      e.preventDefault();
+      if (draggedIndex === null || draggedIndex === dropIndex) return;
+
+      const newImages = [...productImages];
+      const dragged = newImages[draggedIndex];
+      newImages.splice(draggedIndex, 1);
+      newImages.splice(dropIndex, 0, dragged);
+      
+      setProductImages(newImages);
+      setDraggedIndex(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -174,8 +311,11 @@ const ProductForm: React.FC = () => {
         data.append('is_hot', formData.is_hot ? '1' : '0');
         data.append('image', imageFile);
 
-        // Gallery Images
-        galleryImages.forEach((img, index) => data.append(`images[${index}]`, img));
+        // Gallery Images (only non-main images that are URLs, not files)
+        const galleryUrls = productImages
+            .filter(img => !img.is_main && !img.id) // Only new gallery images (not main, not saved yet)
+            .map(img => img.url);
+        galleryUrls.forEach((url, index) => data.append(`images[${index}]`, url));
         
         if (isEditMode) {
             data.append('_method', 'PUT');
@@ -211,7 +351,11 @@ const ProductForm: React.FC = () => {
             sizes: sizesArray,
             colors: colorsArray,
             main_image_url: imageMode === 'url' ? formData.main_image_url : null,
-            images: galleryImages
+            // Send all images in order (main first, then gallery)
+            // Backend will handle syncing - existing images with IDs are kept, new URLs are added
+            images: productImages
+                .filter(img => !img.id) // Only new images (not saved yet)
+                .map(img => img.url)
         };
 
         try {
@@ -230,6 +374,38 @@ const ProductForm: React.FC = () => {
     }
     setLoading(false);
   };
+
+  if (loading && isEditMode) {
+    return (
+      <div className="max-w-4xl mx-auto mb-10">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Carregando produto...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Early return if we're in edit mode but don't have an ID
+  if (isEditMode && !id) {
+    return (
+      <div className="max-w-4xl mx-auto mb-10">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="text-center py-8">
+            <p className="text-red-600">ID do produto não encontrado.</p>
+            <button
+              onClick={() => navigate('/admin/products')}
+              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Voltar para Produtos
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto mb-10">
@@ -372,6 +548,18 @@ const ProductForm: React.FC = () => {
                         onChange={(e) => {
                             handleChange(e);
                             setPreviewUrl(e.target.value);
+                            // If URL is set and not in productImages, add it as main
+                            if (e.target.value && !productImages.find(img => img.url === e.target.value)) {
+                                const newMain: ProductImage = {
+                                    url: e.target.value,
+                                    is_main: true,
+                                    is_external: true,
+                                };
+                                // Remove main flag from others and add new main at the beginning
+                                const updated = productImages.map(img => ({ ...img, is_main: false }));
+                                const sorted = [newMain, ...updated].sort((a, b) => (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0));
+                                setProductImages(sorted);
+                            }
                         }}
                         placeholder="https://..."
                         className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -403,13 +591,22 @@ const ProductForm: React.FC = () => {
 
             {/* Galeria de Imagens */}
             <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Galeria de Imagens (URLs)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Imagens do Produto
+                    <span className="text-xs text-gray-500 ml-2">(Arraste para reordenar, clique em "Principal" para definir a imagem principal)</span>
+                </label>
                 <div className="flex gap-2 mb-4">
                     <input 
                         type="url" 
                         placeholder="https://..." 
                         value={newGalleryUrl}
                         onChange={(e) => setNewGalleryUrl(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addGalleryImage();
+                            }
+                        }}
                         className="flex-grow rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                     <button 
@@ -417,27 +614,75 @@ const ProductForm: React.FC = () => {
                         onClick={addGalleryImage}
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                     >
-                        Adicionar
+                        Adicionar URL
                     </button>
                 </div>
                 
-                {/* Lista de Imagens da Galeria */}
+                {/* Lista de Imagens com Drag and Drop */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {galleryImages.map((url, index) => (
-                        <div key={index} className="relative group border rounded bg-gray-50 overflow-hidden aspect-square">
-                            <img src={url} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
-                            <button
-                                type="button"
-                                onClick={() => removeGalleryImage(index)}
-                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                title="Remover Imagem"
-                            >
+                    {productImages.map((image, index) => (
+                        <div
+                            key={image.id || image.url}
+                            draggable
+                            onDragStart={() => handleDragStart(index)}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, index)}
+                            className={`relative group border-2 rounded bg-gray-50 overflow-hidden aspect-square cursor-move ${
+                                image.is_main ? 'border-indigo-500 ring-2 ring-indigo-300' : 'border-gray-200'
+                            } ${draggedIndex === index ? 'opacity-50' : ''}`}
+                        >
+                            <img 
+                                src={image.url} 
+                                alt={`Product image ${index}`} 
+                                className="w-full h-full object-cover" 
+                            />
+                            
+                            {/* Badge Principal */}
+                            {image.is_main && (
+                                <div className="absolute top-2 left-2 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded shadow-lg">
+                                    Principal
+                                </div>
+                            )}
+                            
+                            {/* Botões de Ação */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center gap-2">
+                                {!image.is_main && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setAsMain(image)}
+                                        className="bg-indigo-600 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-indigo-700"
+                                        title="Definir como Principal"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                        </svg>
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage(image)}
+                                    className="bg-red-500 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
+                                    title="Remover Imagem"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            {/* Ícone de arrastar */}
+                            <div className="absolute bottom-2 right-2 bg-gray-800 bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
                                 </svg>
-                            </button>
+                            </div>
                         </div>
                     ))}
+                    {productImages.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-gray-400 border-2 border-dashed rounded">
+                            Nenhuma imagem adicionada. Adicione URLs de imagens acima.
+                        </div>
+                    )}
                 </div>
             </div>
 
