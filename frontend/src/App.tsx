@@ -9,6 +9,10 @@ import AppLayout from './layout/AppLayout';
 
 // Pages Admin
 import SignIn from './pages/AuthPages/SignIn';
+import Register from './pages/AuthPages/Register';
+import ForgotPassword from './pages/AuthPages/ForgotPassword';
+import ResetPassword from './pages/AuthPages/ResetPassword';
+import VerifyEmail from './pages/AuthPages/VerifyEmail';
 import ECommerce from './pages/Dashboard/ECommerce';
 import AdminProductList from './pages/Dashboard/Products/ProductList';
 import ProductForm from './pages/Dashboard/Products/ProductForm';
@@ -42,6 +46,10 @@ function App() {
       <Routes>
         {/* Rotas Admin */}
         <Route path="/admin/login" element={<SignIn />} />
+        <Route path="/admin/register" element={<Register />} />
+        <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin/reset-password" element={<ResetPassword />} />
+        <Route path="/admin/verify-email" element={<VerifyEmail />} />
         
         <Route path="/admin" element={
             <ProtectedRoute>

@@ -17,6 +17,20 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Credenciais inválidas'], 401);
+        }
+
+        // Check if email is verified
+        if (!$user->email_verified_at) {
+            return response()->json([
+                'message' => 'E-mail não verificado. Verifique seu e-mail para ativar sua conta.',
+                'email_not_verified' => true,
+            ], 403);
+        }
+
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = $user->createToken('admin_token')->plainTextToken;
@@ -28,7 +42,7 @@ class AuthController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        return response()->json(['message' => 'Credenciais inválidas'], 401);
     }
 
     public function logout(Request $request)

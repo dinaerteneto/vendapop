@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 
 const SignIn: React.FC = () => {
@@ -18,7 +18,11 @@ const SignIn: React.FC = () => {
       navigate('/admin');
     } catch (err: any) {
         console.error(err);
-        setError('Login falhou. Verifique suas credenciais.');
+        if (err.response?.status === 403 && err.response?.data?.email_not_verified) {
+            setError('E-mail não verificado. Verifique seu e-mail para ativar sua conta.');
+        } else {
+            setError('Login falhou. Verifique suas credenciais.');
+        }
     }
   };
 
@@ -52,6 +56,21 @@ const SignIn: React.FC = () => {
             Entrar
           </button>
         </form>
+        
+        <div className="mt-4 text-center">
+          <Link to="/admin/forgot-password" className="text-sm text-blue-600 hover:underline">
+            Esqueci minha senha
+          </Link>
+        </div>
+        
+        <div className="mt-4 border-t pt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Não tem uma conta?{' '}
+            <Link to="/admin/register" className="text-blue-600 hover:underline">
+              Cadastre-se
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
