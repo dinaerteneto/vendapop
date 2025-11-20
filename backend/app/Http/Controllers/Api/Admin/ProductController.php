@@ -5,20 +5,34 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\UseCases\Admin\GetProductsUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    private GetProductsUseCase $getProductsUseCase;
+    private ProductRepositoryInterface $productRepository;
+
+    public function __construct(
+        GetProductsUseCase $getProductsUseCase,
+        ProductRepositoryInterface $productRepository
+    ) {
+        $this->getProductsUseCase = $getProductsUseCase;
+        $this->productRepository = $productRepository;
+    }
+
     public function index(Request $request)
     {
+        $tenant = $request->user()->tenant;
         $perPage = $request->get('per_page', 20);
         $sortBy = $request->get('sort_by', 'id');
         $sortDirection = $request->get('sort_direction', 'desc');
 
         // Validar colunas permitidas para ordenação
-        $allowedSorts = ['id', 'name', 'price', 'created_at', 'updated_at'];
+        $allowedSorts = ['id', 'name', 'price', 'created_at', 'updated_at', 'category'];
         if (!in_array($sortBy, $allowedSorts)) {
             $sortBy = 'id';
         }
@@ -27,19 +41,7 @@ class ProductController extends Controller
             $sortDirection = 'desc';
         }
 
-        $query = Product::with(['category', 'images']);
-
-        // Ordenação especial para categoria
-        if ($sortBy === 'category') {
-            $query->join('categories', 'products.category_id', '=', 'categories.id')
-                  ->select('products.*')
-                  ->orderBy('categories.name', $sortDirection)
-                  ->groupBy('products.id');
-        } else {
-            $query->orderBy($sortBy, $sortDirection);
-        }
-
-        return $query->paginate($perPage);
+        return $this->getProductsUseCase->execute($tenant, $perPage, $sortBy, $sortDirection);
     }
 
     public function store(Request $request)
@@ -48,7 +50,7 @@ class ProductController extends Controller
             'name' => 'required|string',
             'price' => 'required|numeric',
             'promotional_price' => 'nullable|numeric',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => 'nullable',
             'sizes' => 'required|array',
             'colors' => 'nullable|array',
             'description' => 'nullable|string',
@@ -60,12 +62,25 @@ class ProductController extends Controller
             'is_hot' => 'boolean',
         ]);
 
+        $tenant = $request->user()->tenant;
+
+        // Validate category belongs to tenant if provided
+        if (!empty($validated['category_id'])) {
+            $category = \App\Models\Category::where('id', $validated['category_id'])
+                ->where('tenant_id', $tenant->id)
+                ->first();
+            if (!$category) {
+                return response()->json(['message' => 'Category not found'], 404);
+            }
+        }
+
         $validated['slug'] = Str::slug($validated['name']);
 
         // Remove campos que não existem mais na tabela products
         $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
+        $productData['tenant_id'] = $tenant->id;
 
-        $product = Product::create($productData);
+        $product = $this->productRepository->create($productData);
 
         // 1. Handle Main Image
         if ($request->hasFile('image')) {
@@ -100,18 +115,36 @@ class ProductController extends Controller
         return response()->json($product->load('images'), 201);
     }
 
-    public function show(Product $product)
+    public function show(Request $request, Product $product)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure product belongs to tenant
+        $product = $this->productRepository->findByIdAndTenant($product->id, $tenant->id);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         return $product->load(['category', 'images']);
     }
 
     public function update(Request $request, Product $product)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure product belongs to tenant
+        $product = $this->productRepository->findByIdAndTenant($product->id, $tenant->id);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         $validated = $request->validate([
             'name' => 'string',
             'price' => 'numeric',
             'promotional_price' => 'nullable|numeric',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => 'nullable',
             'sizes' => 'array',
             'colors' => 'nullable|array',
             'description' => 'nullable|string',
@@ -123,13 +156,23 @@ class ProductController extends Controller
             'is_hot' => 'boolean',
         ]);
 
+        // Validate category belongs to tenant if provided
+        if (!empty($validated['category_id'])) {
+            $category = \App\Models\Category::where('id', $validated['category_id'])
+                ->where('tenant_id', $tenant->id)
+                ->first();
+            if (!$category) {
+                return response()->json(['message' => 'Category not found'], 404);
+            }
+        }
+
         if (isset($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
 
         // Update basic product info
         $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
-        $product->update($productData);
+        $this->productRepository->update($product, $productData);
 
         // 1. Handle Main Image Update
         if ($request->hasFile('image')) {
@@ -215,8 +258,17 @@ class ProductController extends Controller
         return response()->json($product->load('images'));
     }
 
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure product belongs to tenant
+        $product = $this->productRepository->findByIdAndTenant($product->id, $tenant->id);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
+
         // Delete physical files
         foreach ($product->images as $image) {
             if (!$image->is_external && $image->path) {
@@ -224,7 +276,7 @@ class ProductController extends Controller
             }
         }
 
-        $product->delete();
+        $this->productRepository->delete($product);
         return response()->noContent();
     }
 }

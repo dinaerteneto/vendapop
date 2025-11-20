@@ -4,15 +4,30 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Repositories\Interfaces\OrderRepositoryInterface;
+use App\UseCases\Admin\GetOrdersUseCase;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    private GetOrdersUseCase $getOrdersUseCase;
+    private OrderRepositoryInterface $orderRepository;
+
+    public function __construct(
+        GetOrdersUseCase $getOrdersUseCase,
+        OrderRepositoryInterface $orderRepository
+    ) {
+        $this->getOrdersUseCase = $getOrdersUseCase;
+        $this->orderRepository = $orderRepository;
+    }
+
     public function index(Request $request)
     {
+        $tenant = $request->user()->tenant;
         $perPage = $request->get('per_page', 20);
         $sortBy = $request->get('sort_by', 'id');
         $sortDirection = $request->get('sort_direction', 'desc');
+        $status = $request->get('status');
 
         // Validar colunas permitidas para ordenação
         $allowedSorts = ['id', 'order_number', 'status', 'total_amount', 'created_at', 'updated_at'];
@@ -24,29 +39,41 @@ class OrderController extends Controller
             $sortDirection = 'desc';
         }
 
-        $query = Order::with('customer');
-
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
+        return $this->getOrdersUseCase->execute($tenant, $perPage, $sortBy, $sortDirection, $status);
     }
 
-    public function show(Order $order)
+    public function show(Request $request, Order $order)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure order belongs to tenant
+        $order = $this->orderRepository->findByIdAndTenant($order->id, $tenant->id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
         return $order->load(['customer', 'items.product.images']);
     }
 
     public function update(Request $request, Order $order)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure order belongs to tenant
+        $order = $this->orderRepository->findByIdAndTenant($order->id, $tenant->id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:NEW,DONE,CANCELED',
         ]);
 
-        $order->update($validated);
+        $this->orderRepository->update($order, $validated);
 
-        return response()->json($order->load(['customer', 'items.product.images']));
+        return response()->json($order->fresh()->load(['customer', 'items.product.images']));
     }
 }
 

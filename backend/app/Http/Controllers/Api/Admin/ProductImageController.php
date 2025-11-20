@@ -9,8 +9,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
-    public function destroy(ProductImage $productImage)
+    public function destroy(Request $request, ProductImage $productImage)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure product image belongs to tenant's product
+        $product = $productImage->product;
+        if ($product->tenant_id !== $tenant->id) {
+            return response()->json(['message' => 'Product image not found'], 404);
+        }
+
         // Delete physical file if it's local
         if (!$productImage->is_external && $productImage->path) {
             Storage::disk('public')->delete($productImage->path);
@@ -23,7 +31,13 @@ class ProductImageController extends Controller
 
     public function setAsMain(Request $request, ProductImage $productImage)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure product image belongs to tenant's product
         $product = $productImage->product;
+        if ($product->tenant_id !== $tenant->id) {
+            return response()->json(['message' => 'Product image not found'], 404);
+        }
 
         // Remove main flag from all images of this product
         $product->images()->update(['is_main' => false]);

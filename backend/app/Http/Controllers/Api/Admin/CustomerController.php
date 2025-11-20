@@ -4,12 +4,26 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Repositories\Interfaces\CustomerRepositoryInterface;
+use App\UseCases\Admin\GetCustomersUseCase;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+    private GetCustomersUseCase $getCustomersUseCase;
+    private CustomerRepositoryInterface $customerRepository;
+
+    public function __construct(
+        GetCustomersUseCase $getCustomersUseCase,
+        CustomerRepositoryInterface $customerRepository
+    ) {
+        $this->getCustomersUseCase = $getCustomersUseCase;
+        $this->customerRepository = $customerRepository;
+    }
+
     public function index(Request $request)
     {
+        $tenant = $request->user()->tenant;
         $perPage = $request->get('per_page', 20);
         $sortBy = $request->get('sort_by', 'id');
         $sortDirection = $request->get('sort_direction', 'desc');
@@ -24,18 +38,34 @@ class CustomerController extends Controller
             $sortDirection = 'desc';
         }
 
-        return Customer::withCount('orders')
-            ->orderBy($sortBy, $sortDirection)
-            ->paginate($perPage);
+        return $this->getCustomersUseCase->execute($tenant, $perPage, $sortBy, $sortDirection);
     }
 
-    public function show(Customer $customer)
+    public function show(Request $request, Customer $customer)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure customer belongs to tenant
+        $customer = $this->customerRepository->findByIdAndTenant($customer->id, $tenant->id);
+
+        if (!$customer) {
+            return response()->json(['message' => 'Customer not found'], 404);
+        }
+
         return $customer->load('orders');
     }
 
     public function update(Request $request, Customer $customer)
     {
+        $tenant = $request->user()->tenant;
+
+        // Ensure customer belongs to tenant
+        $customer = $this->customerRepository->findByIdAndTenant($customer->id, $tenant->id);
+
+        if (!$customer) {
+            return response()->json(['message' => 'Customer not found'], 404);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|nullable|email|max:255',
@@ -43,9 +73,9 @@ class CustomerController extends Controller
             'notes' => 'sometimes|nullable|string',
         ]);
 
-        $customer->update($validated);
+        $this->customerRepository->update($customer, $validated);
 
-        return response()->json($customer->loadCount('orders'));
+        return response()->json($customer->fresh()->loadCount('orders'));
     }
 }
 
