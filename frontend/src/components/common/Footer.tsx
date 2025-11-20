@@ -19,7 +19,9 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
   if (!storeInfo) return null;
 
-  const whatsappLink = `https://wa.me/${storeInfo.whatsapp_number?.replace(/[^0-9]/g, '')}`;
+  const whatsappNumber = storeInfo.whatsapp_number?.replace(/[^0-9]/g, '');
+  const whatsappMessage = storeInfo.whatsapp_message ? encodeURIComponent(storeInfo.whatsapp_message) : '';
+  const whatsappLink = `https://wa.me/${whatsappNumber}${whatsappMessage ? '?text=' + whatsappMessage : ''}`;
 
   return (
     <footer className="bg-gray-50 pt-10 pb-6 px-4 mt-10 border-t">

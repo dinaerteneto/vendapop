@@ -14,6 +14,7 @@ class Tenant extends Model
         'slug',
         'store_url',
         'whatsapp_number',
+        'whatsapp_message',
         'logo_url',
         'logo_path',
         'logo_is_external',

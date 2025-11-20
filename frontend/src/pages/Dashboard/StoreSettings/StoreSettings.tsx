@@ -16,6 +16,7 @@ interface StoreSettings {
   name: string;
   slug: string;
   whatsapp_number: string;
+  whatsapp_message: string | null;
   store_url: string | null;
   logo_url: string | null;
   primary_color: string | null;
@@ -38,6 +39,7 @@ const StoreSettings: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     whatsapp_number: '',
+    whatsapp_message: '',
     store_url: '',
     logo_url: '',
     primary_color: '#7c3aed',
@@ -75,6 +77,7 @@ const StoreSettings: React.FC = () => {
       setFormData({
         name: data.name || '',
         whatsapp_number: data.whatsapp_number || '',
+        whatsapp_message: data.whatsapp_message || '',
         store_url: data.store_url || '',
         logo_url: data.logo_url || '',
         primary_color: data.primary_color || '#7c3aed',
@@ -305,6 +308,8 @@ const StoreSettings: React.FC = () => {
           imageSrc={imageToCrop}
           onCropComplete={onLogoCropComplete}
           onCancel={onCancelLogoCrop}
+          targetWidth={200}
+          targetHeight={200}
         />
       )}
 
@@ -352,17 +357,38 @@ const StoreSettings: React.FC = () => {
 
             <div>
               <label htmlFor="store_url" className="block text-sm font-medium text-gray-700 mb-2">
-                URL da Loja
+                URL da Loja (ou Slug)
               </label>
               <input
-                type="url"
+                type="text"
                 id="store_url"
                 name="store_url"
                 value={formData.store_url}
                 onChange={handleChange}
-                placeholder="https://sualoja.com.br"
+                placeholder="exemplo ou https://exemplo.com"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Pode ser um slug simples (ex: minha-loja) ou uma URL completa
+              </p>
+            </div>
+            
+            <div>
+              <label htmlFor="whatsapp_message" className="block text-sm font-medium text-gray-700 mb-2">
+                Mensagem Padrão do WhatsApp
+              </label>
+              <textarea
+                id="whatsapp_message"
+                name="whatsapp_message"
+                value={formData.whatsapp_message}
+                onChange={handleChange}
+                placeholder="Olá! Gostaria de saber mais sobre seus produtos."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Esta mensagem será enviada automaticamente quando o cliente clicar no botão do WhatsApp
+              </p>
             </div>
 
             <div>

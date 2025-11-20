@@ -83,7 +83,8 @@ class StoreSettingsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|min:1',
             'whatsapp_number' => 'required|string|min:1',
-            'store_url' => 'nullable|string|url',
+            'whatsapp_message' => 'nullable|string',
+            'store_url' => 'nullable|string', // Changed from 'url' to accept slug
             'primary_color' => 'nullable|string',
             'secondary_color' => 'nullable|string',
             'description' => 'nullable|string',
@@ -128,7 +129,7 @@ class StoreSettingsController extends Controller
 
         // Convert empty strings to null for nullable fields (FormData sends empty strings)
         // But skip logo_url if we just uploaded a file
-        $nullableFields = ['store_url', 'primary_color', 'secondary_color', 'description',
+        $nullableFields = ['store_url', 'whatsapp_message', 'primary_color', 'secondary_color', 'description',
                           'banner_message', 'banner_text_color_1', 'banner_text_color_2',
                           'banner_background_color', 'address', 'email_contact'];
 
