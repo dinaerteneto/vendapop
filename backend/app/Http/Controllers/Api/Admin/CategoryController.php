@@ -10,9 +10,23 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Category::all();
+        $perPage = $request->get('per_page', 20);
+        $sortBy = $request->get('sort_by', 'id');
+        $sortDirection = $request->get('sort_direction', 'desc');
+
+        // Validar colunas permitidas para ordenação
+        $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
+        return Category::orderBy($sortBy, $sortDirection)->paginate($perPage);
     }
 
     public function store(Request $request)

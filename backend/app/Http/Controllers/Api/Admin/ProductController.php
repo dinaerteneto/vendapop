@@ -11,9 +11,35 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Product::with(['category', 'images'])->get();
+        $perPage = $request->get('per_page', 20);
+        $sortBy = $request->get('sort_by', 'id');
+        $sortDirection = $request->get('sort_direction', 'desc');
+
+        // Validar colunas permitidas para ordenação
+        $allowedSorts = ['id', 'name', 'price', 'created_at', 'updated_at'];
+        if (!in_array($sortBy, $allowedSorts)) {
+            $sortBy = 'id';
+        }
+
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'desc';
+        }
+
+        $query = Product::with(['category', 'images']);
+
+        // Ordenação especial para categoria
+        if ($sortBy === 'category') {
+            $query->join('categories', 'products.category_id', '=', 'categories.id')
+                  ->select('products.*')
+                  ->orderBy('categories.name', $sortDirection)
+                  ->groupBy('products.id');
+        } else {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function store(Request $request)
