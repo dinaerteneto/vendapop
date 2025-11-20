@@ -3,8 +3,10 @@
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Api\Admin\ProductImageController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
 use App\Http\Controllers\Api\ManifestController;
@@ -30,7 +32,11 @@ Route::prefix('admin')->group(function () {
             return $request->user();
         });
 
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+
         Route::apiResource('products', AdminProductController::class);
+        Route::delete('product-images/{productImage}', [ProductImageController::class, 'destroy']);
+        Route::put('product-images/{productImage}/set-as-main', [ProductImageController::class, 'setAsMain']);
         Route::apiResource('categories', AdminCategoryController::class);
 
         Route::get('/orders', [AdminOrderController::class, 'index']);
@@ -44,6 +50,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/store', [StoreSettingsController::class, 'show']);
         Route::put('/store', [StoreSettingsController::class, 'update']);
         Route::post('/store', [StoreSettingsController::class, 'update']); // POST for file uploads
+
+        Route::put('/change-password', [AuthController::class, 'changePassword']);
     });
 });
 
