@@ -19,6 +19,7 @@ import OrderDetail from './pages/Dashboard/Orders/OrderDetail';
 import CustomerList from './pages/Dashboard/Customers/CustomerList';
 import CustomerForm from './pages/Dashboard/Customers/CustomerForm';
 import StoreSettings from './pages/Dashboard/StoreSettings/StoreSettings';
+import ChangePassword from './pages/Dashboard/ChangePassword/ChangePassword';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -63,6 +64,7 @@ function App() {
             <Route path="customers/:id" element={<CustomerForm />} />
             
             <Route path="store-settings" element={<StoreSettings />} />
+            <Route path="change-password" element={<ChangePassword />} />
         </Route>
 
         {/* Rotas Públicas (Loja) */}
