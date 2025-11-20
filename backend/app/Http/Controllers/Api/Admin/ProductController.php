@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        return Product::with('category')->get();
+        return Product::with(['category', 'images'])->get();
     }
 
     public function store(Request $request)
@@ -19,26 +21,62 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
+            'promotional_price' => 'nullable|numeric',
             'category_id' => 'nullable|exists:categories,id',
             'sizes' => 'required|array',
             'colors' => 'nullable|array',
             'description' => 'nullable|string',
-            'main_image_url' => 'nullable|url',
-            'is_active' => 'boolean'
+            'main_image_url' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+            'images' => 'nullable|array', // Gallery URLs
+            'images.*' => 'string',
+            'is_active' => 'boolean',
+            'is_hot' => 'boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        // Global scope adds tenant_id automatically
 
-        $product = Product::create($validated);
+        // Remove campos que não existem mais na tabela products
+        $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
 
-        return response()->json($product, 201);
+        $product = Product::create($productData);
+
+        // 1. Handle Main Image
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $product->images()->create([
+                'url' => url(Storage::url($path)),
+                'path' => $path,
+                'is_external' => false,
+                'is_main' => true,
+            ]);
+        } elseif (!empty($validated['main_image_url'])) {
+            $product->images()->create([
+                'url' => $validated['main_image_url'],
+                'path' => null,
+                'is_external' => true, // Assume external if passed as string URL
+                'is_main' => true,
+            ]);
+        }
+
+        // 2. Handle Gallery Images (URLs only for now via this endpoint)
+        if (!empty($validated['images'])) {
+            foreach ($validated['images'] as $galleryUrl) {
+                $product->images()->create([
+                    'url' => $galleryUrl,
+                    'path' => null,
+                    'is_external' => true,
+                    'is_main' => false,
+                ]);
+            }
+        }
+
+        return response()->json($product->load('images'), 201);
     }
 
     public function show(Product $product)
     {
-        // Route model binding + Global Scope ensures access control
-        return $product->load('category');
+        return $product->load(['category', 'images']);
     }
 
     public function update(Request $request, Product $product)
@@ -46,27 +84,121 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'string',
             'price' => 'numeric',
+            'promotional_price' => 'nullable|numeric',
             'category_id' => 'nullable|exists:categories,id',
             'sizes' => 'array',
             'colors' => 'nullable|array',
             'description' => 'nullable|string',
-            'main_image_url' => 'nullable|url',
-            'is_active' => 'boolean'
+            'main_image_url' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+            'images' => 'nullable|array', // Gallery
+            'images.*' => 'string',
+            'is_active' => 'boolean',
+            'is_hot' => 'boolean',
         ]);
 
         if (isset($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
 
-        $product->update($validated);
+        // Update basic product info
+        $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
+        $product->update($productData);
 
-        return response()->json($product);
+        // 1. Handle Main Image Update
+        if ($request->hasFile('image')) {
+            // Delete old main image
+            $oldMain = $product->images()->where('is_main', true)->first();
+            if ($oldMain) {
+                if (!$oldMain->is_external && $oldMain->path) {
+                    Storage::disk('public')->delete($oldMain->path);
+                }
+                $oldMain->delete();
+            }
+
+            // Upload new
+            $path = $request->file('image')->store('products', 'public');
+            $product->images()->create([
+                'url' => url(Storage::url($path)),
+                'path' => $path,
+                'is_external' => false,
+                'is_main' => true,
+            ]);
+        } elseif (array_key_exists('main_image_url', $validated)) {
+            // If main_image_url is explicitly sent (even if empty/null)
+            $newUrl = $validated['main_image_url'];
+            $currentMain = $product->images()->where('is_main', true)->first();
+
+            if ($newUrl) {
+                // If URL changed or didn't exist
+                if (!$currentMain || $currentMain->url !== $newUrl) {
+                     if ($currentMain) {
+                         if (!$currentMain->is_external && $currentMain->path) {
+                             Storage::disk('public')->delete($currentMain->path);
+                         }
+                         $currentMain->delete();
+                     }
+                     $product->images()->create([
+                         'url' => $newUrl,
+                         'is_external' => true,
+                         'is_main' => true,
+                     ]);
+                }
+            } else {
+                // If sent as null/empty, remove main image
+                if ($currentMain) {
+                     if (!$currentMain->is_external && $currentMain->path) {
+                         Storage::disk('public')->delete($currentMain->path);
+                     }
+                     $currentMain->delete();
+                }
+            }
+        }
+
+        // 2. Handle Gallery Sync
+        // Note: This implementation assumes 'images' contains the FULL list of desired gallery URLs.
+        if (array_key_exists('images', $validated)) {
+            $incomingUrls = $validated['images'] ?? [];
+
+            // Get current gallery images
+            $currentGallery = $product->images()->where('is_main', false)->get();
+
+            // Delete removed
+            foreach ($currentGallery as $img) {
+                if (!in_array($img->url, $incomingUrls)) {
+                     if (!$img->is_external && $img->path) {
+                         Storage::disk('public')->delete($img->path);
+                     }
+                     $img->delete();
+                }
+            }
+
+            // Add new
+            $currentUrls = $currentGallery->pluck('url')->toArray();
+            foreach ($incomingUrls as $url) {
+                if (!in_array($url, $currentUrls)) {
+                    $product->images()->create([
+                        'url' => $url,
+                        'is_external' => true,
+                        'is_main' => false,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json($product->load('images'));
     }
 
     public function destroy(Product $product)
     {
+        // Delete physical files
+        foreach ($product->images as $image) {
+            if (!$image->is_external && $image->path) {
+                Storage::disk('public')->delete($image->path);
+            }
+        }
+
         $product->delete();
         return response()->noContent();
     }
 }
-

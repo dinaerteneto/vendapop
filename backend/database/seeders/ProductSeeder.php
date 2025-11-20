@@ -23,7 +23,7 @@ class ProductSeeder extends Seeder
 
         // Vestidos
         if ($catVestidos) {
-            Product::updateOrCreate(
+            $p1 = Product::updateOrCreate(
                 ['slug' => 'vestido-longo-floral', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catVestidos->id,
@@ -33,18 +33,20 @@ class ProductSeeder extends Seeder
                     'price' => 129.90,
                     'sizes' => ['P', 'M', 'G'],
                     'colors' => ['Rosa', 'Azul'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop',
-                        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=600&auto=format&fit=crop',
-                        'https://images.unsplash.com/photo-1583336663277-620dc1996580?q=80&w=600&auto=format&fit=crop',
-                        'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
                 ]
             );
+            $this->syncImages($p1,
+                'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1583336663277-620dc1996580?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop'
+                ]
+            );
 
-            Product::updateOrCreate(
+            $p2 = Product::updateOrCreate(
                 ['slug' => 'vestido-midi-preto', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catVestidos->id,
@@ -54,15 +56,17 @@ class ProductSeeder extends Seeder
                     'price' => 159.90,
                     'sizes' => ['M', 'G'],
                     'colors' => ['Preto'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
                 ]
             );
+            $this->syncImages($p2,
+                'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?q=80&w=600&auto=format&fit=crop'
+                ]
+            );
 
-            Product::updateOrCreate(
+            $p3 = Product::updateOrCreate(
                 ['slug' => 'vestido-festa-paete', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catVestidos->id,
@@ -72,19 +76,21 @@ class ProductSeeder extends Seeder
                     'price' => 299.90,
                     'sizes' => ['P', 'M', 'G'],
                     'colors' => ['Dourado', 'Prata', 'Preto'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                         'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop',
-                         'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
+                ]
+            );
+            $this->syncImages($p3,
+                'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop'
                 ]
             );
         }
 
         // Blusas
         if ($catBlusas) {
-            Product::updateOrCreate(
+            $p4 = Product::updateOrCreate(
                 ['slug' => 'blusa-basica-branca', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catBlusas->id,
@@ -94,16 +100,18 @@ class ProductSeeder extends Seeder
                     'price' => 49.90,
                     'sizes' => ['P', 'M', 'G', 'GG'],
                     'colors' => ['Branco', 'Preto', 'Off-white'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600&auto=format&fit=crop',
-                        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
                 ]
             );
+            $this->syncImages($p4,
+                'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=600&auto=format&fit=crop'
+                ]
+            );
 
-             Product::updateOrCreate(
+            $p5 = Product::updateOrCreate(
                 ['slug' => 'cropped-estampado', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catBlusas->id,
@@ -113,18 +121,20 @@ class ProductSeeder extends Seeder
                     'price' => 59.90,
                     'sizes' => ['P', 'M'],
                     'colors' => ['Verde', 'Laranja'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
+                ]
+            );
+            $this->syncImages($p5,
+                'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=600&auto=format&fit=crop'
                 ]
             );
         }
 
         // Calças
         if ($catCalcas) {
-            Product::updateOrCreate(
+            $p6 = Product::updateOrCreate(
                 ['slug' => 'calca-jeans-skinny', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catCalcas->id,
@@ -134,15 +144,17 @@ class ProductSeeder extends Seeder
                     'price' => 89.90,
                     'sizes' => ['36', '38', '40', '42', '44'],
                     'colors' => ['Jeans Escuro'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1475178626620-a4d074967452?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
                 ]
             );
+            $this->syncImages($p6,
+                'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1475178626620-a4d074967452?q=80&w=600&auto=format&fit=crop'
+                ]
+            );
 
-            Product::updateOrCreate(
+            $p7 = Product::updateOrCreate(
                 ['slug' => 'calca-pantalona-bege', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catCalcas->id,
@@ -152,19 +164,21 @@ class ProductSeeder extends Seeder
                     'price' => 139.90,
                     'sizes' => ['38', '40', '42'],
                     'colors' => ['Bege'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop',
-                        'https://images.unsplash.com/photo-1551488852-0801758cb63f?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
+                ]
+            );
+            $this->syncImages($p7,
+                'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1551488852-0801758cb63f?q=80&w=600&auto=format&fit=crop'
                 ]
             );
         }
 
         // Conjuntos
         if ($catConjuntos) {
-            Product::updateOrCreate(
+            $p8 = Product::updateOrCreate(
                 ['slug' => 'conjunto-alfaiataria-rosa', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catConjuntos->id,
@@ -174,18 +188,20 @@ class ProductSeeder extends Seeder
                     'price' => 219.90,
                     'sizes' => ['P', 'M'],
                     'colors' => ['Rosa'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1591369822096-35c938988a51?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
+                ]
+            );
+            $this->syncImages($p8,
+                'https://images.unsplash.com/photo-1591369822096-35c938988a51?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?q=80&w=600&auto=format&fit=crop'
                 ]
             );
         }
 
         // Macaquinhos
         if ($catMacaquinhos) {
-            Product::updateOrCreate(
+            $p9 = Product::updateOrCreate(
                 ['slug' => 'macaquinho-estampado', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catMacaquinhos->id,
@@ -195,14 +211,38 @@ class ProductSeeder extends Seeder
                     'price' => 89.90,
                     'sizes' => ['U'],
                     'colors' => ['Estampado'],
-                    'main_image_url' => 'https://images.unsplash.com/photo-1495385794356-15371f348c31?q=80&w=600&auto=format&fit=crop',
-                    'images' => [
-                        'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=600&auto=format&fit=crop',
-                        'https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=600&auto=format&fit=crop'
-                    ],
                     'is_active' => true,
                 ]
             );
+            $this->syncImages($p9,
+                'https://images.unsplash.com/photo-1495385794356-15371f348c31?q=80&w=600&auto=format&fit=crop',
+                [
+                    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=600&auto=format&fit=crop',
+                    'https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=600&auto=format&fit=crop'
+                ]
+            );
+        }
+    }
+
+    private function syncImages(Product $product, string $mainUrl, array $galleryUrls)
+    {
+        // Clear existing
+        $product->images()->delete();
+
+        // Main
+        $product->images()->create([
+            'url' => $mainUrl,
+            'is_external' => true,
+            'is_main' => true,
+        ]);
+
+        // Gallery
+        foreach ($galleryUrls as $url) {
+            $product->images()->create([
+                'url' => $url,
+                'is_external' => true,
+                'is_main' => false,
+            ]);
         }
     }
 }

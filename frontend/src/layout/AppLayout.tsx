@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 
 // Layout simples para Admin (Sidebar + Header + Content)
 const AppLayout: React.FC = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+          setUser(JSON.parse(storedUser));
+      }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
@@ -27,6 +35,7 @@ const AppLayout: React.FC = () => {
               <li><Link to="/admin/products" className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded">Produtos</Link></li>
               <li><Link to="/admin/categories" className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded">Categorias</Link></li>
               <li><Link to="/admin/orders" className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded">Pedidos</Link></li>
+              <li><Link to="/admin/customers" className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded">Clientes</Link></li>
               <li><Link to="/admin/store-settings" className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded">Minha Loja</Link></li>
             </ul>
           </nav>
@@ -39,6 +48,12 @@ const AppLayout: React.FC = () => {
             <div className="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden">Menu</button>
                 <div className="flex items-center gap-3 2xl:gap-7">
+                   {user && (
+                       <div className="text-right hidden sm:block">
+                           <span className="block text-sm font-medium text-black">{user.name}</span>
+                           <span className="block text-xs text-gray-500">{user.email}</span>
+                       </div>
+                   )}
                    <button onClick={handleLogout} className="text-sm text-red-600 hover:underline">Sair</button>
                 </div>
             </div>

@@ -9,23 +9,37 @@ class CustomerService
 {
     public function findOrCreate(Tenant $tenant, array $customerData): Customer
     {
-        // Try to find existing customer by email if provided
-        if (!empty($customerData['email'])) {
-            $customer = Customer::where('tenant_id', $tenant->id)
-                               ->where('email', $customerData['email'])
-                               ->first();
+        $email = $customerData['email'] ?? null;
+        $phone = $customerData['phone'] ?? null;
 
-            if ($customer) {
-                return $customer;
+        $query = Customer::where('tenant_id', $tenant->id);
+
+        $query->where(function ($q) use ($email, $phone) {
+            if ($email) {
+                $q->orWhere('email', $email);
             }
+            if ($phone) {
+                $q->orWhere('phone', $phone);
+            }
+        });
+
+        $customer = $query->first();
+
+        if ($customer) {
+            // Update existing customer info
+            $customer->update([
+                'name' => $customerData['name'],
+                'email' => $email ?: $customer->email,
+                'phone' => $phone ?: $customer->phone,
+            ]);
+            return $customer;
         }
 
-        // Create new customer
         return Customer::create([
             'tenant_id' => $tenant->id,
             'name' => $customerData['name'],
-            'email' => $customerData['email'] ?? null,
-            'phone' => $customerData['phone'] ?? null,
+            'email' => $email,
+            'phone' => $phone,
         ]);
     }
 

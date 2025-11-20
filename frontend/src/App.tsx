@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Layouts
 import PublicLayout from './layout/PublicLayout';
@@ -8,7 +10,10 @@ import AppLayout from './layout/AppLayout';
 // Pages Admin
 import SignIn from './pages/AuthPages/SignIn';
 import ECommerce from './pages/Dashboard/ECommerce';
-// import ProductAdmin from './pages/Dashboard/Products'; // TODO
+import AdminProductList from './pages/Dashboard/Products/ProductList';
+import ProductForm from './pages/Dashboard/Products/ProductForm';
+import CategoryList from './pages/Dashboard/Categories/CategoryList';
+import CategoryForm from './pages/Dashboard/Categories/CategoryForm';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -27,6 +32,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 function App() {
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         {/* Rotas Admin */}
         <Route path="/admin/login" element={<SignIn />} />
@@ -37,8 +43,14 @@ function App() {
             </ProtectedRoute>
         }>
             <Route index element={<ECommerce />} />
-            <Route path="products" element={<div>Gestão de Produtos (Em Breve)</div>} />
-            <Route path="categories" element={<div>Gestão de Categorias (Em Breve)</div>} />
+            <Route path="products" element={<AdminProductList />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/:id" element={<ProductForm />} />
+            
+            <Route path="categories" element={<CategoryList />} />
+            <Route path="categories/new" element={<CategoryForm />} />
+            <Route path="categories/:id" element={<CategoryForm />} />
+
             <Route path="orders" element={<div>Gestão de Pedidos (Em Breve)</div>} />
             <Route path="store-settings" element={<div>Configurações da Loja (Em Breve)</div>} />
         </Route>

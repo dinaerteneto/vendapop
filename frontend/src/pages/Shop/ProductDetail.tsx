@@ -5,15 +5,23 @@ import ImageCarousel from '../../components/ui/ImageCarousel';
 import Toast from '../../components/ui/Toast';
 import { useCart } from '../../context/CartContext';
 
+interface ProductImage {
+    id: number;
+    url: string;
+    is_main: boolean;
+}
+
 interface Product {
   id: number;
   name: string;
   description: string;
   price: string;
+  promotional_price?: string | null;
   sizes: string[];
   colors: string[] | null;
   main_image_url: string | null;
-  images: string[] | null;
+  images: ProductImage[] | null;
+  is_hot?: boolean; // Added is_hot
 }
 
 interface ToastState {
@@ -72,10 +80,14 @@ const ProductDetail: React.FC = () => {
           return;
       }
 
+      const finalPrice = product.promotional_price && parseFloat(product.promotional_price) > 0 
+        ? parseFloat(product.promotional_price) 
+        : parseFloat(product.price);
+
       addToCartContext({
           product_id: product.id,
           name: product.name,
-          price: parseFloat(product.price),
+          price: finalPrice,
           size: selectedSize,
           color: selectedColor,
           quantity: quantity,
@@ -88,10 +100,24 @@ const ProductDetail: React.FC = () => {
   if (!product) return <div className="p-8 text-center">Carregando...</div>;
 
   // Prepare images array for carousel
-  const carouselImages = [
-    product.main_image_url,
-    ...(product.images || [])
-  ].filter((img): img is string => !!img);
+  let carouselImages: string[] = [];
+  if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+      // Sort: Main image first
+      const sorted = [...product.images].sort((a, b) => {
+          if (typeof a === 'object' && typeof b === 'object') {
+              return (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0);
+          }
+          return 0;
+      });
+      carouselImages = sorted.map(img => typeof img === 'object' ? img.url : img);
+  } else if (product.main_image_url) {
+      carouselImages = [product.main_image_url];
+  }
+
+  // Price Logic
+  const hasPromo = product.promotional_price && parseFloat(product.promotional_price) > 0;
+  const currentPrice = hasPromo ? parseFloat(product.promotional_price!) : parseFloat(product.price);
+  const originalPrice = hasPromo ? parseFloat(product.price) : null;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
@@ -104,19 +130,30 @@ const ProductDetail: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Image Carousel Section */}
-            <div className="aspect-square w-full bg-gray-100 rounded-xl overflow-hidden shadow-inner">
+            <div className="aspect-square w-full bg-gray-100 rounded-xl overflow-hidden shadow-inner relative">
                 <ImageCarousel images={carouselImages} alt={product.name} />
+                
+                {!!product.is_hot && (
+                    <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md z-10 animate-pulse">
+                        HOT 🔥
+                    </div>
+                )}
             </div>
 
             {/* Product Info Section */}
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
                 
-                <div className="mb-6">
-                    <span className="text-3xl font-extrabold text-purple-700">
-                        R$ {parseFloat(product.price).toFixed(2).replace('.',',')}
+                <div className="mb-6 flex items-baseline gap-3">
+                    {originalPrice && (
+                        <span className="text-lg text-gray-400 line-through">
+                            R$ {originalPrice.toFixed(2).replace('.',',')}
+                        </span>
+                    )}
+                    <span className="text-3xl font-extrabold text-purple-700" style={{ color: primaryColor }}>
+                        R$ {currentPrice.toFixed(2).replace('.',',')}
                     </span>
-                    <span className="text-sm text-gray-500 ml-2">/ unidade</span>
+                    <span className="text-sm text-gray-500">/ unidade</span>
                 </div>
 
                 <div className="space-y-6">

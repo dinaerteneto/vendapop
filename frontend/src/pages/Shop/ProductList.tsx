@@ -7,8 +7,10 @@ interface Product {
   id: number;
   name: string;
   price: string;
+  promotional_price?: string | null;
   main_image_url: string | null;
   category_id: number;
+  is_hot?: boolean;
 }
 
 interface Category {
@@ -90,7 +92,7 @@ const ProductList: React.FC = () => {
          >
              {isOneColumn ? (
                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                  </svg>
              ) : (
                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -122,10 +124,12 @@ const ProductList: React.FC = () => {
                         ) : (
                             <div className="flex h-full items-center justify-center text-gray-400">Sem foto</div>
                         )}
-                        {/* Discount Badge Mock */}
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded text-black shadow-sm">
-                            HOT
-                        </div>
+                        
+                        {!!p.is_hot && (
+                            <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded text-black shadow-sm z-10">
+                                HOT 🔥
+                            </div>
+                        )}
                     </div>
                     <div className="p-3">
                         <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 truncate">
@@ -133,17 +137,27 @@ const ProductList: React.FC = () => {
                         </p>
                         <h3 className="text-sm font-medium text-gray-900 truncate leading-tight mb-2">{p.name}</h3>
                         
-                        <div className="mb-3">
-                            {/* Mocking original price for visual effect */}
-                            <span className="text-xs text-gray-400 line-through mr-2">
-                                R$ {(parseFloat(p.price) * 1.2).toFixed(2).replace('.',',')}
-                            </span>
-                            <span 
-                                className="text-lg font-extrabold block sm:inline"
-                                style={{ color: 'var(--theme-primary)' }}
-                            >
-                                R$ {parseFloat(p.price).toFixed(2).replace('.',',')}
-                            </span>
+                        <div className="mb-3 flex flex-wrap items-baseline gap-2">
+                            {p.promotional_price && parseFloat(p.promotional_price) > 0 ? (
+                                <>
+                                    <span className="text-xs text-gray-400 line-through">
+                                        R$ {parseFloat(p.price).toFixed(2).replace('.',',')}
+                                    </span>
+                                    <span 
+                                        className="text-lg font-extrabold"
+                                        style={{ color: 'var(--theme-primary)' }}
+                                    >
+                                        R$ {parseFloat(p.promotional_price).toFixed(2).replace('.',',')}
+                                    </span>
+                                </>
+                            ) : (
+                                <span 
+                                    className="text-lg font-extrabold"
+                                    style={{ color: 'var(--theme-primary)' }}
+                                >
+                                    R$ {parseFloat(p.price).toFixed(2).replace('.',',')}
+                                </span>
+                            )}
                         </div>
 
                         <button 
