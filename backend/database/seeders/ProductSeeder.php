@@ -222,6 +222,102 @@ class ProductSeeder extends Seeder
                 ]
             );
         }
+
+        // Adicionar mais 50 produtos para testar paginação
+        $this->generateBulkProducts($tenant, [
+            $catVestidos,
+            $catBlusas,
+            $catCalcas,
+            $catConjuntos,
+            $catMacaquinhos,
+        ]);
+    }
+
+    private function generateBulkProducts(Tenant $tenant, array $categories)
+    {
+        $categories = array_filter($categories); // Remove nulls
+        
+        if (empty($categories)) {
+            return;
+        }
+
+        $productNames = [
+            'Vestido', 'Blusa', 'Calça', 'Conjunto', 'Macaquinho',
+            'Top', 'Saia', 'Shorts', 'Jaqueta', 'Cardigan',
+            'Blazer', 'Casaco', 'Regata', 'Camiseta', 'Body',
+        ];
+
+        $adjectives = [
+            'Elegante', 'Moderno', 'Clássico', 'Estiloso', 'Confortável',
+            'Sofisticado', 'Despojado', 'Feminino', 'Jovem', 'Versátil',
+            'Exclusivo', 'Premium', 'Básico', 'Colorido', 'Neutro',
+        ];
+
+        $colors = [
+            'Preto', 'Branco', 'Bege', 'Rosa', 'Azul',
+            'Verde', 'Amarelo', 'Vermelho', 'Roxo', 'Laranja',
+            'Cinza', 'Marrom', 'Coral', 'Lilás', 'Turquesa',
+        ];
+
+        $sizes = [
+            ['P', 'M', 'G'],
+            ['M', 'G', 'GG'],
+            ['P', 'M'],
+            ['36', '38', '40'],
+            ['38', '40', '42', '44'],
+            ['U'],
+        ];
+
+        $prices = [29.90, 39.90, 49.90, 59.90, 69.90, 79.90, 89.90, 99.90, 109.90, 119.90, 129.90, 139.90, 149.90, 159.90, 179.90, 199.90, 219.90, 249.90, 279.90, 299.90];
+
+        $imageUrls = [
+            'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=600&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1591369822096-35c938988a51?q=80&w=600&auto=format&fit=crop',
+        ];
+
+        for ($i = 1; $i <= 50; $i++) {
+            $category = $categories[array_rand($categories)];
+            $productName = $productNames[array_rand($productNames)];
+            $adjective = $adjectives[array_rand($adjectives)];
+            $color = $colors[array_rand($colors)];
+            $sizeSet = $sizes[array_rand($sizes)];
+            $price = $prices[array_rand($prices)];
+            $mainImage = $imageUrls[array_rand($imageUrls)];
+            
+            $name = "$adjective $productName $color";
+            $slug = 'produto-' . $i . '-' . strtolower(str_replace(' ', '-', $name));
+            
+            $product = Product::updateOrCreate(
+                ['slug' => $slug, 'tenant_id' => $tenant->id],
+                [
+                    'category_id' => $category->id,
+                    'name' => $name,
+                    'short_description' => "Produto $i - $adjective e confortável.",
+                    'description' => "Descrição detalhada do $name. Produto de alta qualidade, perfeito para o seu guarda-roupa.",
+                    'price' => $price,
+                    'promotional_price' => (rand(0, 100) > 70) ? $price * 0.8 : null, // 30% chance de ter promoção
+                    'sizes' => $sizeSet,
+                    'colors' => [$color, $colors[array_rand($colors)]],
+                    'is_active' => true,
+                    'is_hot' => (rand(0, 100) > 85), // 15% chance de ser HOT
+                ]
+            );
+
+            $galleryImages = [];
+            for ($j = 0; $j < rand(1, 3); $j++) {
+                $galleryImages[] = $imageUrls[array_rand($imageUrls)];
+            }
+
+            $this->syncImages($product, $mainImage, $galleryImages);
+        }
     }
 
     private function syncImages(Product $product, string $mainUrl, array $galleryUrls)
