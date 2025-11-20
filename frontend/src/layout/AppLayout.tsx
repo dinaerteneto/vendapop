@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import UserDropdown from '../components/admin/UserDropdown';
 
 // Layout simples para Admin (Sidebar + Header + Content)
 const AppLayout: React.FC = () => {
@@ -22,11 +23,6 @@ const AppLayout: React.FC = () => {
     }
   }, [location]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('user');
-    navigate('/admin/login');
-  };
 
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: '📊' },
@@ -95,7 +91,7 @@ const AppLayout: React.FC = () => {
 
       {/* Content Area */}
       <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-        <header className="sticky top-0 z-30 flex w-full bg-white drop-shadow-md">
+        <header className="sticky top-0 z-30 flex w-full bg-white border-b border-gray-200 drop-shadow-sm">
           <div className="flex flex-grow items-center justify-between px-4 py-4 md:px-6 2xl:px-11">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -107,23 +103,12 @@ const AppLayout: React.FC = () => {
               </svg>
             </button>
             <div className="flex items-center gap-3 2xl:gap-7">
-              {user && (
-                <div className="text-right hidden sm:block">
-                  <span className="block text-sm font-medium text-black">{user.name}</span>
-                  <span className="block text-xs text-gray-500">{user.email}</span>
-                </div>
-              )}
-              <button
-                onClick={handleLogout}
-                className="text-sm text-red-600 hover:text-red-700 hover:underline px-3 py-1 rounded hover:bg-red-50 transition-colors"
-              >
-                Sair
-              </button>
+              {user && <UserDropdown userName={user.name} userEmail={user.email} />}
             </div>
           </div>
         </header>
 
-        <main>
+        <main className="bg-gray-100">
           <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
             <Outlet />
           </div>

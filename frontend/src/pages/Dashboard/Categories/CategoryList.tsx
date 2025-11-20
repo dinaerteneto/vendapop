@@ -112,7 +112,7 @@ const CategoryList: React.FC = () => {
       />
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Categorias</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <label htmlFor="perPage" className="text-sm text-gray-600">Itens por página:</label>
@@ -120,7 +120,7 @@ const CategoryList: React.FC = () => {
               id="perPage"
               value={perPage}
               onChange={handlePerPageChange}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="10">10</option>
               <option value="25">25</option>
@@ -129,14 +129,14 @@ const CategoryList: React.FC = () => {
           </div>
           <Link 
             to="/admin/categories/new" 
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors shadow-sm"
           >
             + Nova Categoria
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
