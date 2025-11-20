@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -34,6 +35,30 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        // Verify current password
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'message' => 'A senha atual está incorreta.',
+                'errors' => ['current_password' => ['A senha atual está incorreta.']]
+            ], 422);
+        }
+
+        // Update password
+        $user->password = Hash::make($validated['new_password']);
+        $user->save();
+
+        return response()->json(['message' => 'Senha alterada com sucesso.']);
     }
 }
 
