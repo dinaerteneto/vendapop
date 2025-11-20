@@ -3,6 +3,8 @@ import api from '../../../services/api';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
+import Pagination from '../../../components/ui/Pagination';
+import SortableHeader from '../../../components/ui/SortableHeader';
 
 interface Category {
   id: number;
@@ -19,25 +21,72 @@ interface Product {
   category?: Category;
 }
 
+interface PaginationData {
+  current_page: number;
+  last_page: number;
+  total: number;
+  per_page: number;
+  data: Product[];
+}
+
 const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
+  const [sortBy, setSortBy] = useState('id');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
-    loadProducts();
-  }, []);
+    loadProducts(currentPage, perPage, sortBy, sortDirection);
+  }, [currentPage, perPage, sortBy, sortDirection]);
 
-  const loadProducts = async () => {
+  const loadProducts = async (page: number = 1, perPageValue: number = 20, sortByValue: string = 'id', sortDir: 'asc' | 'desc' = 'desc') => {
     try {
-      const { data } = await api.get('/admin/products');
-      setProducts(data);
+      setLoading(true);
+      const response = await api.get(`/admin/products?page=${page}&per_page=${perPageValue}&sort_by=${sortByValue}&sort_direction=${sortDir}`);
+      const data = response.data;
+      
+      if (data.data) {
+        // Resposta paginada
+        setProducts(data.data);
+        setPagination({
+          current_page: data.current_page,
+          last_page: data.last_page,
+          total: data.total,
+          per_page: data.per_page,
+          data: data.data,
+        });
+      } else {
+        // Fallback para resposta não paginada
+        setProducts(Array.isArray(data) ? data : []);
+        setPagination(null);
+      }
     } catch (error) {
       console.error('Erro ao carregar produtos', error);
       toast.error('Erro ao carregar produtos.');
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSort = (key: string, direction: 'asc' | 'desc') => {
+    setSortBy(key);
+    setSortDirection(direction);
+    setCurrentPage(1); // Resetar para primeira página ao ordenar
+  };
+
+  const handlePerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPerPage = parseInt(e.target.value);
+    setPerPage(newPerPage);
+    setCurrentPage(1); // Resetar para primeira página ao mudar tamanho
   };
 
   const confirmDelete = (id: number) => {
@@ -48,8 +97,9 @@ const ProductList: React.FC = () => {
       if (!deleteId) return;
       try {
           await api.delete(`/admin/products/${deleteId}`);
-          setProducts(products.filter(p => p.id !== deleteId));
           toast.success('Produto excluído com sucesso!');
+          // Recarregar produtos na página atual
+          await loadProducts(currentPage, perPage, sortBy, sortDirection);
       } catch (error) {
           console.error(error);
           toast.error('Erro ao excluir produto.');
@@ -72,12 +122,27 @@ const ProductList: React.FC = () => {
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Produtos</h1>
-        <Link 
-          to="/admin/products/new" 
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-        >
-          + Novo Produto
-        </Link>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label htmlFor="perPage" className="text-sm text-gray-600">Itens por página:</label>
+            <select
+              id="perPage"
+              value={perPage}
+              onChange={handlePerPageChange}
+              className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <Link 
+            to="/admin/products/new" 
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            + Novo Produto
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -85,9 +150,27 @@ const ProductList: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagem</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
+              <SortableHeader
+                label="Nome"
+                sortKey="name"
+                currentSort={sortBy}
+                currentDirection={sortDirection}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                label="Categoria"
+                sortKey="category"
+                currentSort={sortBy}
+                currentDirection={sortDirection}
+                onSort={handleSort}
+              />
+              <SortableHeader
+                label="Preço"
+                sortKey="price"
+                currentSort={sortBy}
+                currentDirection={sortDirection}
+                onSort={handleSort}
+              />
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-right">Ações</th>
             </tr>
@@ -136,6 +219,15 @@ const ProductList: React.FC = () => {
             )}
           </tbody>
         </table>
+        {pagination && (
+          <Pagination
+            currentPage={pagination.current_page}
+            lastPage={pagination.last_page}
+            total={pagination.total}
+            perPage={pagination.per_page}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </div>
   );
