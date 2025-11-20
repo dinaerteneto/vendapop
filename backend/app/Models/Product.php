@@ -24,6 +24,7 @@ class Product extends Model
         // 'images', // Removed
         'is_active',
         'is_hot',
+        'tenant_id',
     ];
 
     protected $casts = [
