@@ -10,6 +10,7 @@ import InstallPwaPrompt from '../components/common/InstallPwaPrompt';
 interface StoreInfo {
   name: string;
   whatsapp_number: string;
+  logo_url?: string | null;
   email_contact?: string;
   address?: string;
   primary_color?: string;
@@ -34,6 +35,8 @@ const PublicLayout: React.FC = () => {
     if (storeSlug) {
         api.get(`/${storeSlug}`)
            .then(response => {
+               console.log('PublicLayout: Store info loaded:', response.data);
+               console.log('PublicLayout: Logo URL from API:', response.data?.logo_url);
                setStoreInfo(response.data);
                
                // Dynamically update manifest link
@@ -64,7 +67,12 @@ const PublicLayout: React.FC = () => {
                 '--theme-secondary': secondaryColor 
             } as React.CSSProperties}
         >
-        <Header storeName={storeInfo?.name} storeSlug={storeSlug} primaryColor={primaryColor} />
+        <Header 
+          storeName={storeInfo?.name} 
+          storeSlug={storeSlug} 
+          primaryColor={primaryColor}
+          logoUrl={storeInfo?.logo_url}
+        />
         
         {storeInfo?.banner_message && (
             <PromotionalBanner
