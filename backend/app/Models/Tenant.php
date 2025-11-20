@@ -15,6 +15,8 @@ class Tenant extends Model
         'store_url',
         'whatsapp_number',
         'logo_url',
+        'logo_path',
+        'logo_is_external',
         'primary_color',
         'secondary_color',
         'description',
@@ -24,6 +26,10 @@ class Tenant extends Model
         'banner_background_color',
         'address',
         'email_contact',
+    ];
+
+    protected $casts = [
+        'logo_is_external' => 'boolean',
     ];
 
     public function users()

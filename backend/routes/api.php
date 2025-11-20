@@ -43,6 +43,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/store', [StoreSettingsController::class, 'show']);
         Route::put('/store', [StoreSettingsController::class, 'update']);
+        Route::post('/store', [StoreSettingsController::class, 'update']); // POST for file uploads
     });
 });
 
