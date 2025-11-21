@@ -318,5 +318,26 @@ Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
 
 ---
 
+---
+
+## 📦 Versões
+
+### v1.0.1 (20 de Novembro de 2025)
+
+**Correções:**
+- ✅ Corrigidos erros de TypeScript que impediam o build em produção
+- ✅ Removidos imports não utilizados (React, Link, navigate)
+- ✅ Adicionada propriedade `whatsapp_message` nas interfaces TypeScript
+- ✅ Corrigida tipagem do parâmetro `token` no handler do reCAPTCHA
+- ✅ Adicionado guia completo de deploy para VPS sem Docker
+
+**Melhorias:**
+- 📝 Documentação de deploy completa em `docs/DEPLOY.md`
+- 🔧 Instruções para instalação em VPS Ubuntu/Debian
+- 🔒 Configuração de SSL com Let's Encrypt
+- 🐳 Suporte para instalação sem Docker
+
+---
+
 **VesteZap v1.0.0** - Transformando vendas de moda com WhatsApp! 💖
 
