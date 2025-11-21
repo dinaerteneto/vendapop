@@ -3,6 +3,7 @@ backend/vendor/
 backend/.env
 backend/.env.backup
 backend/.env.local
+backend/.env.example
 backend/storage/app/*
 backend/storage/framework/cache/*
 backend/storage/framework/sessions/*
@@ -18,6 +19,7 @@ frontend/.env.local
 frontend/.env.development.local
 frontend/.env.test.local
 frontend/.env.production.local
+frontend/.env.production
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
