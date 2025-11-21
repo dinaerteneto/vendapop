@@ -18,7 +18,7 @@ class ManifestController extends Controller
 
         // Use tenant logo or generate a default
         $iconUrl = $tenant->logo_url;
-        
+
         // Se não tiver logo, criar um placeholder com as iniciais
         if (!$iconUrl) {
             $initials = strtoupper(substr($tenant->name, 0, 2));
@@ -26,8 +26,8 @@ class ManifestController extends Controller
         }
 
         $baseUrl = env('FRONTEND_URL', 'http://localhost:5173');
-        
-        return response()->json([
+
+        $manifest = [
             'name' => $tenant->name,
             'short_name' => substr($tenant->name, 0, 12),
             'description' => $tenant->description ?? "Catálogo digital de {$tenant->name}",
@@ -55,7 +55,7 @@ class ManifestController extends Controller
             'screenshots' => [],
             'prefer_related_applications' => false
         ];
-        
+
         return response()->json($manifest)
             ->header('Content-Type', 'application/manifest+json')
             ->header('Access-Control-Allow-Origin', '*')
