@@ -322,6 +322,26 @@ Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
 
 ## 📦 Versões
 
+### v1.0.2 (20 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- ✨ Migração do reCAPTCHA v2 para v3
+- 🔒 Implementação de verificação invisível do reCAPTCHA v3
+- 🎯 Validação por score no backend (threshold de 0.5)
+
+**Melhorias:**
+- 🚀 Experiência do usuário aprimorada com reCAPTCHA invisível
+- 📦 Atualização da biblioteca `react-google-recaptcha-v3` no frontend
+- 🔧 Atualização da validação backend para suportar score do v3
+
+**Notas Técnicas:**
+- Substituída biblioteca `react-google-recaptcha` por `react-google-recaptcha-v3`
+- Removida dependência `@types/react-google-recaptcha`
+- reCAPTCHA v3 funciona de forma invisível, sem interação do usuário
+- Score mínimo de 0.5 para aprovação (padrão recomendado pelo Google)
+
+---
+
 ### v1.0.1 (20 de Novembro de 2025)
 
 **Correções:**
