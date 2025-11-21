@@ -297,14 +297,19 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 FRONTEND_URL=https://vestezap.com.br
 
-RECAPTCHA_SITE_KEY=SUA_CHAVE_RECAPTCHA_SITE
-RECAPTCHA_SECRET_KEY=SUA_CHAVE_RECAPTCHA_SECRET
+# reCAPTCHA v3 - Secret Key (obter em https://www.google.com/recaptcha/admin)
+RECAPTCHA_SECRET_KEY=SUA_CHAVE_SECRET_KEY_AQUI
 ```
 
 **⚠️ IMPORTANTE:**
 - Substitua `SUA_SENHA_DO_BANCO_AQUI` pela senha do banco criada anteriormente
 - Configure um serviço de email (Gmail, SendGrid, Mailgun, etc.)
-- Configure as chaves do reCAPTCHA no Google reCAPTCHA
+- **Configurar reCAPTCHA v3:**
+  1. Acesse: https://www.google.com/recaptcha/admin/create
+  2. Selecione "reCAPTCHA v3"
+  3. Adicione os domínios: `vestezap.com.br` e `api.vestezap.com.br`
+  4. Copie a **Site Key** → use no frontend (`.env.production`)
+  5. Copie a **Secret Key** → use no backend (`.env` acima)
 
 ### Executar migrations
 
@@ -349,8 +354,24 @@ sudo nano .env.production
 Crie o arquivo `.env.production` com:
 
 ```env
-VITE_API_BASE_URL=https://vestezap.com.br/api
+# URL da API (subdomínio api.vestezap.com.br)
+VITE_API_BASE_URL=https://api.vestezap.com.br/api
+
+# Chave Site Key do reCAPTCHA v3 (obter em https://www.google.com/recaptcha/admin/create)
+VITE_RECAPTCHA_SITE_KEY=sua_chave_site_key_aqui
 ```
+
+**⚠️ IMPORTANTE - Configurar reCAPTCHA v3:**
+
+1. Acesse: https://www.google.com/recaptcha/admin/create
+2. Selecione "reCAPTCHA v3"
+3. Adicione o domínio: `vestezap.com.br`
+4. Copie a **Site Key** e cole em `VITE_RECAPTCHA_SITE_KEY`
+5. Copie a **Secret Key** e configure no backend (ver seção Backend)
+
+**⚠️ NOTA:** Se você usa subdomínio separado para API (`api.vestezap.com.br`), certifique-se de adicionar ambos os domínios no reCAPTCHA:
+- `vestezap.com.br`
+- `api.vestezap.com.br` (se necessário)
 
 ```bash
 # Build para produção
