@@ -322,6 +322,25 @@ Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
 
 ## 📦 Versões
 
+### v1.0.3 (21 de Novembro de 2025)
+
+**Correções:**
+- 🐛 Corrigido erro de sintaxe no ManifestController que causava "Manifest: Syntax error"
+- 🐛 Corrigida meta tag depreciada `apple-mobile-web-app-capable`
+- 📝 Atualizada documentação de deploy com instruções completas do reCAPTCHA v3
+
+**Melhorias:**
+- ✅ Adicionada meta tag `mobile-web-app-capable` (nova especificação)
+- 📚 Documentação melhorada para configuração do reCAPTCHA v3 no frontend e backend
+- 🔧 Instruções atualizadas para usar subdomínio `api.vestezap.com.br`
+
+**Notas Técnicas:**
+- ManifestController agora retorna JSON válido corretamente
+- Meta tags PWA atualizadas para compatibilidade futura
+- Guia de deploy inclui configuração de reCAPTCHA v3 passo a passo
+
+---
+
 ### v1.0.2 (20 de Novembro de 2025)
 
 **Novas Funcionalidades:**
