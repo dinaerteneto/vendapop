@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useParams, Link } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import api from '../services/api';
 import Footer from '../components/common/Footer';
 import { CartProvider } from '../context/CartContext';
@@ -10,6 +10,7 @@ import InstallPwaPrompt from '../components/common/InstallPwaPrompt';
 interface StoreInfo {
   name: string;
   whatsapp_number: string;
+  whatsapp_message?: string;
   logo_url?: string | null;
   email_contact?: string;
   address?: string;

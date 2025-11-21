@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import UserDropdown from '../components/admin/UserDropdown';
 
 // Layout simples para Admin (Sidebar + Header + Content)
 const AppLayout: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);

@@ -3,6 +3,7 @@ import React from 'react';
 interface StoreInfo {
   name: string;
   whatsapp_number: string;
+  whatsapp_message?: string;
   email_contact?: string;
   address?: string;
   socials?: {

@@ -137,7 +137,7 @@ const Register: React.FC = () => {
             <ReCAPTCHA
               ref={recaptchaRef}
               sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'} // Test key for development
-              onChange={(token) => setRecaptchaToken(token)}
+              onChange={(token: string | null) => setRecaptchaToken(token)}
               onExpired={() => setRecaptchaToken(null)}
             />
           </div>
