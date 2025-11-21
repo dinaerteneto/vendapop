@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import ReCAPTCHA from 'react-google-recaptcha';
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
-const Register: React.FC = () => {
+const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
     store_name: '',
     store_slug: '',
@@ -12,8 +12,7 @@ const Register: React.FC = () => {
     email: '',
   });
   const [loading, setLoading] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,14 +25,17 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!recaptchaToken) {
-      toast.error('Por favor, complete a verificação reCAPTCHA.');
+    if (!executeRecaptcha) {
+      toast.error('reCAPTCHA não está pronto. Aguarde um momento.');
       return;
     }
     
     setLoading(true);
 
     try {
+      // Executar reCAPTCHA v3
+      const recaptchaToken = await executeRecaptcha('register');
+      
       await api.post('/admin/register', {
         ...formData,
         recaptcha_token: recaptchaToken,
@@ -41,22 +43,45 @@ const Register: React.FC = () => {
       toast.success('Loja cadastrada com sucesso! Verifique seu e-mail para ativar sua conta e receber sua senha.');
       navigate('/admin/login');
     } catch (err: any) {
-      console.error(err);
-      const errorMessage = err.response?.data?.message || 'Erro ao cadastrar loja.';
-      const errors = err.response?.data?.errors;
+      console.error('Erro completo:', err);
+      console.error('Response:', err.response);
+      console.error('Response data:', err.response?.data);
       
-      // Reset reCAPTCHA on error
-      if (recaptchaRef.current) {
-        recaptchaRef.current.reset();
-        setRecaptchaToken(null);
+      let errorMessage = 'Erro ao cadastrar loja.';
+      const errors = err.response?.data?.errors;
+      const message = err.response?.data?.message;
+      
+      if (message) {
+        errorMessage = message;
+        toast.error(message);
       }
       
       if (errors) {
         Object.keys(errors).forEach((key) => {
-          toast.error(errors[key][0]);
+          const errorText = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
+          toast.error(`${key}: ${errorText}`, {
+            autoClose: 5000,
+          });
+        });
+      } else if (!message && err.response?.status) {
+        if (err.response.status === 422) {
+          errorMessage = 'Dados inválidos. Verifique os campos preenchidos.';
+        } else if (err.response.status === 500) {
+          errorMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
+        } else {
+          errorMessage = `Erro ${err.response.status}: ${err.response.statusText || 'Erro desconhecido'}`;
+        }
+        toast.error(errorMessage, {
+          autoClose: 5000,
+        });
+      } else if (err.message) {
+        toast.error(`Erro: ${err.message}`, {
+          autoClose: 5000,
         });
       } else {
-        toast.error(errorMessage);
+        toast.error('Erro desconhecido. Verifique o console do navegador para mais detalhes.', {
+          autoClose: 5000,
+        });
       }
     } finally {
       setLoading(false);
@@ -133,18 +158,9 @@ const Register: React.FC = () => {
             </p>
           </div>
 
-          <div className="mb-6 flex justify-center">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'} // Test key for development
-              onChange={(token: string | null) => setRecaptchaToken(token)}
-              onExpired={() => setRecaptchaToken(null)}
-            />
-          </div>
-
           <button
             type="submit"
-            disabled={loading || !recaptchaToken}
+            disabled={loading || !executeRecaptcha}
             className="w-full rounded bg-blue-600 py-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Cadastrando...' : 'Cadastrar'}
@@ -159,6 +175,24 @@ const Register: React.FC = () => {
         </p>
       </div>
     </div>
+  );
+};
+
+const Register: React.FC = () => {
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
+  
+  return (
+    <GoogleReCaptchaProvider
+      reCaptchaKey={siteKey}
+      scriptProps={{
+        async: false,
+        defer: false,
+        appendTo: "head",
+        nonce: undefined,
+      }}
+    >
+      <RegisterForm />
+    </GoogleReCaptchaProvider>
   );
 };
 

@@ -26,12 +26,16 @@ class RegistrationController extends Controller
             'recaptcha_token' => 'required|string',
         ]);
 
-        // Verify reCAPTCHA
+        // Verify reCAPTCHA v3
         $recaptchaSecret = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'); // Test secret for development
         $recaptchaResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $recaptchaSecret . '&response=' . $validated['recaptcha_token']);
         $recaptchaData = json_decode($recaptchaResponse, true);
 
-        if (!$recaptchaData['success']) {
+        // reCAPTCHA v3 returns a score (0.0 to 1.0)
+        // Score < 0.5 is considered suspicious
+        $score = $recaptchaData['score'] ?? 0;
+        
+        if (!$recaptchaData['success'] || $score < 0.5) {
             return response()->json([
                 'message' => 'Verificação reCAPTCHA falhou. Tente novamente.',
                 'errors' => ['recaptcha' => ['Verificação reCAPTCHA falhou.']]
