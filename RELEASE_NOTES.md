@@ -2,6 +2,26 @@
 
 ## 📋 Histórico de Versões
 
+### v1.2.4 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 🖼️ Imagens dos produtos no email de confirmação de pedido
+- 📧 Thumbnails de 80x80px exibidos para cada item do pedido
+- ✨ Layout melhorado com cards visuais para cada produto
+
+**Melhorias:**
+- 🎨 Email de confirmação mais visual e profissional
+- 📱 Melhor confirmação visual do que foi comprado
+- 🔍 Cliente pode ver as imagens dos produtos adquiridos no email
+
+**Notas Técnicas:**
+- Eager load de `items.product.images` no OrderService
+- Template de email atualizado com HTML table para compatibilidade
+- Imagens exibidas apenas se disponíveis (fallback gracioso)
+- Layout responsivo e compatível com principais clientes de email
+
+---
+
 ### v1.2.3 (24 de Novembro de 2025)
 
 **Refatorações:**
