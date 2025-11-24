@@ -2,6 +2,39 @@
 
 ## 📋 Histórico de Versões
 
+### v1.0.5 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 🔔 Sistema completo de notificações para administradores
+- 📧 Notificações por email quando novo pedido é criado
+- 🔔 Suporte a push notifications via Web Push API
+- 💬 Notificação via WhatsApp com número do pedido, link e nome do cliente
+- 🔑 Script para gerar chaves VAPID automaticamente (`scripts/generate-vapid-keys.php`)
+
+**Melhorias:**
+- 📚 Documentação completa de configuração e testes de notificações
+- 🛠️ Integração automática de notificações no fluxo de criação de pedidos
+- 📝 Atualização do README.md com seção dedicada ao sistema de notificações
+- 🔧 Adicionadas variáveis VAPID ao `.env.example`
+
+**Notas Técnicas:**
+- Adicionada biblioteca `minishlink/web-push` para push notifications
+- Criado `NotificationService` para centralizar envio de notificações
+- Criado `PushSubscriptionController` para gerenciar subscriptions
+- Migration criada para tabela `push_subscriptions`
+- Template de email criado para notificação de novo pedido
+- Push notifications funcionam em localhost, 127.0.0.1 e HTTPS
+- Script de geração de chaves instala automaticamente dependências se necessário
+
+**Como usar:**
+1. Execute: `docker compose exec backend php scripts/generate-vapid-keys.php`
+2. Adicione as chaves ao arquivo `backend/.env`
+3. Execute: `docker compose exec backend php artisan migrate`
+4. Acesse o admin e permita notificações no navegador
+5. Crie um pedido de teste para verificar as notificações
+
+---
+
 ### v1.0.4 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
