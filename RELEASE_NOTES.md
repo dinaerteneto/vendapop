@@ -2,6 +2,53 @@
 
 ## 📋 Histórico de Versões
 
+### v1.4.0 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 🖼️ Sistema completo de banners rotativos
+- 🎠 Carrossel automático na loja pública com rotação a cada 5 segundos
+- 📸 Suporte a upload de imagem local ou URL externa
+- 🔗 Links opcionais ao clicar nos banners
+- 📝 Título e descrição opcionais para cada banner
+- 🎯 Ordenação personalizada de banners
+- ✅ Ativação/desativação individual de banners
+
+**Melhorias:**
+- 🎨 Interface admin completa para gerenciamento de banners
+- 📋 Listagem com paginação, ordenação e filtros
+- 🖱️ Drag & drop para upload de imagens
+- 👁️ Preview de imagem antes de salvar
+- 🗑️ Exclusão automática de imagens locais ao remover banners
+- 🏗️ Arquitetura seguindo SOLID (Repository, Service, Use Cases)
+
+**Correções:**
+- 🔧 UserSeeder agora marca email como verificado automaticamente
+- ✅ Permite login imediato após executar seeders
+- 🔄 Usa `updateOrCreate` para garantir atualização correta
+
+**Notas Técnicas:**
+- Backend:
+  - Migration `create_rotating_banners_table` com campos: image_url, image_path, is_external, link_url, order, is_active, title, description
+  - Model `RotatingBanner` com relacionamento com `Tenant`
+  - Repository Pattern: `RotatingBannerRepositoryInterface` + `RotatingBannerRepository`
+  - `BannerService` para gerenciamento de imagens (upload/URL)
+  - Use Cases: GetBannersUseCase, CreateBannerUseCase, UpdateBannerUseCase, DeleteBannerUseCase, UpdateBannerOrderUseCase
+  - Endpoint público: `GET /api/{storeSlug}/banners`
+  - Endpoints admin: CRUD completo em `/api/admin/banners`
+  - `RotatingBannerSeeder` com 5 banners de exemplo
+- Frontend:
+  - Componente `RotatingBanners.tsx` com carrossel, navegação e indicadores
+  - Páginas admin: `BannerList.tsx` e `BannerForm.tsx`
+  - Integração no `PublicLayout` para exibição pública
+  - Menu "Banners" adicionado ao `AppLayout`
+- Arquitetura:
+  - Separação de responsabilidades seguindo SOLID
+  - Controllers delegam para Use Cases
+  - Services lidam com lógica de negócio específica
+  - Repositories abstraem acesso a dados
+
+---
+
 ### v1.3.0 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
