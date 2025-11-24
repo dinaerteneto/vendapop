@@ -36,6 +36,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Interfaces\CustomerRepositoryInterface::class,
             \App\Repositories\Eloquent\CustomerRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\RotatingBannerRepositoryInterface::class,
+            \App\Repositories\Eloquent\RotatingBannerRepository::class
+        );
     }
 
     /**

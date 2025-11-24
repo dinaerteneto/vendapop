@@ -57,4 +57,9 @@ class Tenant extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function rotatingBanners()
+    {
+        return $this->hasMany(RotatingBanner::class)->orderBy('order');
+    }
 }

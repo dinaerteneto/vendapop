@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\Admin\ProductImageController;
 use App\Http\Controllers\Api\Admin\PushSubscriptionController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
+use App\Http\Controllers\Api\Admin\RotatingBannerController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
 use App\Http\Controllers\Api\CustomerPushSubscriptionController;
 use App\Http\Controllers\Api\ManifestController;
@@ -63,6 +64,9 @@ Route::prefix('admin')->group(function () {
 
         Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store']);
         Route::delete('/push-subscriptions/{id}', [PushSubscriptionController::class, 'destroy']);
+
+        Route::apiResource('banners', RotatingBannerController::class);
+        Route::post('/banners/update-order', [RotatingBannerController::class, 'updateOrder']);
     });
 });
 
@@ -70,6 +74,7 @@ Route::prefix('admin')->group(function () {
 Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
     Route::get('/manifest.json', [ManifestController::class, 'show']); // Dynamic PWA Manifest
     Route::get('/', [StoreController::class, 'storeInfo']); // Nova rota para info da loja
+    Route::get('/banners', [StoreController::class, 'banners']); // Banners rotativos ativos
     Route::get('/categories', [StoreController::class, 'categories']);
     Route::get('/products', [StoreController::class, 'products']);
     Route::get('/products/{product}', [StoreController::class, 'productDetail']);

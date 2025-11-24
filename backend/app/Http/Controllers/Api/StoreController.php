@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\UseCases\Store\CreateOrderUseCase;
+use App\UseCases\Store\GetBannersUseCase;
 use App\UseCases\Store\GetCategoriesUseCase;
 use App\UseCases\Store\GetOrderUseCase;
 use App\UseCases\Store\GetProductDetailsUseCase;
@@ -19,6 +20,7 @@ class StoreController extends Controller
     private GetProductDetailsUseCase $getProductDetailsUseCase;
     private CreateOrderUseCase $createOrderUseCase;
     private GetOrderUseCase $getOrderUseCase;
+    private GetBannersUseCase $getBannersUseCase;
 
     public function __construct(
         GetStoreInfoUseCase $getStoreInfoUseCase,
@@ -26,7 +28,8 @@ class StoreController extends Controller
         GetProductsUseCase $getProductsUseCase,
         GetProductDetailsUseCase $getProductDetailsUseCase,
         CreateOrderUseCase $createOrderUseCase,
-        GetOrderUseCase $getOrderUseCase
+        GetOrderUseCase $getOrderUseCase,
+        GetBannersUseCase $getBannersUseCase
     ) {
         $this->getStoreInfoUseCase = $getStoreInfoUseCase;
         $this->getCategoriesUseCase = $getCategoriesUseCase;
@@ -34,6 +37,7 @@ class StoreController extends Controller
         $this->getProductDetailsUseCase = $getProductDetailsUseCase;
         $this->createOrderUseCase = $createOrderUseCase;
         $this->getOrderUseCase = $getOrderUseCase;
+        $this->getBannersUseCase = $getBannersUseCase;
     }
 
     public function storeInfo(Request $request, $storeSlug)
@@ -45,6 +49,18 @@ class StoreController extends Controller
         }
 
         return response()->json($tenant);
+    }
+
+    public function banners(Request $request, $storeSlug)
+    {
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
+        $banners = $this->getBannersUseCase->execute($tenant);
+        return response()->json($banners);
     }
 
     public function categories(Request $request, $storeSlug)
