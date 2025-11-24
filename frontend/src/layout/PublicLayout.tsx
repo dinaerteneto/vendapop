@@ -5,6 +5,7 @@ import Footer from '../components/common/Footer';
 import { CartProvider } from '../context/CartContext';
 import Header from '../components/common/Header';
 import PromotionalBanner from '../components/common/PromotionalBanner';
+import RotatingBanners from '../components/common/RotatingBanners';
 import InstallPwaPrompt from '../components/common/InstallPwaPrompt';
 import { formatWhatsAppNumber } from '../utils/whatsapp';
 
@@ -100,6 +101,11 @@ const PublicLayout: React.FC = () => {
                 backgroundColor={storeInfo.banner_background_color || '#000000'}
             />
         )}
+
+        {/* Banners Rotativos */}
+        <div className="w-full max-w-6xl mx-auto px-4 pt-6">
+            <RotatingBanners />
+        </div>
         
         <main className="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
             <Outlet context={{ storeInfo }} />

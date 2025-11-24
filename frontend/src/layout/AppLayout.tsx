@@ -32,6 +32,7 @@ const AppLayout: React.FC = () => {
     { path: '/admin', label: 'Dashboard', icon: '📊' },
     { path: '/admin/products', label: 'Produtos', icon: '🛍️' },
     { path: '/admin/categories', label: 'Categorias', icon: '📁' },
+    { path: '/admin/banners', label: 'Banners', icon: '🖼️' },
     { path: '/admin/orders', label: 'Pedidos', icon: '📦' },
     { path: '/admin/customers', label: 'Clientes', icon: '👥' },
     { path: '/admin/store-settings', label: 'Minha Loja', icon: '⚙️' },

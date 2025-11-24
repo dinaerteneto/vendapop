@@ -23,6 +23,8 @@ import CustomerList from './pages/Dashboard/Customers/CustomerList';
 import CustomerForm from './pages/Dashboard/Customers/CustomerForm';
 import StoreSettings from './pages/Dashboard/StoreSettings/StoreSettings';
 import ChangePassword from './pages/Dashboard/ChangePassword/ChangePassword';
+import BannerList from './pages/Dashboard/Banners/BannerList';
+import BannerForm from './pages/Dashboard/Banners/BannerForm';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -78,6 +80,10 @@ function App() {
             
             <Route path="store-settings" element={<StoreSettings />} />
             <Route path="change-password" element={<ChangePassword />} />
+            
+            <Route path="banners" element={<BannerList />} />
+            <Route path="banners/new" element={<BannerForm />} />
+            <Route path="banners/:id" element={<BannerForm />} />
         </Route>
 
         {/* Rotas Públicas (Loja) */}
