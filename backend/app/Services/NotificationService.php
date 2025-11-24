@@ -51,7 +51,7 @@ class NotificationService
     {
         try {
             $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
-            $orderUrl = "{$frontendUrl}/admin/orders/{$order->id}";
+            $orderUrl = "{$frontendUrl}/admin/orders/{$order->uuid}";
 
             Mail::to($admin->email)->send(new NewOrderNotificationMail($order, $orderUrl));
         } catch (\Exception $e) {
@@ -75,7 +75,7 @@ class NotificationService
             }
 
             $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
-            $orderUrl = "{$frontendUrl}/admin/orders/{$order->id}";
+            $orderUrl = "{$frontendUrl}/admin/orders/{$order->uuid}";
 
             $payload = json_encode([
                 'title' => 'Novo Pedido Recebido',
@@ -84,7 +84,7 @@ class NotificationService
                 'badge' => '/icon-192x192.png',
                 'url' => $orderUrl,
                 'data' => [
-                    'order_id' => $order->id,
+                    'order_uuid' => $order->uuid,
                     'order_number' => $order->order_number,
                 ],
             ]);
