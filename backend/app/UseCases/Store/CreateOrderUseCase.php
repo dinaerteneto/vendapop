@@ -17,7 +17,7 @@ class CreateOrderUseCase
         $this->customerService = $customerService;
     }
 
-    public function execute(Tenant $tenant, array $customerData, array $items, ?string $notes = null): array
+    public function execute(Tenant $tenant, array $customerData, array $items, ?string $notes = null, bool $generateWhatsAppLink = false): array
     {
         // Validate customer data
         $this->customerService->validateCustomerData($customerData);
@@ -28,13 +28,16 @@ class CreateOrderUseCase
         // Create order
         $order = $this->orderService->createOrder($tenant, $customer, $items, $notes);
 
-        // Generate WhatsApp link
-        $whatsAppLink = $this->orderService->generateWhatsAppLink($tenant, $order, $customer);
-
-        return [
+        $result = [
             'order' => $order,
             'customer' => $customer,
-            'whatsapp_link' => $whatsAppLink,
         ];
+
+        // Generate WhatsApp link only if requested
+        if ($generateWhatsAppLink) {
+            $result['whatsapp_link'] = $this->orderService->generateWhatsAppLink($tenant, $order, $customer);
+        }
+
+        return $result;
     }
 }

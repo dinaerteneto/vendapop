@@ -32,8 +32,8 @@ const Checkout: React.FC = () => {
           // Limpar carrinho
           clearCart();
 
-          // Redirecionar WhatsApp
-          window.location.href = data.whatsapp_link;
+          // Redirecionar para página de confirmação do pedido
+          window.location.href = `/${storeSlug}/order/${data.order_uuid}`;
       } catch (e) {
           console.error(e);
           alert('Erro ao processar pedido.');
@@ -95,7 +95,7 @@ const Checkout: React.FC = () => {
             disabled={loading}
             className="w-full bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700 disabled:opacity-50"
           >
-            {loading ? 'Enviando...' : 'Finalizar no WhatsApp'}
+            {loading ? 'Finalizando pedido...' : 'Finalizar Pedido'}
           </button>
       </div>
   );

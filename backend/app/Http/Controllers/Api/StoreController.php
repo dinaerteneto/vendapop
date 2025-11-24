@@ -128,14 +128,15 @@ class StoreController extends Controller
                 $tenant,
                 $customerData,
                 $request->input('items'),
-                $request->input('notes')
+                $request->input('notes'),
+                false // Don't generate WhatsApp link during checkout
             );
 
             return response()->json([
                 'message' => 'Order created successfully',
+                'order_uuid' => $result['order']->uuid,
                 'order_number' => $result['order']->order_number,
                 'total_amount' => $result['order']->total_amount,
-                'whatsapp_link' => $result['whatsapp_link'],
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error processing order', 'error' => $e->getMessage()], 500);
@@ -152,6 +153,28 @@ class StoreController extends Controller
         try {
             $order = $this->getOrderUseCase->execute($tenant, $uuid);
             return response()->json($order);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+    }
+
+    public function getWhatsAppLink(Request $request, $storeSlug, $uuid)
+    {
+        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        if (!$tenant) {
+            return response()->json(['message' => 'Store not found'], 404);
+        }
+
+        try {
+            $order = $this->getOrderUseCase->execute($tenant, $uuid);
+            $order->load('customer');
+            
+            $orderService = app(\App\Services\OrderService::class);
+            $whatsAppLink = $orderService->generateWhatsAppLink($tenant, $order, $order->customer);
+            
+            return response()->json([
+                'whatsapp_link' => $whatsAppLink,
+            ]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Order not found'], 404);
         }
