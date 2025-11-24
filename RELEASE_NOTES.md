@@ -1,3 +1,47 @@
+# Release Notes - VesteZap
+
+## 📋 Histórico de Versões
+
+### v1.0.4 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- ✨ Formatação automática do código do país (55) para números de WhatsApp
+- 🔧 Função utilitária `formatWhatsAppNumber()` no frontend
+- 🌐 Suporte automático ao código do país Brasil em todos os links WhatsApp
+
+**Melhorias:**
+- 📱 Links do WhatsApp agora funcionam corretamente mesmo sem código do país
+- 🛠️ Formatação automática aplicada no Footer, botão flutuante e links de pedidos
+- 🔄 Consistência entre frontend e backend na formatação de números
+
+**Correções:**
+- ✅ Números WhatsApp sem código do país são automaticamente formatados com "55"
+- ✅ Evita erros de links WhatsApp quando usuário esquece de incluir código do país
+
+**Notas Técnicas:**
+- Criada função utilitária em `frontend/src/utils/whatsapp.ts`
+- Atualizado `WhatsAppService.php` no backend para aplicar mesma lógica
+- Função verifica se número já começa com "55" antes de adicionar
+
+---
+
+### v1.0.3 (Data Anterior)
+
+**Correções:**
+- ✅ Corrigida meta tag depreciada `apple-mobile-web-app-capable`
+- ✅ Corrigido erro de sintaxe no ManifestController
+- ✅ Adicionado pipeline Bitbucket para deploy automático
+
+**Melhorias:**
+- 📝 Atualizada documentação de deploy com instruções completas do reCAPTCHA v3
+
+**Notas Técnicas:**
+- ManifestController agora retorna JSON válido corretamente
+- Meta tags PWA atualizadas para compatibilidade futura
+- Guia de deploy inclui configuração de reCAPTCHA v3 passo a passo
+
+---
+
 # Release Notes - VesteZap v1.0.0 🎉
 
 **Data de Lançamento:** 20 de Novembro de 2025
@@ -321,6 +365,29 @@ Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
 ---
 
 ## 📦 Versões
+
+### v1.0.4 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- ✨ Formatação automática do código do país (55) para números de WhatsApp
+- 🔧 Função utilitária `formatWhatsAppNumber()` no frontend
+- 🌐 Suporte automático ao código do país Brasil em todos os links WhatsApp
+
+**Melhorias:**
+- 📱 Links do WhatsApp agora funcionam corretamente mesmo sem código do país
+- 🛠️ Formatação automática aplicada no Footer, botão flutuante e links de pedidos
+- 🔄 Consistência entre frontend e backend na formatação de números
+
+**Correções:**
+- ✅ Números WhatsApp sem código do país são automaticamente formatados com "55"
+- ✅ Evita erros de links WhatsApp quando usuário esquece de incluir código do país
+
+**Notas Técnicas:**
+- Criada função utilitária em `frontend/src/utils/whatsapp.ts`
+- Atualizado `WhatsAppService.php` no backend para aplicar mesma lógica
+- Função verifica se número já começa com "55" antes de adicionar
+
+---
 
 ### v1.0.3 (21 de Novembro de 2025)
 
