@@ -15,15 +15,18 @@ class OrderService
     private OrderRepositoryInterface $orderRepository;
     private ProductRepositoryInterface $productRepository;
     private WhatsAppService $whatsAppService;
+    private NotificationService $notificationService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         ProductRepositoryInterface $productRepository,
-        WhatsAppService $whatsAppService
+        WhatsAppService $whatsAppService,
+        NotificationService $notificationService
     ) {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
         $this->whatsAppService = $whatsAppService;
+        $this->notificationService = $notificationService;
     }
 
     public function createOrder(Tenant $tenant, Customer $customer, array $items, ?string $notes = null): Order
@@ -75,6 +78,9 @@ class OrderService
                     'subtotal' => $data['subtotal'],
                 ]);
             }
+
+            // Notify administrators about the new order
+            $this->notificationService->notifyNewOrder($order);
 
             return $order;
         });

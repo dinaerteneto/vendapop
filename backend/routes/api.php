@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PasswordResetController;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\Admin\ProductImageController;
+use App\Http\Controllers\Api\Admin\PushSubscriptionController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
 use App\Http\Controllers\Api\ManifestController;
@@ -58,6 +59,9 @@ Route::prefix('admin')->group(function () {
         Route::post('/store', [StoreSettingsController::class, 'update']); // POST for file uploads
 
         Route::put('/change-password', [AuthController::class, 'changePassword']);
+
+        Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store']);
+        Route::delete('/push-subscriptions/{id}', [PushSubscriptionController::class, 'destroy']);
     });
 });
 
@@ -70,4 +74,5 @@ Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
     Route::get('/products/{product}', [StoreController::class, 'productDetail']);
     Route::post('/checkout', [StoreController::class, 'checkout']);
     Route::get('/order/{uuid}', [StoreController::class, 'getOrder']);
+    Route::get('/order/{uuid}/whatsapp', [StoreController::class, 'getWhatsAppLink']);
 });
