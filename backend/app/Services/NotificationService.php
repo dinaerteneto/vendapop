@@ -146,8 +146,8 @@ class NotificationService
     private function sendWhatsAppNotification(Tenant $tenant, Order $order): void
     {
         try {
-            $baseUrl = rtrim($tenant->store_url, '/');
-            $trackingUrl = "{$baseUrl}/{$tenant->slug}/order/{$order->uuid}";
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+            $trackingUrl = "{$frontendUrl}/{$tenant->slug}/order/{$order->uuid}";
 
             $message = "🔔 *Novo Pedido Recebido!*\n\n";
             $message .= "Pedido nº: *{$order->order_number}*\n";
