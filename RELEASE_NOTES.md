@@ -2,6 +2,21 @@
 
 ## 📋 Histórico de Versões
 
+### v1.2.3 (24 de Novembro de 2025)
+
+**Refatorações:**
+- 🔄 Removida interface de push notifications para clientes na página de rastreamento
+- 🧹 Código simplificado removendo funcionalidades de subscription de push
+- 📝 Componente OrderTracking mais limpo e focado
+
+**Notas Técnicas:**
+- Removidos estados `isSubscribed` e `subscribing`
+- Removidas funções `requestNotificationPermission`, `subscribeToPush`, `urlBase64ToUint8Array`, `arrayBufferToBase64`
+- Funcionalidade de push notifications no backend mantida para uso futuro
+- Interface de rastreamento agora foca apenas em exibir informações do pedido
+
+---
+
 ### v1.2.2 (24 de Novembro de 2025)
 
 **Correções Críticas:**
