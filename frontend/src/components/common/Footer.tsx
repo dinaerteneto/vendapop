@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatWhatsAppNumber } from '../../utils/whatsapp';
 
 interface StoreInfo {
   name: string;
@@ -20,7 +21,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
   if (!storeInfo) return null;
 
-  const whatsappNumber = storeInfo.whatsapp_number?.replace(/[^0-9]/g, '');
+  const whatsappNumber = formatWhatsAppNumber(storeInfo.whatsapp_number);
   const whatsappMessage = storeInfo.whatsapp_message ? encodeURIComponent(storeInfo.whatsapp_message) : '';
   const whatsappLink = `https://wa.me/${whatsappNumber}${whatsappMessage ? '?text=' + whatsappMessage : ''}`;
 

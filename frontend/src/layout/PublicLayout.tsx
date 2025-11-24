@@ -6,6 +6,7 @@ import { CartProvider } from '../context/CartContext';
 import Header from '../components/common/Header';
 import PromotionalBanner from '../components/common/PromotionalBanner';
 import InstallPwaPrompt from '../components/common/InstallPwaPrompt';
+import { formatWhatsAppNumber } from '../utils/whatsapp';
 
 interface StoreInfo {
   name: string;
@@ -109,7 +110,7 @@ const PublicLayout: React.FC = () => {
         {/* Floating WhatsApp Button */}
         {storeInfo?.whatsapp_number && (
             <a 
-            href={`https://wa.me/${storeInfo.whatsapp_number.replace(/[^0-9]/g, '')}${storeInfo.whatsapp_message ? '?text=' + encodeURIComponent(storeInfo.whatsapp_message) : ''}`}
+            href={`https://wa.me/${formatWhatsAppNumber(storeInfo.whatsapp_number)}${storeInfo.whatsapp_message ? '?text=' + encodeURIComponent(storeInfo.whatsapp_message) : ''}`}
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-20 right-4 z-40 text-white p-3 rounded-full shadow-lg hover:opacity-90 transition-all hover:scale-110"

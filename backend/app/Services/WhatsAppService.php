@@ -25,6 +25,12 @@ class WhatsAppService
     public function generateWhatsAppUrl(Tenant $tenant, string $message): string
     {
         $phone = preg_replace('/[^0-9]/', '', $tenant->whatsapp_number);
+        
+        // Add country code 55 (Brazil) if not present
+        if (!empty($phone) && substr($phone, 0, 2) !== '55') {
+            $phone = '55' . $phone;
+        }
+        
         $encodedMessage = urlencode($message);
 
         return "https://wa.me/{$phone}?text={$encodedMessage}";
