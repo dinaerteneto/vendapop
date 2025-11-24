@@ -52,6 +52,8 @@ services:
     environment:
       # URL da API vista DE FORA (browser)
       VITE_API_BASE_URL: "http://localhost:8000/api"
+      # VAPID Public Key para Push Notifications (mesma chave do backend)
+      VITE_VAPID_PUBLIC_KEY: "BCbbdLAieX1EI8ivn5jYk1qdFgQrRhcSKzL59cQpEXUyN4OaWq7I6AR9OOYVliqR1Rp3RyEpJtWvUNJXJGJvzW8"
     volumes:
       - ./frontend:/app
       - /app/node_modules
