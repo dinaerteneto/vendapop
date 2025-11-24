@@ -20,6 +20,7 @@ VesteZap é uma plataforma SaaS multi-tenant desenvolvida para lojistas de moda 
 - **💬 WhatsApp Integration**: Finalização de pedidos via WhatsApp
 - **📊 Painel Admin**: Gestão completa de produtos, categorias e pedidos
 - **🎨 Customização**: Cores e identidade visual por loja
+- **🔔 Notificações**: Sistema de notificações para administradores (Email, Push e WhatsApp)
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -65,7 +66,19 @@ VesteZap é uma plataforma SaaS multi-tenant desenvolvida para lojistas de moda 
    docker compose exec backend php artisan migrate --seed
    ```
 
-4. **Acesse a aplicação**
+4. **Configure notificações (opcional)**
+   ```bash
+   # Gere chaves VAPID para push notifications
+   docker compose exec backend php scripts/generate-vapid-keys.php
+   ```
+   Copie as chaves geradas e adicione ao arquivo `backend/.env`:
+   ```env
+   VAPID_PUBLIC_KEY=sua_chave_publica
+   VAPID_PRIVATE_KEY=sua_chave_privada
+   VAPID_SUBJECT=mailto:admin@vestezap.com.br
+   ```
+
+5. **Acesse a aplicação**
    - **Loja**: http://localhost:5173/modachic
    - **Admin**: http://localhost:5173/admin/login
    - **API**: http://localhost:8000/api
@@ -170,6 +183,109 @@ Customer (1) ── (N) Order
 Order (1) ───── (N) OrderItem
 Product (1) ─── (N) OrderItem
 ```
+
+## 🔔 Sistema de Notificações
+
+O VesteZap possui um sistema completo de notificações que alerta os administradores quando um novo pedido é criado.
+
+### Tipos de Notificação
+
+1. **📧 Email**: Enviado automaticamente para o email cadastrado do administrador
+2. **🔔 Push Notification**: Notificação no navegador (requer permissão do usuário)
+3. **💬 WhatsApp**: Link do WhatsApp com número do pedido, link e nome do cliente
+
+### Configuração
+
+#### 1. Gerar Chaves VAPID (para Push Notifications)
+
+Execute o script dentro do container:
+
+```bash
+docker compose exec backend php scripts/generate-vapid-keys.php
+```
+
+O script irá:
+- Instalar a biblioteca `minishlink/web-push` se necessário
+- Gerar as chaves VAPID automaticamente
+- Exibir as chaves para adicionar ao `.env`
+
+#### 2. Adicionar Chaves ao .env
+
+Adicione as chaves geradas ao arquivo `backend/.env`:
+
+```env
+VAPID_PUBLIC_KEY=sua_chave_publica_aqui
+VAPID_PRIVATE_KEY=sua_chave_privada_aqui
+VAPID_SUBJECT=mailto:admin@vestezap.com.br
+```
+
+**Importante:**
+- `VAPID_PUBLIC_KEY`: Chave pública (pode ser compartilhada)
+- `VAPID_PRIVATE_KEY`: Chave privada (mantenha em segredo!)
+- `VAPID_SUBJECT`: Email de contato (formato: `mailto:email@exemplo.com`)
+
+#### 3. Executar Migration
+
+```bash
+docker compose exec backend php artisan migrate
+```
+
+### Testando Push Notifications Localmente
+
+Push notifications funcionam em:
+- ✅ **localhost** (http://localhost)
+- ✅ **127.0.0.1** (http://127.0.0.1)
+- ✅ **HTTPS** (produção)
+
+**Passos para testar:**
+
+1. **Acesse o painel admin** em `http://localhost:5173/admin/login`
+
+2. **Permita notificações no navegador**
+   - O navegador solicitará permissão automaticamente
+   - Clique em "Permitir" quando solicitado
+
+3. **Registre a subscription** (automático)
+   - O frontend registra automaticamente a subscription de push
+   - Verifique no console do navegador se houve sucesso
+
+4. **Crie um pedido de teste**
+   - Acesse a loja: `http://localhost:5173/modachic`
+   - Adicione produtos ao carrinho
+   - Finalize um pedido
+
+5. **Verifique as notificações**
+   - **Email**: Verifique a caixa de entrada (ou MailHog em `http://localhost:8025`)
+   - **Push**: Deve aparecer uma notificação no navegador
+   - **WhatsApp**: Link será gerado e logado no backend
+
+### Verificar Logs
+
+```bash
+# Ver logs do backend
+docker compose logs -f backend
+
+# Verificar se as notificações foram enviadas
+docker compose exec backend php artisan tinker
+# No tinker:
+# \App\Models\PushSubscription::all();
+```
+
+### Troubleshooting
+
+**Push notifications não funcionam:**
+- Verifique se as chaves VAPID estão configuradas no `.env`
+- Certifique-se de estar usando `localhost` ou `127.0.0.1` (não IP da rede)
+- Verifique se o navegador permitiu notificações
+- Verifique os logs do backend para erros
+
+**Email não chega:**
+- Em desenvolvimento, verifique o MailHog: `http://localhost:8025`
+- Em produção, verifique as configurações SMTP no `.env`
+
+**WhatsApp não funciona:**
+- Verifique se o número do WhatsApp está configurado no tenant
+- O link é apenas gerado, não enviado automaticamente (requer integração com API do WhatsApp)
 
 ## 🚀 Deploy
 
