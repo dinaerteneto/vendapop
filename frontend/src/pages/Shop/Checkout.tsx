@@ -9,6 +9,7 @@ const Checkout: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleFinish = async () => {
@@ -24,7 +25,8 @@ const Checkout: React.FC = () => {
                   quantity: i.quantity,
                   size: i.size,
                   color: i.color
-              }))
+              })),
+              notes: notes || null
           };
 
           const { data } = await api.post(`/${storeSlug}/checkout`, payload);
@@ -86,6 +88,13 @@ const Checkout: React.FC = () => {
                 placeholder="Seu Celular/WhatsApp"
                 className="w-full border p-2 rounded"
                 value={phone} onChange={e => setPhone(e.target.value)}
+              />
+              <textarea
+                placeholder="Observações do pedido (opcional)"
+                className="w-full border p-2 rounded min-h-[100px] resize-y"
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                rows={4}
               />
               <p className="text-xs text-gray-500">* Campos obrigatórios. Preencha Email ou Celular.</p>
           </div>
