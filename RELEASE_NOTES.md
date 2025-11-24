@@ -2,6 +2,48 @@
 
 ## 📋 Histórico de Versões
 
+### v1.0.6 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 🔐 Sistema de UUIDs para Products, Categories, Customers e Orders
+- 🔗 URLs amigáveis com slugs para produtos e categorias (rotas públicas)
+- 📦 Comando Artisan para atualizar UUIDs de registros existentes
+- 🎯 Enum OrderStatus para padronização de status de pedidos
+
+**Melhorias:**
+- 🔒 Segurança aprimorada: IDs numéricos não são mais expostos nas URLs
+- 🌐 URLs amigáveis melhoram SEO e experiência do usuário
+- 🎨 Route model binding inteligente: UUID para admin, slug para público
+- 📝 Type safety melhorado com uso de enums em vez de strings
+- 🔄 Consistência entre frontend e backend no uso de identificadores
+
+**Refatorações:**
+- ♻️ Atualização de todos os controllers admin para usar UUID
+- ♻️ Atualização do frontend admin para usar UUID em navegação e APIs
+- ♻️ Atualização do StoreController para usar slug em rotas públicas
+- ♻️ Atualização do NotificationService para usar UUID em URLs de pedidos
+- ♻️ Substituição de strings de status por OrderStatus enum
+
+**Notas Técnicas:**
+- Adicionada biblioteca `spatie/laravel-sluggable` para geração automática de slugs
+- Migrations criadas para adicionar UUIDs e constraints de slug
+- Modelos atualizados com geração automática de UUID e slug
+- Route model binding configurado dinamicamente (UUID/slug baseado na rota)
+- Comando `products:update-uuids` disponível para migração de dados existentes
+
+**Como usar:**
+1. Execute as migrations: `docker compose exec backend php artisan migrate`
+2. Para atualizar registros existentes: `docker compose exec backend php artisan products:update-uuids`
+3. URLs públicas agora usam slugs: `/{storeSlug}/product/{product-slug}`
+4. URLs admin agora usam UUIDs: `/admin/products/{uuid}`
+
+**Breaking Changes:**
+- ⚠️ URLs de produtos públicos mudaram de `/{storeSlug}/product/{id}` para `/{storeSlug}/product/{slug}`
+- ⚠️ URLs admin mudaram de `/admin/{resource}/{id}` para `/admin/{resource}/{uuid}`
+- ⚠️ APIs admin agora esperam UUID em vez de ID numérico
+
+---
+
 ### v1.0.5 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
