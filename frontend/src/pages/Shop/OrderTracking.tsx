@@ -35,8 +35,6 @@ const OrderTracking: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingWhatsApp, setLoadingWhatsApp] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [subscribing, setSubscribing] = useState(false);
   const [error, setError] = useState('');
   const context = useOutletContext<{ storeInfo: any }>();
   const primaryColor = context?.storeInfo?.primary_color || '#7c3aed';
@@ -54,102 +52,8 @@ const OrderTracking: React.FC = () => {
           setLoading(false);
         });
     }
-
-    // Check if already subscribed
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      navigator.serviceWorker.ready.then(registration => {
-        registration.pushManager.getSubscription().then(subscription => {
-          setIsSubscribed(!!subscription);
-        });
-      });
-    }
   }, [storeSlug, orderUuid]);
 
-  const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-      alert('Seu navegador não suporta notificações.');
-      return;
-    }
-
-    if (Notification.permission === 'denied') {
-      alert('As notificações foram bloqueadas. Por favor, permita notificações nas configurações do navegador.');
-      return;
-    }
-
-    if (Notification.permission === 'granted') {
-      await subscribeToPush();
-      return;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      await subscribeToPush();
-    } else {
-      alert('Permissão de notificações negada.');
-    }
-  };
-
-  const subscribeToPush = async () => {
-    if (!storeSlug || !orderUuid) return;
-
-    try {
-      setSubscribing(true);
-
-      // Get VAPID public key from environment or use a default
-      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
-
-      if (!vapidPublicKey) {
-        console.warn('VAPID_PUBLIC_KEY não configurada');
-        alert('Configuração de notificações não disponível.');
-        setSubscribing(false);
-        return;
-      }
-
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
-      });
-
-      // Send subscription to backend
-      await api.post(`/${storeSlug}/order/${orderUuid}/push-subscriptions`, {
-        endpoint: subscription.endpoint,
-        keys: {
-          p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
-          auth: arrayBufferToBase64(subscription.getKey('auth')!),
-        },
-      });
-
-      setIsSubscribed(true);
-      alert('Notificações ativadas! Você receberá atualizações sobre seu pedido.');
-    } catch (err: any) {
-      console.error('Erro ao inscrever-se em push notifications:', err);
-      alert('Erro ao ativar notificações. Tente novamente.');
-    } finally {
-      setSubscribing(false);
-    }
-  };
-
-  // Helper functions
-  const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
-    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-  };
-
-  const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
-  };
 
   const getStatusLabel = (status: string) => {
     const statusUpper = status.toUpperCase();
@@ -237,31 +141,6 @@ const OrderTracking: React.FC = () => {
             <h2 className="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Observações</h2>
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Notificações Push */}
-        {('serviceWorker' in navigator && 'PushManager' in window) && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-gray-800 mb-1">Receba atualizações do pedido</h3>
-                <p className="text-sm text-gray-600">
-                  {isSubscribed 
-                    ? '✅ Você receberá notificações quando o pedido for enviado ou concluído.'
-                    : 'Ative as notificações para ser avisado quando seu pedido for enviado ou concluído.'}
-                </p>
-              </div>
-              {!isSubscribed && (
-                <button
-                  onClick={requestNotificationPermission}
-                  disabled={subscribing}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  {subscribing ? 'Ativando...' : 'Ativar Notificações'}
-                </button>
-              )}
             </div>
           </div>
         )}
