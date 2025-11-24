@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\NewOrderNotificationMail;
+use App\Models\CustomerPushSubscription;
 use App\Models\Order;
 use App\Models\PushSubscription;
 use App\Models\Tenant;
@@ -165,6 +166,117 @@ class NotificationService
             ]);
         } catch (\Exception $e) {
             Log::error('Erro ao gerar link do WhatsApp: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Notify customer about order status change
+     */
+    public function notifyCustomerOrderStatus(Order $order): void
+    {
+        $order->load(['customer', 'tenant']);
+
+        // Only notify for SENT and DONE statuses
+        if (!in_array($order->status, ['SENT', 'DONE'])) {
+            return;
+        }
+
+        $this->sendCustomerPushNotification($order);
+    }
+
+    /**
+     * Send push notification to customer
+     */
+    private function sendCustomerPushNotification(Order $order): void
+    {
+        try {
+            $subscriptions = CustomerPushSubscription::where('order_uuid', $order->uuid)->get();
+
+            if ($subscriptions->isEmpty()) {
+                return;
+            }
+
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+            $orderUrl = "{$frontendUrl}/{$order->tenant->slug}/order/{$order->uuid}";
+
+            $customerName = $order->customer->name;
+            $orderNumber = $order->order_number;
+            $storeName = $order->tenant->name;
+
+            $statusMessages = [
+                'SENT' => "Olá {$customerName}, seu pedido n. {$orderNumber} da loja {$storeName} foi enviado! 🚚",
+                'DONE' => "Olá {$customerName}, seu pedido n. {$orderNumber} da loja {$storeName} foi concluído! ✅",
+            ];
+
+            $statusBodies = [
+                'SENT' => "Seu pedido está a caminho! Acompanhe o rastreamento pelo link abaixo.",
+                'DONE' => "Obrigado pela sua compra! Esperamos que tenha gostado dos produtos.",
+            ];
+
+            $title = $statusMessages[$order->status] ?? "Olá {$customerName}, seu pedido n. {$orderNumber} foi atualizado.";
+            $body = $statusBodies[$order->status] ?? "Acompanhe o status do seu pedido pelo link abaixo.";
+
+            $payload = json_encode([
+                'title' => $title,
+                'body' => $body,
+                'icon' => '/icon-192x192.png',
+                'badge' => '/icon-192x192.png',
+                'url' => $orderUrl,
+                'data' => [
+                    'order_uuid' => $order->uuid,
+                    'order_number' => $order->order_number,
+                    'status' => $order->status,
+                ],
+            ]);
+
+            $vapidPublicKey = env('VAPID_PUBLIC_KEY');
+            $vapidPrivateKey = env('VAPID_PRIVATE_KEY');
+            $vapidSubject = env('VAPID_SUBJECT', 'mailto:notificacoes@vestezap.com.br');
+
+            if (empty($vapidPublicKey) || empty($vapidPrivateKey)) {
+                Log::warning('VAPID keys não configuradas. Push notifications não serão enviadas.');
+                return;
+            }
+
+            // Check if web-push package is available
+            if (!class_exists(\Minishlink\WebPush\WebPush::class)) {
+                Log::warning('Biblioteca web-push não instalada. Execute: composer require minishlink/web-push');
+                return;
+            }
+
+            $auth = [
+                'VAPID' => [
+                    'subject' => $vapidSubject,
+                    'publicKey' => $vapidPublicKey,
+                    'privateKey' => $vapidPrivateKey,
+                ],
+            ];
+
+            $webPush = new \Minishlink\WebPush\WebPush($auth);
+
+            foreach ($subscriptions as $subscription) {
+                try {
+                    $webPushSubscription = \Minishlink\WebPush\Subscription::create([
+                        'endpoint' => $subscription->endpoint,
+                        'keys' => [
+                            'p256dh' => $subscription->public_key,
+                            'auth' => $subscription->auth_token,
+                        ],
+                    ]);
+
+                    $webPush->queueNotification($webPushSubscription, $payload);
+                } catch (\Exception $e) {
+                    Log::error('Erro ao criar subscription para push do cliente: ' . $e->getMessage());
+                }
+            }
+
+            foreach ($webPush->flush() as $report) {
+                if (!$report->isSuccess()) {
+                    Log::error('Erro ao enviar push notification para cliente: ' . $report->getReason());
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar push notification para cliente: ' . $e->getMessage());
         }
     }
 }

@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Repositories\Interfaces\OrderRepositoryInterface;
+use App\Services\NotificationService;
 use App\UseCases\Admin\GetOrdersUseCase;
 use Illuminate\Http\Request;
 
@@ -13,13 +14,16 @@ class OrderController extends Controller
 {
     private GetOrdersUseCase $getOrdersUseCase;
     private OrderRepositoryInterface $orderRepository;
+    private NotificationService $notificationService;
 
     public function __construct(
         GetOrdersUseCase $getOrdersUseCase,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        NotificationService $notificationService
     ) {
         $this->getOrdersUseCase = $getOrdersUseCase;
         $this->orderRepository = $orderRepository;
+        $this->notificationService = $notificationService;
     }
 
     public function index(Request $request)
@@ -70,9 +74,17 @@ class OrderController extends Controller
             'status' => ['required', 'in:' . implode(',', OrderStatus::values())],
         ]);
 
+        $oldStatus = $order->status;
         $this->orderRepository->update($order, $validated);
 
-        return response()->json($order->fresh()->load(['customer', 'items.product.images']));
+        $order = $order->fresh()->load(['customer', 'items.product.images']);
+
+        // Notify customer if status changed to SENT or DONE
+        if ($oldStatus !== $order->status && in_array($order->status, ['SENT', 'DONE'])) {
+            $this->notificationService->notifyCustomerOrderStatus($order);
+        }
+
+        return response()->json($order);
     }
 }
 
