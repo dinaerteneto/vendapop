@@ -31,7 +31,7 @@ interface ToastState {
 }
 
 const ProductDetail: React.FC = () => {
-  const { storeSlug, productId } = useParams();
+  const { storeSlug, productSlug } = useParams();
   const { addToCart: addToCartContext } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -50,14 +50,14 @@ const ProductDetail: React.FC = () => {
   useEffect(() => {
      const fetch = async () => {
          try {
-             const { data } = await api.get(`/${storeSlug}/products/${productId}`);
+             const { data } = await api.get(`/${storeSlug}/products/${productSlug}`);
              setProduct(data);
          } catch (e) {
              console.error(e);
          }
      };
-     if (storeSlug && productId) fetch();
-  }, [storeSlug, productId]);
+     if (storeSlug && productSlug) fetch();
+  }, [storeSlug, productSlug]);
 
   const showToast = (message: string, type: ToastState['type'] = 'warning') => {
     setToast({ isVisible: true, message, type });

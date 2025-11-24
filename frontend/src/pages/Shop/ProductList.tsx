@@ -5,6 +5,7 @@ import CategoryList from '../../components/ecommerce/CategoryList';
 
 interface Product {
   id: number;
+  slug: string;
   name: string;
   price: string;
   promotional_price?: string | null;
@@ -117,7 +118,7 @@ const ProductList: React.FC = () => {
       ) : (
         <div className={`grid gap-4 ${isOneColumn ? 'grid-cols-1' : 'grid-cols-2'} md:grid-cols-3 lg:grid-cols-4`}>
             {products.map((p) => (
-                <Link to={`/${storeSlug}/product/${p.id}`} key={p.id} className="group block overflow-hidden rounded-xl bg-gray-50 shadow-sm hover:shadow-md transition-all">
+                <Link to={`/${storeSlug}/product/${p.slug}`} key={p.id} className="group block overflow-hidden rounded-xl bg-gray-50 shadow-sm hover:shadow-md transition-all">
                     <div className="aspect-[3/4] w-full overflow-hidden bg-gray-200 relative">
                         {p.main_image_url ? (
                             <img src={p.main_image_url} alt={p.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />

@@ -77,7 +77,7 @@ function App() {
         {/* Rotas Públicas (Loja) */}
         <Route path="/:storeSlug" element={<PublicLayout />}>
             <Route index element={<ProductList />} />
-            <Route path="product/:productId" element={<ProductDetail />} />
+            <Route path="product/:productSlug" element={<ProductDetail />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="order/:orderUuid" element={<OrderTracking />} />
