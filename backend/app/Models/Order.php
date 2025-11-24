@@ -39,5 +39,13 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Get the route key for the model (use UUID instead of ID)
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }
 
