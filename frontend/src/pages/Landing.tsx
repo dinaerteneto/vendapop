@@ -60,7 +60,7 @@ const Landing: React.FC = () => {
           A solução perfeita para lojistas que estão migrando do físico para o digital.
           Gerencie seus produtos, receba pedidos e venda direto pelo WhatsApp.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
           <Link
             to="/admin/register"
             className="px-8 py-4 bg-white text-purple-700 rounded-lg font-bold text-lg hover:bg-purple-50 transition shadow-xl hover:scale-105"
@@ -73,6 +73,20 @@ const Landing: React.FC = () => {
           >
             Já tenho uma conta
           </Link>
+        </div>
+        
+        {/* Link para loja de exemplo */}
+        <div className="mb-12 relative z-10">
+          <a
+            href="https://vestezap.com.br/modachic"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/20 backdrop-blur-sm border-2 border-white/30 text-white rounded-lg font-semibold hover:bg-purple-500/30 hover:border-white/50 transition shadow-lg hover:scale-105"
+          >
+            <span>👁️</span>
+            <span>Ver Loja de Exemplo</span>
+            <span>→</span>
+          </a>
         </div>
 
         {/* Visual Preview Section */}
@@ -107,6 +121,28 @@ const Landing: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Example Store Section */}
+      <section className="bg-gradient-to-br from-indigo-50 to-purple-50 py-16 relative overflow-hidden">
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Veja como funciona na prática
+          </h2>
+          <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+            Explore nossa loja de exemplo e veja como seus clientes vão interagir com seus produtos
+          </p>
+          <a
+            href="https://vestezap.com.br/modachic"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-bold text-lg hover:from-purple-700 hover:to-indigo-700 transition shadow-xl hover:scale-105"
+          >
+            <span>🛍️</span>
+            <span>Visitar Loja de Exemplo</span>
+            <span>→</span>
+          </a>
         </div>
       </section>
 

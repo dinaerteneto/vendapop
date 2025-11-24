@@ -2,6 +2,37 @@
 
 ## 📋 Histórico de Versões
 
+### v1.3.0 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 🏠 Landing page completa e responsiva
+- 🎨 Página inicial com hero section, features e CTAs
+- 📱 Design moderno com elementos visuais decorativos
+- 🔗 Integração de botões de login e registro na landing page
+- ✨ Seção de preview visual com cards mockup
+- 🌈 Efeitos de glassmorphism e animações sutis
+
+**Melhorias:**
+- 🎯 Página de entrada profissional para atrair novos usuários
+- 📊 Seção "Como Funciona" explicando o processo em 3 passos
+- 💼 Showcase de 6 principais features do sistema
+- 🎨 Background decorativo com formas geométricas e padrões
+- 📝 Documentação de roadmap do produto
+
+**Documentação:**
+- 📄 Adicionado ROADMAP.md com visão do produto e features futuras
+- 📋 Planejamento de integração com Instagram
+- 💡 Estratégias de monetização documentadas
+
+**Notas Técnicas:**
+- Nova rota `/` para landing page
+- Componente Landing.tsx com design responsivo
+- Integração com rotas existentes mantida
+- Elementos decorativos usando Tailwind CSS
+- Z-index e overflow controlados para camadas visuais
+
+---
+
 ### v1.2.4 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
