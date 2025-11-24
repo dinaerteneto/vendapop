@@ -2,6 +2,40 @@
 
 ## 📋 Histórico de Versões
 
+### v1.1.0 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 📝 Campo de observações no checkout para clientes adicionarem notas ao pedido
+- 📧 Email de confirmação automático para clientes com e-mail cadastrado
+- 📦 Novos status de pedido: "Em Separação" (PREPARING) e "Enviado" (SENT)
+- 🔗 Configuração simplificada de redes sociais com URLs base fixas
+
+**Melhorias:**
+- 📱 Observações do pedido agora aparecem em todos os lugares: admin, rastreamento público, WhatsApp e emails
+- 🎨 Cores diferenciadas para novos status: azul para "Em Separação" e roxo para "Enviado"
+- 🔧 Links de rastreamento de pedidos agora usam FRONTEND_URL de forma consistente
+- 🎯 Configuração de redes sociais mais intuitiva: usuário só precisa informar o username
+
+**Correções:**
+- ✅ Links de pedidos no WhatsApp agora usam formato correto (FRONTEND_URL + slug + UUID)
+- ✅ Redes sociais: endereço base fixo no código, usuário informa apenas username
+- ✅ Observações do pedido visíveis para admin e cliente em todas as interfaces
+
+**Notas Técnicas:**
+- Criado `OrderConfirmationMail` para emails de confirmação aos clientes
+- Template de email `order-confirmation.blade.php` com detalhes completos do pedido
+- Enum `OrderStatus` expandido com PREPARING e SENT
+- `WhatsAppService` atualizado para incluir observações na mensagem
+- `StoreSettings` atualizado com select de redes sociais e URLs base pré-configuradas
+
+**Como usar:**
+1. Clientes podem adicionar observações no checkout antes de finalizar
+2. Clientes com e-mail recebem confirmação automática do pedido
+3. Admin pode atualizar status do pedido para: Novo → Em Separação → Enviado → Concluído
+4. Configurar redes sociais: selecionar rede e informar apenas o username
+
+---
+
 ### v1.0.6 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
