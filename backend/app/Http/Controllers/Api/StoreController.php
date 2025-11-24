@@ -81,7 +81,7 @@ class StoreController extends Controller
     // Since write tool overwrites the file, I MUST include the full content.
     // Let me copy the rest of the methods from previous context.
 
-    public function productDetail(Request $request, $storeSlug, $productId)
+    public function productDetail(Request $request, $storeSlug, \App\Models\Product $product)
     {
         $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
 
@@ -89,9 +89,9 @@ class StoreController extends Controller
             return response()->json(['message' => 'Store not found'], 404);
         }
 
-        $product = $this->getProductDetailsUseCase->execute($tenant->id, (int) $productId);
-
-        if (!$product || !$product->is_active) {
+        // Product is already resolved by route model binding using slug
+        // Ensure product belongs to tenant and is active
+        if ($product->tenant_id !== $tenant->id || !$product->is_active) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
@@ -168,10 +168,10 @@ class StoreController extends Controller
         try {
             $order = $this->getOrderUseCase->execute($tenant, $uuid);
             $order->load('customer');
-            
+
             $orderService = app(\App\Services\OrderService::class);
             $whatsAppLink = $orderService->generateWhatsAppLink($tenant, $order, $order->customer);
-            
+
             return response()->json([
                 'whatsapp_link' => $whatsAppLink,
             ]);
