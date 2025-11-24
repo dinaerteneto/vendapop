@@ -117,7 +117,7 @@ class OrderService
     private function sendCustomerConfirmationEmail(Order $order): void
     {
         try {
-            $order->load(['customer', 'tenant', 'items']);
+            $order->load(['customer', 'tenant', 'items.product.images']);
             $frontendUrl = rtrim(config('services.frontend_url', 'http://localhost:5173'), '/');
             $orderUrl = "{$frontendUrl}/{$order->tenant->slug}/order/{$order->uuid}";
 
