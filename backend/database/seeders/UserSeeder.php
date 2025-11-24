@@ -14,13 +14,14 @@ class UserSeeder extends Seeder
         $tenant = Tenant::where('slug', 'modachic')->first();
 
         if ($tenant) {
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['email' => 'admin@modachic.com'],
                 [
                     'tenant_id' => $tenant->id,
                     'name' => 'Admin Moda Chic',
                     'password' => Hash::make('password'),
                     'is_owner' => true,
+                    'email_verified_at' => now(), // Email verificado para permitir login
                 ]
             );
         }
