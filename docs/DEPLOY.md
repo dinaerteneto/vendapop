@@ -646,6 +646,8 @@ sudo -u www-data php artisan view:cache
 # Frontend
 cd ../frontend
 sudo npm install
+# Instalar dependência opcional do Rollup (corrige erro de build em produção)
+sudo npm install @rollup/rollup-linux-x64-gnu --save-optional --force || true
 sudo npm run build
 
 # Recarregar serviços
@@ -749,6 +751,22 @@ sudo certbot renew
 
 # Verificar configuração do Nginx
 sudo nginx -t
+```
+
+### Erro de build do frontend (Rollup)
+
+Se aparecer o erro `Cannot find module @rollup/rollup-linux-x64-gnu`:
+
+```bash
+cd /var/www/vestezap/frontend
+
+# Instalar dependência opcional do Rollup
+sudo npm install @rollup/rollup-linux-x64-gnu --save-optional --force
+
+# Limpar node_modules e reinstalar (se necessário)
+sudo rm -rf node_modules package-lock.json
+sudo npm install
+sudo npm run build
 ```
 
 ---
