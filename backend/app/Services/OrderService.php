@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStatus;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -61,7 +62,7 @@ class OrderService
                 'customer_id' => $customer->id,
                 'order_number' => $orderNumber,
                 'total_amount' => $totalAmount,
-                'status' => 'novo',
+                'status' => OrderStatus::NEW->value,
                 'notes' => $notes,
             ]);
 
