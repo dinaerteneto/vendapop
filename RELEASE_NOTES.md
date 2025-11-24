@@ -2,6 +2,43 @@
 
 ## 📋 Histórico de Versões
 
+### v1.2.0 (24 de Novembro de 2025)
+
+**Novas Funcionalidades:**
+- 🔔 Push notifications para clientes quando pedido é enviado ou concluído
+- 📱 Sistema de subscriptions de push notifications para clientes (sem autenticação)
+- 🎯 Interface na página de rastreamento para ativar notificações
+- 💬 Mensagens personalizadas e amigáveis nas notificações push
+
+**Melhorias:**
+- 📨 Notificações push incluem nome do cliente, número do pedido e nome da loja
+- 🎨 Mensagens mais amigáveis: "Olá {Nome}, seu pedido n. {número} da loja {loja} foi enviado!"
+- 🔗 Links de rastreamento incluídos automaticamente nas notificações
+- ✅ Detecção automática de mudanças de status para envio de notificações
+
+**Notas Técnicas:**
+- Criada tabela `customer_push_subscriptions` para armazenar subscriptions de clientes
+- Model `CustomerPushSubscription` vinculado a `order_uuid` (sem necessidade de autenticação)
+- Controller público `CustomerPushSubscriptionController` para gerenciar subscriptions
+- Rotas públicas: `POST /{storeSlug}/order/{orderUuid}/push-subscriptions`
+- `NotificationService` expandido com método `notifyCustomerOrderStatus()`
+- `OrderController` detecta mudanças de status e notifica clientes automaticamente
+- Frontend usa VAPID public key do ambiente para subscriptions
+- Notificações enviadas apenas para status SENT e DONE
+
+**Como usar:**
+1. Cliente acessa a página de rastreamento do pedido
+2. Cliente clica em "Ativar Notificações" e concede permissão
+3. Quando admin atualiza status para "Enviado" ou "Concluído", cliente recebe notificação push
+4. Cliente pode clicar na notificação para abrir a página de rastreamento
+
+**Configuração:**
+- Certifique-se de que `VAPID_PUBLIC_KEY` está configurada no frontend (`.env` ou variável de ambiente)
+- Backend já usa `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY` do `.env`
+- Execute a migration: `docker compose exec backend php artisan migrate`
+
+---
+
 ### v1.1.0 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
