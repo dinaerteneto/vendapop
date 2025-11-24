@@ -11,6 +11,18 @@ interface Social {
   icon?: string;
 }
 
+// Base URLs for social networks
+const SOCIAL_BASE_URLS: Record<string, string> = {
+  'Instagram': 'https://instagram.com/',
+  'Facebook': 'https://facebook.com/',
+  'TikTok': 'https://tiktok.com/@',
+  'YouTube': 'https://youtube.com/@',
+  'Twitter': 'https://twitter.com/',
+  'LinkedIn': 'https://linkedin.com/in/',
+  'Pinterest': 'https://pinterest.com/',
+  'Outro': '', // Custom URL
+};
+
 interface StoreSettings {
   id: number;
   name: string;
@@ -54,7 +66,7 @@ const StoreSettings: React.FC = () => {
   });
 
   const [socials, setSocials] = useState<Social[]>([]);
-  const [newSocial, setNewSocial] = useState<Social>({ name: '', url: '', icon: '' });
+  const [newSocial, setNewSocial] = useState<{ name: string; username: string; url: string }>({ name: '', username: '', url: '' });
 
   // Logo upload states
   const [logoMode, setLogoMode] = useState<'url' | 'file'>('url');
@@ -114,12 +126,22 @@ const StoreSettings: React.FC = () => {
   };
 
   const handleAddSocial = () => {
-    if (!newSocial.name || !newSocial.url) {
-      toast.error('Preencha o nome e a URL da rede social.');
+    if (!newSocial.name || (!newSocial.username && newSocial.name !== 'Outro')) {
+      toast.error('Preencha o nome e o usuário da rede social.');
       return;
     }
-    setSocials([...socials, { ...newSocial }]);
-    setNewSocial({ name: '', url: '', icon: '' });
+    
+    // Build URL based on social network
+    let url = '';
+    if (newSocial.name === 'Outro') {
+      url = newSocial.username; // For "Outro", username is the full URL
+    } else {
+      const baseUrl = SOCIAL_BASE_URLS[newSocial.name] || '';
+      url = baseUrl + newSocial.username.replace(/^@/, '').replace(/^https?:\/\//, '');
+    }
+    
+    setSocials([...socials, { name: newSocial.name, url, icon: '' }]);
+    setNewSocial({ name: '', username: '', url: '' });
   };
 
   const handleRemoveSocial = (index: number) => {
@@ -735,74 +757,88 @@ const StoreSettings: React.FC = () => {
           <h2 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Redes Sociais</h2>
           
           <div className="space-y-4">
-            {socials.map((social, index) => (
-              <div key={index} className="flex gap-2 items-start p-3 bg-gray-50 rounded-lg">
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <input
-                    type="text"
-                    value={social.name}
-                    onChange={(e) => {
-                      const updated = [...socials];
-                      updated[index].name = e.target.value;
-                      setSocials(updated);
-                    }}
-                    placeholder="Nome (ex: Instagram)"
-                    className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                  <input
-                    type="url"
-                    value={social.url}
-                    onChange={(e) => {
-                      const updated = [...socials];
-                      updated[index].url = e.target.value;
-                      setSocials(updated);
-                    }}
-                    placeholder="URL (ex: https://instagram.com/loja)"
-                    className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                  <input
-                    type="text"
-                    value={social.icon || ''}
-                    onChange={(e) => {
-                      const updated = [...socials];
-                      updated[index].icon = e.target.value;
-                      setSocials(updated);
-                    }}
-                    placeholder="Ícone (opcional)"
-                    className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
+            {socials.map((social, index) => {
+              // Extract username from URL for display
+              const baseUrl = Object.values(SOCIAL_BASE_URLS).find(base => social.url.startsWith(base));
+              const username = baseUrl && baseUrl !== '' 
+                ? social.url.replace(baseUrl, '').replace(/\/$/, '')
+                : social.url;
+              const socialName = Object.keys(SOCIAL_BASE_URLS).find(key => 
+                social.url.startsWith(SOCIAL_BASE_URLS[key]) || (key === 'Outro' && !Object.values(SOCIAL_BASE_URLS).some(b => social.url.startsWith(b)))
+              ) || 'Outro';
+              
+              return (
+                <div key={index} className="flex gap-2 items-start p-3 bg-gray-50 rounded-lg">
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <select
+                      value={socialName}
+                      onChange={(e) => {
+                        const updated = [...socials];
+                        const newName = e.target.value;
+                        const baseUrl = SOCIAL_BASE_URLS[newName] || '';
+                        if (newName === 'Outro') {
+                          updated[index].url = username;
+                        } else {
+                          updated[index].url = baseUrl + username.replace(/^@/, '').replace(/^https?:\/\//, '');
+                        }
+                        updated[index].name = newName;
+                        setSocials(updated);
+                      }}
+                      className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      {Object.keys(SOCIAL_BASE_URLS).map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => {
+                        const updated = [...socials];
+                        const username = e.target.value;
+                        const baseUrl = SOCIAL_BASE_URLS[socialName] || '';
+                        if (socialName === 'Outro') {
+                          updated[index].url = username;
+                        } else {
+                          updated[index].url = baseUrl + username.replace(/^@/, '').replace(/^https?:\/\//, '');
+                        }
+                        setSocials(updated);
+                      }}
+                      placeholder={socialName === 'Outro' ? 'URL completa (ex: https://exemplo.com)' : 'Usuário (ex: loja)'}
+                      className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSocial(index)}
+                    className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                  >
+                    Remover
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSocial(index)}
-                  className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                >
-                  Remover
-                </button>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="flex gap-2 items-start p-3 bg-gray-50 rounded-lg">
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input
-                  type="text"
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                <select
                   value={newSocial.name}
-                  onChange={(e) => setNewSocial({ ...newSocial, name: e.target.value })}
-                  placeholder="Nome (ex: Instagram)"
+                  onChange={(e) => {
+                    const name = e.target.value;
+                    setNewSocial({ ...newSocial, name, url: '' });
+                  }}
                   className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-                <input
-                  type="url"
-                  value={newSocial.url}
-                  onChange={(e) => setNewSocial({ ...newSocial, url: e.target.value })}
-                  placeholder="URL (ex: https://instagram.com/loja)"
-                  className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
+                >
+                  <option value="">Selecione a rede social</option>
+                  {Object.keys(SOCIAL_BASE_URLS).map(name => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
                 <input
                   type="text"
-                  value={newSocial.icon || ''}
-                  onChange={(e) => setNewSocial({ ...newSocial, icon: e.target.value })}
-                  placeholder="Ícone (opcional)"
+                  value={newSocial.username}
+                  onChange={(e) => setNewSocial({ ...newSocial, username: e.target.value })}
+                  placeholder={newSocial.name === 'Outro' || !newSocial.name ? 'URL completa ou usuário' : `Usuário (ex: ${newSocial.name === 'Instagram' ? 'loja' : 'loja'})`}
                   className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 />
               </div>
