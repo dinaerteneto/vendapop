@@ -24,6 +24,7 @@ interface Order {
   status: string;
   total_amount: string;
   created_at: string;
+  notes?: string | null;
   customer: {
     name: string;
     email: string;
@@ -63,6 +64,8 @@ const OrderDetail: React.FC = () => {
   const getStatusColor = (status: string) => {
     const statusUpper = status.toUpperCase();
     if (statusUpper === 'NEW') return 'bg-yellow-100 text-yellow-800';
+    if (statusUpper === 'PREPARING') return 'bg-blue-100 text-blue-800';
+    if (statusUpper === 'SENT') return 'bg-purple-100 text-purple-800';
     if (statusUpper === 'DONE') return 'bg-green-100 text-green-800';
     if (statusUpper === 'CANCELED') return 'bg-red-100 text-red-800';
     return 'bg-gray-100 text-gray-800';
@@ -71,6 +74,8 @@ const OrderDetail: React.FC = () => {
   const getStatusLabel = (status: string) => {
     const statusUpper = status.toUpperCase();
     if (statusUpper === 'NEW') return 'Novo';
+    if (statusUpper === 'PREPARING') return 'Em Separação';
+    if (statusUpper === 'SENT') return 'Enviado';
     if (statusUpper === 'DONE') return 'Concluído';
     if (statusUpper === 'CANCELED') return 'Cancelado';
     return status;
@@ -149,6 +154,8 @@ const OrderDetail: React.FC = () => {
                 className={`px-4 py-2 text-sm font-semibold rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(order.status)}`}
               >
                 <option value="NEW">Novo</option>
+                <option value="PREPARING">Em Separação</option>
+                <option value="SENT">Enviado</option>
                 <option value="DONE">Concluído</option>
                 <option value="CANCELED">Cancelado</option>
               </select>
@@ -250,6 +257,16 @@ const OrderDetail: React.FC = () => {
               </span>
             </div>
           </div>
+
+          {/* Observações do Pedido */}
+          {order.notes && (
+            <div className="mb-6">
+              <h2 className="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Observações do Cliente</h2>
+              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

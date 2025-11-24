@@ -5,6 +5,8 @@ namespace App\Enums;
 enum OrderStatus: string
 {
     case NEW = 'NEW';
+    case PREPARING = 'PREPARING';
+    case SENT = 'SENT';
     case DONE = 'DONE';
     case CANCELED = 'CANCELED';
 
@@ -15,6 +17,8 @@ enum OrderStatus: string
     {
         return match($this) {
             self::NEW => 'Novo',
+            self::PREPARING => 'Em Separação',
+            self::SENT => 'Enviado',
             self::DONE => 'Concluído',
             self::CANCELED => 'Cancelado',
         };

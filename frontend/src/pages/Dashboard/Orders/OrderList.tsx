@@ -91,6 +91,8 @@ const OrderList: React.FC = () => {
   const getStatusColor = (status: string) => {
     const statusUpper = status.toUpperCase();
     if (statusUpper === 'NEW') return 'bg-yellow-100 text-yellow-800';
+    if (statusUpper === 'PREPARING') return 'bg-blue-100 text-blue-800';
+    if (statusUpper === 'SENT') return 'bg-purple-100 text-purple-800';
     if (statusUpper === 'DONE') return 'bg-green-100 text-green-800';
     if (statusUpper === 'CANCELED') return 'bg-red-100 text-red-800';
     return 'bg-gray-100 text-gray-800';
@@ -99,6 +101,8 @@ const OrderList: React.FC = () => {
   const getStatusLabel = (status: string) => {
     const statusUpper = status.toUpperCase();
     if (statusUpper === 'NEW') return 'Novo';
+    if (statusUpper === 'PREPARING') return 'Em Separação';
+    if (statusUpper === 'SENT') return 'Enviado';
     if (statusUpper === 'DONE') return 'Concluído';
     if (statusUpper === 'CANCELED') return 'Cancelado';
     return status;

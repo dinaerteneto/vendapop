@@ -21,6 +21,7 @@ interface Order {
   status: string;
   total_amount: string;
   created_at: string;
+  notes?: string | null;
   customer: {
     name: string;
     email: string;
@@ -53,6 +54,26 @@ const OrderTracking: React.FC = () => {
     }
   }, [storeSlug, orderUuid]);
 
+  const getStatusLabel = (status: string) => {
+    const statusUpper = status.toUpperCase();
+    if (statusUpper === 'NEW') return 'Novo';
+    if (statusUpper === 'PREPARING') return 'Em Separação';
+    if (statusUpper === 'SENT') return 'Enviado';
+    if (statusUpper === 'DONE') return 'Concluído';
+    if (statusUpper === 'CANCELED') return 'Cancelado';
+    return status;
+  };
+
+  const getStatusColor = (status: string) => {
+    const statusUpper = status.toUpperCase();
+    if (statusUpper === 'NEW') return 'text-yellow-600';
+    if (statusUpper === 'PREPARING') return 'text-blue-600';
+    if (statusUpper === 'SENT') return 'text-purple-600';
+    if (statusUpper === 'DONE') return 'text-green-600';
+    if (statusUpper === 'CANCELED') return 'text-red-600';
+    return 'text-gray-600';
+  };
+
   if (loading) return <div className="p-8 text-center">Carregando pedido...</div>;
   if (error || !order) return <div className="p-8 text-center text-red-600">{error}</div>;
 
@@ -69,7 +90,7 @@ const OrderTracking: React.FC = () => {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-500">Status</p>
-              <p className="font-bold capitalize text-green-600">{order.status}</p>
+              <p className={`font-bold ${getStatusColor(order.status)}`}>{getStatusLabel(order.status)}</p>
             </div>
             <div>
               <p className="text-gray-500">Data</p>
@@ -113,6 +134,15 @@ const OrderTracking: React.FC = () => {
             <span>R$ {parseFloat(order.total_amount).toFixed(2).replace('.', ',')}</span>
           </div>
         </div>
+
+        {order.notes && (
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Observações</h2>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-4 mt-8">
           <button
