@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Admin\ProductImageController;
 use App\Http\Controllers\Api\Admin\PushSubscriptionController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
+use App\Http\Controllers\Api\CustomerPushSubscriptionController;
 use App\Http\Controllers\Api\ManifestController;
 use App\Http\Controllers\Api\StoreController;
 use Illuminate\Http\Request;
@@ -75,4 +76,6 @@ Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
     Route::post('/checkout', [StoreController::class, 'checkout']);
     Route::get('/order/{uuid}', [StoreController::class, 'getOrder']);
     Route::get('/order/{uuid}/whatsapp', [StoreController::class, 'getWhatsAppLink']);
+    Route::post('/order/{orderUuid}/push-subscriptions', [CustomerPushSubscriptionController::class, 'store']);
+    Route::delete('/order/{orderUuid}/push-subscriptions/{id}', [CustomerPushSubscriptionController::class, 'destroy']);
 });
