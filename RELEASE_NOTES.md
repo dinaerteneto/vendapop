@@ -2,6 +2,38 @@
 
 ## 📋 Histórico de Versões
 
+### v1.2.2 (24 de Novembro de 2025)
+
+**Correções Críticas:**
+- 🔧 Correção de links usando localhost em produção
+- ✅ Substituição de `env('FRONTEND_URL')` por `config('services.frontend_url')`
+- 🐛 Resolve problema onde `env()` não funciona com cache de configuração ativo
+
+**Melhorias:**
+- ⚙️ Adicionado `frontend_url` ao arquivo `config/services.php`
+- 🔄 Todos os serviços e controllers agora usam `config()` em vez de `env()`
+- 📝 Links de pedidos, emails e notificações agora usam URL correta em produção
+
+**Notas Técnicas:**
+- `env()` não funciona quando há cache de configuração (`config:cache`)
+- `config()` lê do cache de configuração, garantindo funcionamento correto
+- Arquivos atualizados:
+  - `config/services.php` - Adicionada configuração `frontend_url`
+  - `WhatsAppService.php` - Usa `config('services.frontend_url')`
+  - `NotificationService.php` - Usa `config('services.frontend_url')`
+  - `OrderService.php` - Usa `config('services.frontend_url')`
+  - `ManifestController.php` - Usa `config('services.frontend_url')`
+  - `RegistrationController.php` - Usa `config('services.frontend_url')`
+  - `EmailVerificationController.php` - Usa `config('services.frontend_url')`
+  - `PasswordResetController.php` - Usa `config('services.frontend_url')`
+
+**Como aplicar em produção:**
+1. Certifique-se de que `FRONTEND_URL` está no `.env` do backend
+2. Execute: `php artisan config:clear && php artisan config:cache`
+3. Recarregue PHP-FPM: `systemctl reload php8.2-fpm`
+
+---
+
 ### v1.2.1 (24 de Novembro de 2025)
 
 **Correções:**
