@@ -6,6 +6,7 @@ import SortableHeader from '../../../components/ui/SortableHeader';
 
 interface Customer {
   id: number;
+  uuid: string;
   name: string;
   email: string | null;
   phone: string | null;
@@ -191,7 +192,7 @@ const CustomerList: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() => navigate(`/admin/customers/${customer.id}`)}
+                        onClick={() => navigate(`/admin/customers/${customer.uuid}`)}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         Editar

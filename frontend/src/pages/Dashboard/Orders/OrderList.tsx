@@ -6,6 +6,7 @@ import SortableHeader from '../../../components/ui/SortableHeader';
 
 interface Order {
   id: number;
+  uuid: string;
   order_number: string;
   status: string;
   total_amount: string;
@@ -226,7 +227,7 @@ const OrderList: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() => navigate(`/admin/orders/${order.id}`)}
+                        onClick={() => navigate(`/admin/orders/${order.uuid}`)}
                         className="text-indigo-600 hover:text-indigo-900 mr-4"
                       >
                         Ver Detalhes

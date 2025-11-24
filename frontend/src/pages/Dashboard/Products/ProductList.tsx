@@ -13,6 +13,8 @@ interface Category {
 
 interface Product {
   id: number;
+  uuid: string;
+  slug: string;
   name: string;
   price: number;
   promotional_price?: number;
@@ -32,7 +34,7 @@ interface PaginationData {
 const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteUuid, setDeleteUuid] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -89,14 +91,14 @@ const ProductList: React.FC = () => {
     setCurrentPage(1); // Resetar para primeira página ao mudar tamanho
   };
 
-  const confirmDelete = (id: number) => {
-      setDeleteId(id);
+  const confirmDelete = (uuid: string) => {
+      setDeleteUuid(uuid);
   };
 
   const executeDelete = async () => {
-      if (!deleteId) return;
+      if (!deleteUuid) return;
       try {
-          await api.delete(`/admin/products/${deleteId}`);
+          await api.delete(`/admin/products/${deleteUuid}`);
           toast.success('Produto excluído com sucesso!');
           // Recarregar produtos na página atual
           await loadProducts(currentPage, perPage, sortBy, sortDirection);
@@ -104,7 +106,7 @@ const ProductList: React.FC = () => {
           console.error(error);
           toast.error('Erro ao excluir produto.');
       } finally {
-          setDeleteId(null);
+          setDeleteUuid(null);
       }
   }
 
@@ -113,11 +115,11 @@ const ProductList: React.FC = () => {
   return (
     <div>
       <ConfirmationModal 
-        isOpen={!!deleteId}
+        isOpen={!!deleteUuid}
         title="Excluir Produto"
         message="Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita."
         onConfirm={executeDelete}
-        onCancel={() => setDeleteId(null)}
+        onCancel={() => setDeleteUuid(null)}
       />
 
       <div className="flex justify-between items-center mb-6">
@@ -205,8 +207,8 @@ const ProductList: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link to={`/admin/products/${product.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Editar</Link>
-                  <button onClick={() => confirmDelete(product.id)} className="text-red-600 hover:text-red-900">Excluir</button>
+                  <Link to={`/admin/products/${product.uuid}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Editar</Link>
+                  <button onClick={() => confirmDelete(product.uuid)} className="text-red-600 hover:text-red-900">Excluir</button>
                 </td>
               </tr>
             ))}

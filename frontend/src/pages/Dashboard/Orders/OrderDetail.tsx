@@ -19,6 +19,7 @@ interface OrderItem {
 
 interface Order {
   id: number;
+  uuid: string;
   order_number: string;
   status: string;
   total_amount: string;
@@ -80,7 +81,7 @@ const OrderDetail: React.FC = () => {
     
     try {
       setUpdatingStatus(true);
-      const response = await api.put(`/admin/orders/${order.id}`, { status: newStatus });
+      const response = await api.put(`/admin/orders/${order.uuid}`, { status: newStatus });
       setOrder(response.data);
       toast.success('Status do pedido atualizado com sucesso!');
     } catch (err: any) {

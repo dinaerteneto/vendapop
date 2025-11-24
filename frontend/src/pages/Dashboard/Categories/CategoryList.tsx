@@ -8,6 +8,8 @@ import SortableHeader from '../../../components/ui/SortableHeader';
 
 interface Category {
   id: number;
+  uuid: string;
+  slug: string;
   name: string;
   image_url?: string;
   is_active: boolean;
@@ -24,7 +26,7 @@ interface PaginationData {
 const CategoryList: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteUuid, setDeleteUuid] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -81,12 +83,12 @@ const CategoryList: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const confirmDelete = (id: number) => setDeleteId(id);
+  const confirmDelete = (uuid: string) => setDeleteUuid(uuid);
 
   const executeDelete = async () => {
-      if (!deleteId) return;
+      if (!deleteUuid) return;
       try {
-          await api.delete(`/admin/categories/${deleteId}`);
+          await api.delete(`/admin/categories/${deleteUuid}`);
           toast.success('Categoria excluída com sucesso!');
           // Recarregar categorias na página atual
           await loadCategories(currentPage, perPage, sortBy, sortDirection);
@@ -95,7 +97,7 @@ const CategoryList: React.FC = () => {
           const msg = error.response?.data?.message || 'Erro ao excluir categoria.';
           toast.error(msg);
       } finally {
-          setDeleteId(null);
+          setDeleteUuid(null);
       }
   }
 
@@ -104,11 +106,11 @@ const CategoryList: React.FC = () => {
   return (
     <div>
       <ConfirmationModal 
-        isOpen={!!deleteId}
+        isOpen={!!deleteUuid}
         title="Excluir Categoria"
         message="Tem certeza que deseja excluir esta categoria? Produtos associados podem ficar sem categoria."
         onConfirm={executeDelete}
-        onCancel={() => setDeleteId(null)}
+        onCancel={() => setDeleteUuid(null)}
       />
 
       <div className="flex justify-between items-center mb-6">
@@ -171,8 +173,8 @@ const CategoryList: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link to={`/admin/categories/${category.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Editar</Link>
-                  <button onClick={() => confirmDelete(category.id)} className="text-red-600 hover:text-red-900">Excluir</button>
+                  <Link to={`/admin/categories/${category.uuid}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Editar</Link>
+                  <button onClick={() => confirmDelete(category.uuid)} className="text-red-600 hover:text-red-900">Excluir</button>
                 </td>
               </tr>
             ))}
