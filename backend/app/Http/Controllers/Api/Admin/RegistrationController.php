@@ -108,7 +108,7 @@ class RegistrationController extends Controller
         }
 
         // Send welcome email with verification link and password
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $frontendUrl = config('services.frontend_url', 'http://localhost:5173');
         $verificationUrl = $frontendUrl . '/admin/verify-email?token=' . $verificationToken . '&email=' . urlencode($user->email);
 
         try {

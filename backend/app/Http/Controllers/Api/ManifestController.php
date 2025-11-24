@@ -25,7 +25,7 @@ class ManifestController extends Controller
             $iconUrl = "https://ui-avatars.com/api/?name={$initials}&size=512&background=" . str_replace('#', '', $primaryColor) . "&color=ffffff&bold=true";
         }
 
-        $baseUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $baseUrl = config('services.frontend_url', 'http://localhost:5173');
 
         $manifest = [
             'name' => $tenant->name,

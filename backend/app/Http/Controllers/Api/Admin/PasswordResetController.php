@@ -44,7 +44,7 @@ class PasswordResetController extends Controller
         );
 
         // Send email with reset link
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+        $frontendUrl = config('services.frontend_url', 'http://localhost:5173');
         $resetUrl = $frontendUrl . '/admin/reset-password?token=' . $token . '&email=' . urlencode($user->email);
 
         try {
