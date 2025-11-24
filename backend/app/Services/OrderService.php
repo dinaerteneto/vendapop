@@ -118,7 +118,7 @@ class OrderService
     {
         try {
             $order->load(['customer', 'tenant', 'items']);
-            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+            $frontendUrl = rtrim(config('services.frontend_url', 'http://localhost:5173'), '/');
             $orderUrl = "{$frontendUrl}/{$order->tenant->slug}/order/{$order->uuid}";
 
             Mail::to($order->customer->email)->send(new OrderConfirmationMail($order, $orderUrl));

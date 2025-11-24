@@ -51,7 +51,7 @@ class NotificationService
     private function sendEmailNotification(User $admin, Order $order, Tenant $tenant): void
     {
         try {
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            $frontendUrl = config('services.frontend_url', 'http://localhost:5173');
             $orderUrl = "{$frontendUrl}/admin/orders/{$order->uuid}";
 
             Mail::to($admin->email)->send(new NewOrderNotificationMail($order, $orderUrl));
@@ -75,7 +75,7 @@ class NotificationService
                 return;
             }
 
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            $frontendUrl = config('services.frontend_url', 'http://localhost:5173');
             $orderUrl = "{$frontendUrl}/admin/orders/{$order->uuid}";
 
             $payload = json_encode([
@@ -147,7 +147,7 @@ class NotificationService
     private function sendWhatsAppNotification(Tenant $tenant, Order $order): void
     {
         try {
-            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+            $frontendUrl = rtrim(config('services.frontend_url', 'http://localhost:5173'), '/');
             $trackingUrl = "{$frontendUrl}/{$tenant->slug}/order/{$order->uuid}";
 
             $message = "🔔 *Novo Pedido Recebido!*\n\n";
@@ -196,7 +196,7 @@ class NotificationService
                 return;
             }
 
-            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+            $frontendUrl = rtrim(config('services.frontend_url', 'http://localhost:5173'), '/');
             $orderUrl = "{$frontendUrl}/{$order->tenant->slug}/order/{$order->uuid}";
 
             $customerName = $order->customer->name;

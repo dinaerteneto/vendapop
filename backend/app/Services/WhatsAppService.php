@@ -11,7 +11,7 @@ class WhatsAppService
     public function generateOrderMessage(Tenant $tenant, Order $order, Customer $customer, array $items): string
     {
         // Use FRONTEND_URL to build the tracking link (fixed format)
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+        $frontendUrl = rtrim(config('services.frontend_url', 'http://localhost:5173'), '/');
         $trackingUrl = "{$frontendUrl}/{$tenant->slug}/order/{$order->uuid}";
 
         $message = "Olá, fiz um pedido na loja *{$tenant->name}*.\n";
