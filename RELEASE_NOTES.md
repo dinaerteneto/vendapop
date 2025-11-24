@@ -2,6 +2,25 @@
 
 ## 📋 Histórico de Versões
 
+### v1.2.1 (24 de Novembro de 2025)
+
+**Correções:**
+- 🔧 Correção de erro de TypeScript no build de produção
+- ✅ Adicionado cast explícito `as BufferSource` para compatibilidade de tipos
+- 🐛 Build do frontend agora completa sem erros de tipo
+
+**Melhorias:**
+- ⚙️ Configuração de `VITE_VAPID_PUBLIC_KEY` adicionada ao `docker-compose.yaml`
+- 🚀 Ambiente Docker agora configurado automaticamente para push notifications
+- 📝 Documentação atualizada com instruções de configuração
+
+**Notas Técnicas:**
+- Correção de incompatibilidade de tipos entre `Uint8Array` e `BufferSource` na subscription de push
+- Variável de ambiente `VITE_VAPID_PUBLIC_KEY` configurada no Docker Compose para desenvolvimento
+- Mesma chave VAPID do backend agora disponível automaticamente no frontend
+
+---
+
 ### v1.2.0 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
