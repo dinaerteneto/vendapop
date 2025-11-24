@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -10,6 +11,8 @@ use App\Models\Tenant;
 use App\Repositories\Interfaces\OrderRepositoryInterface;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderService
 {
@@ -83,6 +86,11 @@ class OrderService
             // Notify administrators about the new order
             $this->notificationService->notifyNewOrder($order);
 
+            // Send confirmation email to customer if they have an email
+            if ($customer->email) {
+                $this->sendCustomerConfirmationEmail($order);
+            }
+
             return $order;
         });
     }
@@ -101,5 +109,21 @@ class OrderService
 
         $message = $this->whatsAppService->generateOrderMessage($tenant, $order, $customer, $items);
         return $this->whatsAppService->generateWhatsAppUrl($tenant, $message);
+    }
+
+    /**
+     * Send confirmation email to customer
+     */
+    private function sendCustomerConfirmationEmail(Order $order): void
+    {
+        try {
+            $order->load(['customer', 'tenant', 'items']);
+            $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:5173'), '/');
+            $orderUrl = "{$frontendUrl}/{$order->tenant->slug}/order/{$order->uuid}";
+
+            Mail::to($order->customer->email)->send(new OrderConfirmationMail($order, $orderUrl));
+        } catch (\Exception $e) {
+            Log::error('Erro ao enviar email de confirmação para o cliente: ' . $e->getMessage());
+        }
     }
 }
