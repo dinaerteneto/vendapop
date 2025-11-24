@@ -31,6 +31,9 @@ import Cart from './pages/Shop/Cart';
 import Checkout from './pages/Shop/Checkout';
 import OrderTracking from './pages/Shop/OrderTracking';
 
+// Landing Page
+import Landing from './pages/Landing';
+
 // Proteção de Rota Admin
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('admin_token');
@@ -43,6 +46,9 @@ function App() {
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<Landing />} />
+
         {/* Rotas Admin */}
         <Route path="/admin/login" element={<SignIn />} />
         <Route path="/admin/register" element={<Register />} />
