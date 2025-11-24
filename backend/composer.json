@@ -10,7 +10,8 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
-        "minishlink/web-push": "^9.0"
+        "minishlink/web-push": "^9.0",
+        "spatie/laravel-sluggable": "^3.7"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
