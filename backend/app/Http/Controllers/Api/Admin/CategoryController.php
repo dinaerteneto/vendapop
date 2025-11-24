@@ -54,7 +54,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        // Slug será gerado automaticamente pela biblioteca sluggable
         $validated['tenant_id'] = $tenant->id;
 
         if ($request->hasFile('image')) {
@@ -99,9 +99,7 @@ class CategoryController extends Controller
             'is_active' => 'boolean'
         ]);
 
-        if (isset($validated['name'])) {
-            $validated['slug'] = Str::slug($validated['name']);
-        }
+        // Slug será atualizado automaticamente pela biblioteca sluggable se o nome mudar
 
         if ($request->hasFile('image')) {
             // Delete old image if exists and is local
@@ -125,10 +123,9 @@ class CategoryController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Category is already resolved by route model binding using slug
         // Ensure category belongs to tenant
-        $category = $this->categoryRepository->findByIdAndTenant($category->id, $tenant->id);
-
-        if (!$category) {
+        if ($category->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Category not found'], 404);
         }
 

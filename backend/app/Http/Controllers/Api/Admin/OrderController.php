@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Repositories\Interfaces\OrderRepositoryInterface;
@@ -46,10 +47,9 @@ class OrderController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Order is already resolved by route model binding using UUID
         // Ensure order belongs to tenant
-        $order = $this->orderRepository->findByIdAndTenant($order->id, $tenant->id);
-
-        if (!$order) {
+        if ($order->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
@@ -60,15 +60,14 @@ class OrderController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Order is already resolved by route model binding using UUID
         // Ensure order belongs to tenant
-        $order = $this->orderRepository->findByIdAndTenant($order->id, $tenant->id);
-
-        if (!$order) {
+        if ($order->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:NEW,DONE,CANCELED',
+            'status' => ['required', 'in:' . implode(',', OrderStatus::values())],
         ]);
 
         $this->orderRepository->update($order, $validated);

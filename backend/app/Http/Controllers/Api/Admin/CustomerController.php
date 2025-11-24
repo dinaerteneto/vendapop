@@ -45,10 +45,9 @@ class CustomerController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Customer is already resolved by route model binding using UUID
         // Ensure customer belongs to tenant
-        $customer = $this->customerRepository->findByIdAndTenant($customer->id, $tenant->id);
-
-        if (!$customer) {
+        if ($customer->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Customer not found'], 404);
         }
 
@@ -59,10 +58,9 @@ class CustomerController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Customer is already resolved by route model binding using UUID
         // Ensure customer belongs to tenant
-        $customer = $this->customerRepository->findByIdAndTenant($customer->id, $tenant->id);
-
-        if (!$customer) {
+        if ($customer->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Customer not found'], 404);
         }
 

@@ -21,6 +21,18 @@ class OrderRepository implements OrderRepositoryInterface
                    ->first();
     }
 
+    public function findByUuid(string $uuid): ?Order
+    {
+        return Order::where('uuid', $uuid)->first();
+    }
+
+    public function findByUuidAndTenant(string $uuid, int $tenantId): ?Order
+    {
+        return Order::where('uuid', $uuid)
+                   ->where('tenant_id', $tenantId)
+                   ->first();
+    }
+
     public function findByTenant(int $tenantId): Collection
     {
         return Order::where('tenant_id', $tenantId)

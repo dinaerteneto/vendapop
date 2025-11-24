@@ -74,7 +74,7 @@ class ProductController extends Controller
             }
         }
 
-        $validated['slug'] = Str::slug($validated['name']);
+        // Slug será gerado automaticamente pela biblioteca sluggable
 
         // Remove campos que não existem mais na tabela products
         $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
@@ -119,10 +119,9 @@ class ProductController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Product is already resolved by route model binding using slug
         // Ensure product belongs to tenant
-        $product = $this->productRepository->findByIdAndTenant($product->id, $tenant->id);
-
-        if (!$product) {
+        if ($product->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
@@ -133,10 +132,9 @@ class ProductController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Product is already resolved by route model binding using slug
         // Ensure product belongs to tenant
-        $product = $this->productRepository->findByIdAndTenant($product->id, $tenant->id);
-
-        if (!$product) {
+        if ($product->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
@@ -166,9 +164,7 @@ class ProductController extends Controller
             }
         }
 
-        if (isset($validated['name'])) {
-            $validated['slug'] = Str::slug($validated['name']);
-        }
+        // Slug será atualizado automaticamente pela biblioteca sluggable se o nome mudar
 
         // Update basic product info
         $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
@@ -262,10 +258,9 @@ class ProductController extends Controller
     {
         $tenant = $request->user()->tenant;
 
+        // Product is already resolved by route model binding using slug
         // Ensure product belongs to tenant
-        $product = $this->productRepository->findByIdAndTenant($product->id, $tenant->id);
-
-        if (!$product) {
+        if ($product->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
