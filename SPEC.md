@@ -149,6 +149,30 @@ public function createOrder($tenant, $customer, $items) {
 
 ## 4. Funcionalidades principais
 
+### 4.0. Tipos de Tenants
+
+O sistema suporta diferentes tipos de lojistas:
+
+- **Varejistas:**
+  - Vendem de forma unitária, normalmente produtos rotativos
+  - Podem ou não controlar estoque (sistema simples para quem não controla)
+  - Usam `sizes` e `colors` como JSON quando não controlam estoque
+
+- **Atacadistas:**
+  - Devem ter controle de estoque e quantidade mínima para venda
+  - Sistema migra automaticamente atributos simples (`sizes`, `colors`) quando ativam controle de estoque
+  - Usam sistema de variações com estoque por combinação
+
+- **Afiliados:**
+  - Produtos com `action_type = 'affiliate_link'`
+  - Botão "Comprar agora" redireciona para link externo
+  - Não criam pedidos no sistema
+
+- **Contato direto (ex: imobiliárias, corretores):**
+  - Produtos com `action_type = 'whatsapp_contact'`
+  - Botão "Fale com um vendedor" abre WhatsApp do vendedor
+  - Não criam pedidos no sistema
+
 ### 4.1. Lado público (cliente da loja)
 
 - **Página inicial da loja:**
@@ -159,15 +183,22 @@ public function createOrder($tenant, $customer, $items) {
 - **Página de detalhes do produto:**
   - Imagens grandes
   - Nome, preço, descrição
-  - Seleção de tamanho (P, M, G, etc.)
-  - Seleção de cor (opcional)
-  - Botão “Adicionar ao carrinho”
+  - Seleção de tamanho (P, M, G, etc.) - se produto tiver `sizes` ou atributos
+  - Seleção de cor (opcional) - se produto tiver `colors` ou atributos
+  - Botão de ação (comportamento varia por `action_type`):
+    - **Adicionar ao carrinho** (padrão): Adiciona produto ao carrinho
+    - **Comprar agora** (affiliate_link): Abre link externo em nova aba
+    - **Fale com um vendedor** (whatsapp_contact): Abre WhatsApp com mensagem personalizada
 - **Carrinho:**
   - Itens adicionados (nome, tamanho, cor, quantidade, preço)
   - Alterar quantidade
   - Remover item
   - Total geral
 - **Checkout:**
+  - **Validação de estoque** (se `stock_management_enabled = true`):
+    - Verificar se cada variação (combinação de atributos) tem estoque suficiente
+    - Se não houver estoque: retornar erro 422 com lista de variações indisponíveis
+    - Cliente deve voltar ao carrinho para substituir produtos sem estoque
   - Formulário com campos:
     - Nome (obrigatório)
     - E-mail (opcional individualmente)
@@ -181,12 +212,17 @@ public function createOrder($tenant, $customer, $items) {
   - Ao confirmar:
     - Criar um registro de pedido no backend (tabela `orders` + `order_items`)
     - Gerar um número de pedido (ex.: LOJA-2025-000123)
+    - Se `stock_management_enabled = true`: decrementar estoque das variações
     - Retornar para o frontend os dados necessários para montar o link do WhatsApp (número da loja, mensagem, etc.)
   - Redirecionamento para WhatsApp:
     - Usar `https://wa.me/` ou `https://api.whatsapp.com/send` com o número do WhatsApp da loja.
     - A mensagem deve seguir o formato (em pt-BR):
       `"Olá, gostaria de confirmar meu pedido nº {NUMERO_PEDIDO} na loja {NOME_LOJA}:\n\nItens:\n- {PRODUTO_1} – Tamanho: {TAM} – Qtde: {QTD}\n...\nTotal: R$ {TOTAL}\n\nMeus dados:\nNome: {NOME_CLIENTE}\nE-mail: {EMAIL}\nCelular: {CELULAR}"`
     - O React deve abrir essa URL usando `window.location.href`.
+  - **Página de confirmação do pedido:**
+    - Mostrar chave PIX para copiar (se `pix_key` configurada)
+    - Mostrar QR Code PIX (opcional)
+    - Botão "Enviar comprovante via WhatsApp" que abre WhatsApp com mensagem pré-formatada
 
 ### 4.2. Painel do lojista (admin por tenant)
 
@@ -206,6 +242,15 @@ public function createOrder($tenant, $customer, $items) {
   - Cores
   - Número de WhatsApp
   - Pequena descrição/sobre
+  - **Pagamento PIX:**
+    - Chave PIX e tipo da chave
+  - **Inativação temporária:**
+    - Ativar/desativar loja temporariamente
+    - Banner e mensagem para exibir quando inativa
+    - Agendar reativação automática
+  - **Planos:**
+    - Visualizar plano atual
+    - Cancelar plano (voltar para gratuito ou remover loja)
 
 ## 5. Modelo de dados e migrations (Laravel)
 
@@ -220,6 +265,22 @@ Crie as migrations para as tabelas abaixo. Campos de auditoria (`id`, `created_a
 - `primary_color` (string, nullable)
 - `secondary_color` (string, nullable)
 - `description` (text, nullable)
+- **Pagamento PIX:**
+  - `pix_key` (string, nullable) - Chave PIX do vendedor
+  - `pix_key_type` (enum: 'cpf', 'cnpj', 'email', 'phone', 'random', nullable) - Tipo da chave
+- **Inativação temporária:**
+  - `is_temporarily_inactive` (boolean, default false)
+  - `inactive_banner_image_url` (string, nullable)
+  - `inactive_banner_image_path` (string, nullable)
+  - `inactive_message` (text, nullable)
+  - `inactive_until` (timestamp, nullable) - Data de reativação automática
+- **Planos:**
+  - `plan_type` (enum: 'free', 'basic', 'premium', 'enterprise', default 'free')
+  - `plan_status` (enum: 'active', 'cancelled', 'suspended', default 'active')
+  - `cancelled_at` (timestamp, nullable)
+  - `cancellation_reason` (text, nullable)
+- **Controle de estoque:**
+  - `stock_management_enabled` (boolean, default false) - Ativa controle de estoque por variações
 
 ### 5.2. `users` (lojistas)
 - `id`
@@ -246,11 +307,16 @@ Crie as migrations para as tabelas abaixo. Campos de auditoria (`id`, `created_a
 - `short_description` (string, nullable)
 - `description` (text, nullable)
 - `price` (decimal, ex.: 10,2)
-- `sizes` (json) – ex.: ["P","M","G"]
-- `colors` (json, nullable) – ex.: ["preto","azul"]
-- `main_image_url` (string, nullable)
-- `images` (json, nullable) – URLs adicionais
+- `promotional_price` (decimal, nullable)
+- `sizes` (json) – ex.: ["P","M","G"] - Usado quando `stock_management_enabled = false`
+- `colors` (json, nullable) – ex.: ["preto","azul"] - Usado quando `stock_management_enabled = false`
 - `is_active` (boolean, default true)
+- `is_hot` (boolean, default false)
+- **Ação do botão:**
+  - `action_type` (enum: 'add_to_cart', 'affiliate_link', 'whatsapp_contact', default 'add_to_cart')
+  - `affiliate_link` (string, nullable) - URL do link de afiliado (quando `action_type = 'affiliate_link'`)
+  - `whatsapp_message` (text, nullable) - Mensagem personalizada para WhatsApp (quando `action_type = 'whatsapp_contact'`)
+- **Nota:** `main_image_url` e `images` foram removidos. Use tabela `product_images` (relacionamento `hasMany`).
 
 ### 5.5. `customers` (clientes finais)
 - `id`
@@ -280,6 +346,40 @@ Crie as migrations para as tabelas abaixo. Campos de auditoria (`id`, `created_a
 - `size` (string, nullable)
 - `color` (string, nullable)
 - `subtotal` (decimal 10,2)
+
+### 5.8. Sistema de Estoque por Atributos (Futuro - quando `stock_management_enabled = true`)
+
+Quando um tenant ativa controle de estoque, o sistema migra automaticamente `sizes` e `colors` para tabelas de atributos:
+
+#### 5.8.1. `product_attributes`
+- `id`
+- `tenant_id` (foreignId → tenants.id)
+- `name` (string) - ex: "Tamanho", "Cor", "Gola"
+- `slug` (string)
+- `order` (integer, default 0)
+- `is_active` (boolean, default true)
+
+#### 5.8.2. `product_attribute_values`
+- `id`
+- `attribute_id` (foreignId → product_attributes.id)
+- `value` (string) - ex: "P", "M", "Azul", "128GB"
+- `order` (integer, default 0)
+- `is_active` (boolean, default true)
+
+#### 5.8.3. `product_variations`
+- `id`
+- `product_id` (foreignId → products.id)
+- `attributes` (json) - Combinação de atributos: `{"tamanho": "P", "cor": "Azul"}`
+- `stock` (integer, nullable) - Quantidade em estoque
+- `price` (decimal, nullable) - Preço específico da variação (opcional)
+- `sku` (string, nullable) - Código SKU da variação
+- `is_active` (boolean, default true)
+
+**Migração automática:** Quando `stock_management_enabled` é ativado, o sistema:
+1. Cria atributo "Tamanho" se produto tiver `sizes`
+2. Cria atributo "Cor" se produto tiver `colors`
+3. Cria variações para todas as combinações existentes
+4. Mantém dados originais (`sizes`, `colors`) para rollback se necessário
 
 **Instrução para a IA:**
 Criar as migrations Laravel para todas as tabelas acima, incluindo chaves estrangeiras, índices apropriados e `onDelete('cascade')` quando fizer sentido (por exemplo, ao apagar um tenant, apagar subordinados).
