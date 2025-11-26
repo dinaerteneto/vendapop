@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\TenantService;
+use App\Services\ProductAttributeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -84,7 +85,6 @@ class StoreSettingsController extends Controller
             'name' => 'required|string|min:1',
             'whatsapp_number' => 'required|string|min:1',
             'whatsapp_message' => 'nullable|string',
-            'store_url' => 'nullable|string', // Changed from 'url' to accept slug
             'primary_color' => 'nullable|string',
             'secondary_color' => 'nullable|string',
             'description' => 'nullable|string',
@@ -96,6 +96,7 @@ class StoreSettingsController extends Controller
             'logo_url' => 'nullable|string',
             'address' => 'nullable|string',
             'email_contact' => 'nullable|string|email',
+            'business_sector' => 'nullable|in:fashion,electronics,jewelry,real_estate,food,custom_orders,affiliates,other',
             'socials' => 'nullable',
         ]);
 
@@ -129,9 +130,9 @@ class StoreSettingsController extends Controller
 
         // Convert empty strings to null for nullable fields (FormData sends empty strings)
         // But skip logo_url if we just uploaded a file
-        $nullableFields = ['store_url', 'whatsapp_message', 'primary_color', 'secondary_color', 'description',
+        $nullableFields = ['whatsapp_message', 'primary_color', 'secondary_color', 'description',
                           'banner_message', 'banner_text_color_1', 'banner_text_color_2',
-                          'banner_background_color', 'address', 'email_contact'];
+                          'banner_background_color', 'address', 'email_contact', 'business_sector'];
 
         foreach ($nullableFields as $field) {
             if (isset($validated[$field]) && $validated[$field] === '') {
@@ -187,7 +188,17 @@ class StoreSettingsController extends Controller
         // Remove logo from validated if it's a file (already handled)
         unset($validated['logo']);
 
+        // Check if business_sector changed
+        $businessSectorChanged = isset($validated['business_sector']) && 
+                                 $tenant->business_sector !== $validated['business_sector'];
+
         $tenant->update($validated);
+
+        // Create default attributes if business_sector was set/changed
+        if ($businessSectorChanged && $validated['business_sector']) {
+            $attributeService = app(ProductAttributeService::class);
+            $attributeService->createDefaultAttributesForSector($tenant, $validated['business_sector']);
+        }
 
         // Handle socials - can come as JSON string in FormData or as array in JSON
         if ($request->has('socials')) {
