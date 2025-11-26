@@ -14,6 +14,14 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductSeeder::class,
             RotatingBannerSeeder::class,
+            // Seeders dos novos ramos
+            ImobiliariaSeeder::class,
+            EletronicosSeeder::class,
+            RoupasSeeder::class,
+            JoiasSeeder::class,
+            BoloCaseiroSeeder::class,
+            EncomendasSeeder::class,
+            AfiliadosSeeder::class,
         ]);
     }
 }
