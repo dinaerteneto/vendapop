@@ -1177,7 +1177,7 @@ const ProductForm: React.FC = () => {
                       </div>
 
                       {/* Valores do Atributo (Tags) */}
-                      <div>
+            <div>
                         <label className="block text-xs text-gray-600 mb-2">
                           Valores (digite e pressione Enter)
                         </label>
@@ -1197,13 +1197,13 @@ const ProductForm: React.FC = () => {
                               </button>
                             </span>
                           ))}
-                          <input
-                            type="text"
+              <input
+                type="text"
                             onKeyDown={(e) => handleAddAttributeValue(index, e)}
                             placeholder="Digite e pressione Enter"
                             className="flex-1 min-w-[150px] border-0 focus:ring-0 focus:outline-none"
-                          />
-                        </div>
+              />
+            </div>
                       </div>
                     </div>
                   ))}
@@ -1273,13 +1273,13 @@ const ProductForm: React.FC = () => {
                             
                             {/* SKU */}
                             <td className="px-4 py-3 whitespace-nowrap">
-                              <input
-                                type="text"
+              <input
+                type="text"
                                 value={variation.sku || ''}
                                 onChange={(e) => handleVariationChange(index, 'sku', e.target.value || null)}
                                 placeholder="SKU"
                                 className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                              />
+              />
                             </td>
                           </tr>
                         ))}
