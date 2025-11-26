@@ -2,6 +2,85 @@
 
 ## 📋 Histórico de Versões
 
+### v1.5.0 (27 de Janeiro de 2025)
+
+**Novas Funcionalidades:**
+- 🏷️ Sistema completo de atributos dinâmicos de produtos
+- 📦 Sistema de variações de produtos com estoque e preço individual
+- 🎯 Controle de estoque por variação (habilitável por produto)
+- 💰 Preço dinâmico baseado na variação selecionada
+- 🛒 Botões de ação dinâmicos (Adicionar ao Carrinho, Link Afiliado, WhatsApp)
+- 🏢 Business Sector (Ramo de Atividade) com criação automática de atributos
+- 📋 Seeders para diferentes ramos: Imobiliários, Eletrônicos, Roupas, Joias, Bolo Caseiro, Encomendas e Afiliados
+- 🎨 Interface de gerenciamento de variações com tabela completa (estoque, preço, SKU)
+- 🔄 Comando de migração para converter sizes/colors existentes em atributos
+
+**Melhorias:**
+- 🎨 ProductResource para padronizar todas as respostas de API de produtos
+- 🖱️ Drag & drop para reordenar banners no admin
+- 📝 Slug da loja agora é read-only no admin
+- 🎯 Botão label personalizável por produto
+- 🏷️ Seleção de atributos estilo Select2 com criação inline
+- 📊 Tabela de variações mostrando todas as combinações de atributos
+- ✅ Validação de estoque considerando quantidade já no carrinho
+- 🔍 Normalização de atributos (arrays indexados para objetos com IDs)
+
+**Correções:**
+- ✅ Remove campos `sizes` e `colors` da tabela products (substituídos por atributos)
+- ✅ Remove tabela `product_attribute_values` (valores agora são livres nas variações)
+- ✅ Corrige bug de multiplicação de quantidade no carrinho
+- ✅ Corrige comparação de atributos para agrupar itens corretamente
+- ✅ Remove campo `store_url` dos tenants (mantém apenas slug)
+- ✅ Corrige resolveRouteBinding para tratar encoding de slug
+- ✅ Banners aparecem apenas na página inicial da loja
+- ✅ Remove referências ao AttributeList removido
+- ✅ Cria manifest.json para corrigir erro de PWA
+- ✅ Simplifica StoreController removendo UseCases desnecessários
+
+**Notas Técnicas:**
+- Backend:
+  - Migration `create_product_attributes_tables` cria tabelas de atributos e variações
+  - Migration `add_business_sector_to_tenants_table` adiciona campo de ramo de atividade
+  - Migration `add_action_fields_to_products_table` adiciona action_type, affiliate_link, whatsapp_message
+  - Migration `add_button_label_to_products_table` adiciona campo de label personalizado
+  - Migration `add_stock_management_enabled_to_products_table` adiciona controle de estoque
+  - Migration `add_attributes_to_order_items_table` adiciona coluna attributes (JSON)
+  - Migration `remove_sizes_and_colors_from_products_table` remove campos obsoletos
+  - Migration `drop_product_attribute_values_table` remove tabela de valores
+  - Migration `remove_store_url_from_tenants_table` remove campo obsoleto
+  - Model `ProductAttribute` para gerenciar atributos por tenant
+  - Model `ProductVariation` para variações com estoque, preço e SKU
+  - `ProductResource` padroniza todas as respostas de produtos
+  - `ProductAttributeService` gerencia atributos por business sector
+  - Comando `products:migrate-sizes-colors-to-attributes` para migração de dados
+  - `resolveRouteBinding` melhorado para tratar encoding de slugs
+- Frontend:
+  - Formulário de produtos com interface de variações completa
+  - Tabela de variações com estoque, preço e SKU editáveis
+  - Seleção de atributos com criação inline (estilo Select2)
+  - Validação de estoque no carrinho considerando quantidade existente
+  - Preço dinâmico na página de detalhes do produto
+  - Indicador de disponibilidade baseado em estoque
+  - Botões de ação dinâmicos (`ProductActionButton`)
+  - Banners aparecem apenas na página inicial
+- Seeders:
+  - `ImobiliariaSeeder` com produtos imobiliários e variações
+  - `EletronicosSeeder`, `RoupasSeeder`, `JoiasSeeder`, `BoloCaseiroSeeder`, `EncomendasSeeder`, `AfiliadosSeeder`
+  - Usuários admin criados para cada tenant de exemplo
+  - Nomes realistas para casos de sucesso
+
+**Breaking Changes:**
+- ⚠️ Campos `sizes` e `colors` foram removidos da tabela products
+- ⚠️ Estrutura de variações mudou para usar atributos dinâmicos
+- ⚠️ Campo `store_url` foi removido dos tenants
+
+**Migração:**
+1. Execute todas as migrations: `php artisan migrate`
+2. Para migrar dados existentes: `php artisan products:migrate-sizes-colors-to-attributes`
+3. Configure business_sector nos tenants para criar atributos padrão automaticamente
+
+---
+
 ### v1.4.0 (24 de Novembro de 2025)
 
 **Novas Funcionalidades:**
