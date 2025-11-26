@@ -14,7 +14,6 @@ class TenantSeeder extends Seeder
             ['slug' => 'modachic'],
             [
                 'name' => 'Moda Chic',
-                'store_url' => 'http://localhost:5173', // Default dev URL
                 'whatsapp_number' => '5511999999999',
                 'description' => 'A melhor moda feminina da região!',
                 'banner_message' => '🔥 PROMOÇÃO BLACK FRIDAY - 50% OFF EM TODA A LOJA! 🔥',
