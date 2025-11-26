@@ -4,6 +4,8 @@ import api from '../../services/api';
 import ImageCarousel from '../../components/ui/ImageCarousel';
 import Toast from '../../components/ui/Toast';
 import { useCart } from '../../context/CartContext';
+import ProductActionButton from '../../components/ecommerce/ProductActionButton';
+import { formatCurrency } from '../../utils/currency';
 
 interface ProductImage {
     id: number;
@@ -11,17 +13,51 @@ interface ProductImage {
     is_main: boolean;
 }
 
+interface ProductAttribute {
+  attributeId: number;
+  attributeName: string;
+  values: string[];
+}
+
 interface Product {
   id: number;
+  uuid?: string;
+  slug: string;
   name: string;
   description: string;
+  short_description?: string;
   price: string;
   promotional_price?: string | null;
-  sizes: string[];
-  colors: string[] | null;
+  sizes?: string[]; // Apenas para produtos antigos sem variações
+  colors?: string[] | null; // Apenas para produtos antigos sem variações
+  variations?: Array<{
+    id: number;
+    attributes: { [key: string]: string }; // { attributeId: value }
+    attribute_names?: { [key: string]: string }; // { attributeId: name }
+    stock?: number | null;
+    price?: number | null;
+    sku?: string | null;
+    is_active?: boolean;
+  }>;
+  attributes_map?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
   main_image_url: string | null;
   images: ProductImage[] | null;
-  is_hot?: boolean; // Added is_hot
+  is_hot?: boolean;
+  is_active?: boolean;
+  action_type?: 'add_to_cart' | 'affiliate_link' | 'whatsapp_contact';
+  affiliate_link?: string | null;
+  whatsapp_message?: string | null;
+  button_label?: string | null;
+  category_id?: number;
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
 }
 
 interface ToastState {
@@ -34,8 +70,8 @@ const ProductDetail: React.FC = () => {
   const { storeSlug, productSlug } = useParams();
   const { addToCart: addToCartContext } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
-  const [selectedSize, setSelectedSize] = useState<string>('');
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [productAttributes, setProductAttributes] = useState<ProductAttribute[]>([]);
+  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
   const [quantity, setQuantity] = useState<number>(1);
   const context = useOutletContext<{ storeInfo: any }>();
   const primaryColor = context?.storeInfo?.primary_color || '#7c3aed';
@@ -50,14 +86,87 @@ const ProductDetail: React.FC = () => {
   useEffect(() => {
      const fetch = async () => {
          try {
-             const { data } = await api.get(`/${storeSlug}/products/${productSlug}`);
-             setProduct(data);
+             const response = await api.get(`/${storeSlug}/products/${productSlug}`);
+             // Laravel Resource retorna diretamente o objeto (sem wrapper { data: {...} })
+             const productData = response.data;
+             
+             if (!productData || !productData.id) {
+                 console.error('Product data is invalid:', response.data);
+                 return;
+             }
+             
+             setProduct(productData);
+             
+             // Extrair atributos das variações
+             if (productData?.variations && Array.isArray(productData.variations) && productData.variations.length > 0) {
+                 const attributes = extractAttributesFromVariations(productData.variations, productData.attributes_map || []);
+                 setProductAttributes(attributes);
+                 
+                 // Selecionar primeiro valor de cada atributo por padrão
+                 const defaultSelections: { [key: number]: string } = {};
+                 attributes.forEach(attr => {
+                     if (attr.values.length > 0) {
+                         defaultSelections[attr.attributeId] = attr.values[0];
+                     }
+                 });
+                 setSelectedAttributes(defaultSelections);
+             }
          } catch (e) {
              console.error(e);
          }
      };
      if (storeSlug && productSlug) fetch();
   }, [storeSlug, productSlug]);
+
+  // Função para extrair atributos únicos das variações
+  const extractAttributesFromVariations = (
+    variations: Array<{ 
+      attributes: { [key: string]: string };
+      attribute_names?: { [key: string]: string };
+    }>,
+    attributesMap: Array<{ id: number; name: string; slug: string }> = []
+  ): ProductAttribute[] => {
+    const attributesById: { [key: number]: { attributeId: number; attributeName: string; values: Set<string> } } = {};
+    
+    // Criar mapeamento rápido de IDs para nomes
+    const nameMap: { [key: number]: string } = {};
+    attributesMap.forEach(attr => {
+      nameMap[attr.id] = attr.name;
+    });
+
+    variations.forEach((variation) => {
+        if (variation.attributes && typeof variation.attributes === 'object') {
+            Object.keys(variation.attributes).forEach((attrIdStr) => {
+                const attrId = parseInt(attrIdStr, 10);
+                const attrValue = variation.attributes[attrIdStr];
+                
+                if (!attributesById[attrId]) {
+                    // Buscar nome do atributo: primeiro em attribute_names, depois em attributesMap, depois fallback
+                    const attributeName = variation.attribute_names?.[attrIdStr] 
+                        || nameMap[attrId] 
+                        || `Atributo ${attrId}`;
+                    
+                    attributesById[attrId] = {
+                        attributeId: attrId,
+                        attributeName: attributeName,
+                        values: new Set<string>(),
+                    };
+                }
+                
+                if (attrValue && typeof attrValue === 'string' && attrValue.trim()) {
+                    attributesById[attrId].values.add(attrValue.trim());
+                }
+            });
+        }
+    });
+
+    // Converter para array
+    return Object.values(attributesById).map((attr) => ({
+        attributeId: attr.attributeId,
+        attributeName: attr.attributeName,
+        values: Array.from(attr.values).sort(),
+    }));
+  };
 
   const showToast = (message: string, type: ToastState['type'] = 'warning') => {
     setToast({ isVisible: true, message, type });
@@ -70,26 +179,33 @@ const ProductDetail: React.FC = () => {
   const addToCart = () => {
       if (!product) return;
       
-      if (!selectedSize && product.sizes?.length > 0) {
-          showToast('Por favor, selecione um tamanho.', 'warning');
+      // Validar se todos os atributos obrigatórios foram selecionados (apenas se houver variações)
+      if (productAttributes.length > 0) {
+          for (const attr of productAttributes) {
+              if (!selectedAttributes[attr.attributeId]) {
+                  showToast(`Por favor, selecione ${attr.attributeName.toLowerCase()}.`, 'warning');
           return;
       }
-
-      if (!selectedColor && product.colors && product.colors.length > 0) {
-          showToast('Por favor, selecione uma cor.', 'warning');
-          return;
+          }
       }
 
       const finalPrice = product.promotional_price && parseFloat(product.promotional_price) > 0 
         ? parseFloat(product.promotional_price) 
         : parseFloat(product.price);
 
+      // Preparar atributos para o carrinho (compatibilidade com formato antigo)
+      const attributesPayload: { [key: string]: string } = {};
+      Object.keys(selectedAttributes).forEach(attrId => {
+          attributesPayload[attrId] = selectedAttributes[parseInt(attrId)];
+      });
+
       addToCartContext({
           product_id: product.id,
           name: product.name,
           price: finalPrice,
-          size: selectedSize,
-          color: selectedColor,
+          size: '', // Deprecated, usar attributes
+          color: '', // Deprecated, usar attributes
+          attributes: attributesPayload, // Novo formato
           quantity: quantity,
           main_image_url: product.main_image_url || undefined
       });
@@ -147,56 +263,43 @@ const ProductDetail: React.FC = () => {
                 <div className="mb-6 flex items-baseline gap-3">
                     {originalPrice && (
                         <span className="text-lg text-gray-400 line-through">
-                            R$ {originalPrice.toFixed(2).replace('.',',')}
+                            {formatCurrency(originalPrice)}
                         </span>
                     )}
                     <span className="text-3xl font-extrabold text-purple-700" style={{ color: primaryColor }}>
-                        R$ {currentPrice.toFixed(2).replace('.',',')}
+                        {formatCurrency(currentPrice)}
                     </span>
                     <span className="text-sm text-gray-500">/ unidade</span>
                 </div>
 
                 <div className="space-y-6">
-                    {/* Size Selection */}
-                    <div>
-                        <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">Tamanho</p>
+                    {/* Atributos Dinâmicos - Apenas se houver variações */}
+                    {productAttributes.length > 0 && (
+                        productAttributes.map((attr) => (
+                            <div key={attr.attributeId}>
+                                <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
+                                    {attr.attributeName}
+                                </p>
                         <div className="flex flex-wrap gap-3">
-                            {product.sizes.map(s => (
+                                    {attr.values.map((value) => (
                                 <button
-                                    key={s}
-                                    onClick={() => setSelectedSize(s)}
-                                    className={`min-w-[3rem] h-10 px-3 rounded-lg font-medium transition-all duration-200 ${
-                                        selectedSize === s 
-                                        ? 'bg-black text-white shadow-md scale-105' 
-                                        : 'bg-white border border-gray-200 text-gray-700 hover:border-black'
-                                    }`}
-                                >
-                                    {s}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Color Selection */}
-                    {product.colors && product.colors.length > 0 && (
-                        <div>
-                            <p className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">Cor</p>
-                            <div className="flex flex-wrap gap-3">
-                                {product.colors.map(c => (
-                                    <button
-                                        key={c}
-                                        onClick={() => setSelectedColor(c)}
+                                            key={value}
+                                            onClick={() => setSelectedAttributes(prev => ({
+                                                ...prev,
+                                                [attr.attributeId]: value
+                                            }))}
                                         className={`px-4 py-2 rounded-lg font-medium border transition-all duration-200 ${
-                                            selectedColor === c 
-                                            ? 'bg-black text-white border-black shadow-md' 
+                                                selectedAttributes[attr.attributeId] === value
+                                                    ? 'bg-black text-white border-black shadow-md scale-105'
                                             : 'bg-white border-gray-200 text-gray-700 hover:border-black'
                                         }`}
                                     >
-                                        {c}
+                                            {value}
                                     </button>
                                 ))}
                             </div>
                         </div>
+                        ))
                     )}
 
                     {/* Description */}
@@ -227,14 +330,17 @@ const ProductDetail: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Add to Cart Button */}
-                    <button 
-                        onClick={addToCart} 
-                        className="w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 hover:opacity-90"
-                        style={{ backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}40` }}
-                    >
-                        <span>🛒</span> Adicionar ao Carrinho
-                    </button>
+                    {/* Action Button (Add to Cart, WhatsApp, or Affiliate) */}
+                    <ProductActionButton
+                        actionType={product.action_type || 'add_to_cart'}
+                        affiliateLink={product.affiliate_link}
+                        whatsappMessage={product.whatsapp_message}
+                        whatsappNumber={context?.storeInfo?.whatsapp_number}
+                        buttonLabel={product.button_label}
+                        onAddToCart={addToCart}
+                        primaryColor={primaryColor}
+                        productName={product.name}
+                    />
 
                     {/* Share Button */}
                     <button 

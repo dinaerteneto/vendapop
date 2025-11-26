@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useOutletContext } from 'react-router-dom';
 import api from '../../services/api';
 import CategoryList from '../../components/ecommerce/CategoryList';
+import { formatWhatsAppNumber } from '../../utils/whatsapp';
+import { formatCurrency } from '../../utils/currency';
 
 interface Product {
   id: number;
@@ -12,6 +14,10 @@ interface Product {
   main_image_url: string | null;
   category_id: number;
   is_hot?: boolean;
+  action_type?: 'add_to_cart' | 'affiliate_link' | 'whatsapp_contact';
+  affiliate_link?: string | null;
+  whatsapp_message?: string | null;
+  button_label?: string | null;
 }
 
 interface Category {
@@ -23,6 +29,7 @@ interface Category {
 
 const ProductList: React.FC = () => {
   const { storeSlug } = useParams();
+  const context = useOutletContext<{ storeInfo: any }>();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +56,8 @@ const ProductList: React.FC = () => {
               if (searchTerm) params.search = searchTerm;
 
               const { data } = await api.get(`/${storeSlug}/products`, { params });
-              setProducts(data);
+              // Resource::collection() retorna { data: [...] }, então precisamos acessar data.data
+              setProducts(Array.isArray(data) ? data : (data?.data || []));
           } catch (error) {
               console.error("Erro ao buscar produtos", error);
           } finally {
@@ -142,13 +150,13 @@ const ProductList: React.FC = () => {
                             {p.promotional_price && parseFloat(p.promotional_price) > 0 ? (
                                 <>
                                     <span className="text-xs text-gray-400 line-through">
-                                        R$ {parseFloat(p.price).toFixed(2).replace('.',',')}
+                                        {formatCurrency(parseFloat(p.price))}
                                     </span>
                                     <span 
                                         className="text-lg font-extrabold"
                                         style={{ color: 'var(--theme-primary)' }}
                                     >
-                                        R$ {parseFloat(p.promotional_price).toFixed(2).replace('.',',')}
+                                        {formatCurrency(parseFloat(p.promotional_price))}
                                     </span>
                                 </>
                             ) : (
@@ -156,17 +164,61 @@ const ProductList: React.FC = () => {
                                     className="text-lg font-extrabold"
                                     style={{ color: 'var(--theme-primary)' }}
                                 >
-                                    R$ {parseFloat(p.price).toFixed(2).replace('.',',')}
+                                    {formatCurrency(parseFloat(p.price))}
                                 </span>
                             )}
                         </div>
 
-                        <button 
-                            className="w-full rounded-full py-2 text-sm font-bold text-white shadow hover:opacity-90 transition-colors uppercase tracking-wide"
-                            style={{ backgroundColor: 'var(--theme-primary)' }}
+                        {(() => {
+                            const actionType = p.action_type || 'add_to_cart';
+                            const primaryColor = context?.storeInfo?.primary_color || 'var(--theme-primary)';
+                            
+                            // WhatsApp Contact
+                            if (actionType === 'whatsapp_contact' && context?.storeInfo?.whatsapp_number) {
+                                const formattedNumber = formatWhatsAppNumber(context.storeInfo.whatsapp_number);
+                                const message = p.whatsapp_message || `Olá! Tenho interesse em ${p.name}. Poderia me enviar mais informações?`;
+                                const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(message)}`;
+                                const label = p.button_label || 'Falar com Vendedor';
+                                
+                                return (
+                                    <a
+                                        href={whatsappUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-full rounded-full py-2 text-sm font-bold text-white shadow hover:opacity-90 transition-colors uppercase tracking-wide block text-center"
+                                        style={{ backgroundColor: primaryColor }}
+                                    >
+                                        {label}
+                                    </a>
+                                );
+                            }
+                            
+                            // Affiliate Link
+                            if (actionType === 'affiliate_link' && p.affiliate_link) {
+                                return (
+                                    <a
+                                        href={p.affiliate_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-full rounded-full py-2 text-sm font-bold text-white shadow hover:opacity-90 transition-colors uppercase tracking-wide block text-center"
+                                        style={{ backgroundColor: primaryColor }}
+                                    >
+                                        Comprar Agora
+                                    </a>
+                                );
+                            }
+                            
+                            // Default: Add to Cart (navigate to detail page)
+                            return (
+                                <span className="w-full rounded-full py-2 text-sm font-bold text-white shadow hover:opacity-90 transition-colors uppercase tracking-wide block text-center"
+                                    style={{ backgroundColor: primaryColor }}
                         >
                             Comprar
-                        </button>
+                                </span>
+                            );
+                        })()}
                     </div>
                 </Link>
             ))}
