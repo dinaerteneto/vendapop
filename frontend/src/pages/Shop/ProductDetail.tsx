@@ -69,7 +69,7 @@ interface ToastState {
 
 const ProductDetail: React.FC = () => {
   const { storeSlug, productSlug } = useParams();
-  const { addToCart: addToCartContext } = useCart();
+  const { addToCart: addToCartContext, cart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [productAttributes, setProductAttributes] = useState<ProductAttribute[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
@@ -235,6 +235,14 @@ const ProductDetail: React.FC = () => {
   const addToCart = () => {
       if (!product) return;
       
+      // Preparar atributos para o carrinho (precisa ser criado antes para usar na validação)
+      const attributesPayload: { [key: string]: string } = {};
+      if (productAttributes.length > 0) {
+          Object.keys(selectedAttributes).forEach(attrId => {
+              attributesPayload[attrId] = selectedAttributes[parseInt(attrId)];
+          });
+      }
+      
       // Validar se todos os atributos obrigatórios foram selecionados (apenas se houver variações)
       if (productAttributes.length > 0) {
           for (const attr of productAttributes) {
@@ -258,31 +266,64 @@ const ProductDetail: React.FC = () => {
                   return;
               }
 
-              if (selectedVariation.stock !== null && selectedVariation.stock !== undefined && quantity > selectedVariation.stock) {
-                  showToast(`Quantidade indisponível. Máximo disponível: ${selectedVariation.stock}`, 'warning');
-                  return;
+              // Verificar quantidade no estoque considerando o que já está no carrinho
+              if (selectedVariation.stock !== null && selectedVariation.stock !== undefined) {
+                  // Buscar quantidade já no carrinho para esta variação específica
+                  const hasAttributes = Object.keys(attributesPayload).length > 0;
+                  const existingCartItem = cart.find((item) => {
+                      if (item.product_id !== product.id) return false;
+                      
+                      // Normalizar atributos para comparação
+                      const itemAttrs = item.attributes || {};
+                      const payloadAttrs = attributesPayload || {};
+                      const itemHasAttrs = Object.keys(itemAttrs).length > 0;
+                      
+                      // Se ambos têm atributos ou ambos não têm, comparar
+                      if (hasAttributes || itemHasAttrs) {
+                          const itemAttrsStr = JSON.stringify(itemAttrs);
+                          const payloadAttrsStr = JSON.stringify(payloadAttrs);
+                          return itemAttrsStr === payloadAttrsStr;
+                      }
+                      
+                      // Se nenhum tem atributos, é a mesma variação
+                      return true;
+                  });
+                  
+                  const quantityInCart = existingCartItem?.quantity || 0;
+                  const totalQuantity = quantityInCart + quantity;
+                  
+                  if (totalQuantity > selectedVariation.stock) {
+                      const availableQuantity = selectedVariation.stock - quantityInCart;
+                      if (availableQuantity <= 0) {
+                          showToast(`Você já possui ${quantityInCart} unidade(s) no carrinho. Não há mais estoque disponível.`, 'warning');
+                      } else {
+                          showToast(`Quantidade indisponível. Você já tem ${quantityInCart} no carrinho. Restam apenas ${availableQuantity} disponível(is).`, 'warning');
+                      }
+                      return;
+                  }
               }
           }
       }
 
-      // Preparar atributos para o carrinho (compatibilidade com formato antigo)
-      const attributesPayload: { [key: string]: string } = {};
-      Object.keys(selectedAttributes).forEach(attrId => {
-          attributesPayload[attrId] = selectedAttributes[parseInt(attrId)];
-      });
-
       const finalPrice = getCurrentPrice();
 
-      addToCartContext({
+      // Criar o item do carrinho
+      const cartItem: any = {
           product_id: product.id,
           name: product.name,
           price: finalPrice,
           size: '', // Deprecated, usar attributes
           color: '', // Deprecated, usar attributes
-          attributes: attributesPayload, // Novo formato
           quantity: quantity,
           main_image_url: product.main_image_url || undefined
-      });
+      };
+      
+      // Só adicionar attributes se realmente houver atributos selecionados
+      if (productAttributes.length > 0 && Object.keys(attributesPayload).length > 0) {
+          cartItem.attributes = attributesPayload;
+      }
+      
+      addToCartContext(cartItem);
 
       showToast('Produto adicionado ao carrinho!', 'success');
   };
