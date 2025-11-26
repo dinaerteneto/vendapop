@@ -54,6 +54,7 @@ class OrderService
                     'quantity' => $item['quantity'],
                     'size' => $item['size'] ?? null,
                     'color' => $item['color'] ?? null,
+                    'attributes' => $item['attributes'] ?? null,
                     'subtotal' => $subtotal,
                 ];
             }
@@ -79,6 +80,7 @@ class OrderService
                     'quantity' => $data['quantity'],
                     'size' => $data['size'],
                     'color' => $data['color'],
+                    'attributes' => $data['attributes'],
                     'subtotal' => $data['subtotal'],
                 ]);
             }

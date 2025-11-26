@@ -17,7 +17,12 @@ class OrderItem extends Model
         'quantity',
         'size',
         'color',
+        'attributes',
         'subtotal',
+    ];
+
+    protected $casts = [
+        'attributes' => 'array',
     ];
 
     public function order()
