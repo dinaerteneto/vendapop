@@ -38,8 +38,16 @@ const Cart: React.FC = () => {
                                 <div>
                                     <h3 className="font-bold text-gray-800">{item.name}</h3>
                                     <p className="text-sm text-gray-500">
-                                        {item.size && <span className="mr-2">Tam: {item.size}</span>}
-                                        {item.color && <span>Cor: {item.color}</span>}
+                                        {item.attributes && Object.keys(item.attributes).length > 0 ? (
+                                            <>
+                                                {Object.values(item.attributes).join(', ')}
+                                            </>
+                                        ) : (
+                                            <>
+                                                {item.size && <span className="mr-2">Tam: {item.size}</span>}
+                                                {item.color && <span>Cor: {item.color}</span>}
+                                            </>
+                                        )}
                                     </p>
                                     <p className="text-sm font-bold text-purple-700 mt-1">
                                         R$ {item.price.toFixed(2).replace('.',',')}

@@ -4,8 +4,9 @@ export interface CartItem {
   product_id: number;
   name: string;
   price: number;
-  size: string;
-  color: string;
+  size?: string; // Deprecated, usar attributes
+  color?: string; // Deprecated, usar attributes
+  attributes?: { [key: string]: string }; // { attributeId: value }
   quantity: number;
   main_image_url?: string;
 }
@@ -50,12 +51,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode; storeSlug?: str
 
   const addToCart = (item: CartItem) => {
     setCart((prev) => {
-      const existingItemIndex = prev.findIndex(
-        (i) => 
-          i.product_id === item.product_id && 
-          i.size === item.size && 
-          i.color === item.color
-      );
+      // Comparar por product_id e atributos (ou size/color para compatibilidade)
+      const existingItemIndex = prev.findIndex((i) => {
+        if (i.product_id !== item.product_id) return false;
+        
+        // Se tiver attributes, comparar por attributes
+        if (item.attributes && Object.keys(item.attributes).length > 0) {
+          const itemAttrsStr = JSON.stringify(item.attributes);
+          const iAttrsStr = i.attributes ? JSON.stringify(i.attributes) : '';
+          return itemAttrsStr === iAttrsStr;
+        }
+        
+        // Fallback para size/color (compatibilidade)
+        return i.size === item.size && i.color === item.color;
+      });
 
       if (existingItemIndex >= 0) {
         const newCart = [...prev];

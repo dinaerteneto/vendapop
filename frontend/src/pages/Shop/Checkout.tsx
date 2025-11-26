@@ -23,8 +23,9 @@ const Checkout: React.FC = () => {
               items: cart.map(i => ({
                   product_id: i.product_id,
                   quantity: i.quantity,
-                  size: i.size,
-                  color: i.color
+                  size: i.size || null, // Deprecated, manter para compatibilidade
+                  color: i.color || null, // Deprecated, manter para compatibilidade
+                  attributes: i.attributes || null, // Novo formato
               })),
               notes: notes || null
           };
@@ -60,7 +61,19 @@ const Checkout: React.FC = () => {
                           )}
                           <div>
                               <div className="font-medium text-gray-800">{item.name}</div>
-                              <div className="text-xs text-gray-500">{item.size && `Tam: ${item.size}`} {item.color && `Cor: ${item.color}`} <span className="font-semibold">x{item.quantity}</span></div>
+                              <div className="text-xs text-gray-500">
+                                  {item.attributes && Object.keys(item.attributes).length > 0 ? (
+                                      <>
+                                          {Object.values(item.attributes).join(', ')} <span className="font-semibold">x{item.quantity}</span>
+                                      </>
+                                  ) : (
+                                      <>
+                                          {item.size && `Tam: ${item.size} `} 
+                                          {item.color && `Cor: ${item.color} `} 
+                                          <span className="font-semibold">x{item.quantity}</span>
+                                      </>
+                                  )}
+                              </div>
                           </div>
                       </div>
                       <div className="font-bold text-gray-700">R$ {(item.price * item.quantity).toFixed(2).replace('.',',')}</div>

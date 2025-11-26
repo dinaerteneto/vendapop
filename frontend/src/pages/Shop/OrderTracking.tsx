@@ -10,6 +10,7 @@ interface OrderItem {
   subtotal: string;
   size?: string;
   color?: string;
+  attributes?: { [key: string]: string }; // { attributeId: value }
   product?: {
     main_image_url: string | null;
   };
@@ -120,8 +121,21 @@ const OrderTracking: React.FC = () => {
                     <div>
                         <p className="font-medium text-gray-900">{item.product_name}</p>
                         <p className="text-xs text-gray-500">
-                            {item.size && `Tam: ${item.size} `} 
-                            {item.color && `Cor: ${item.color} `}
+                            {/* Exibir atributos se existirem */}
+                            {item.attributes && Object.keys(item.attributes).length > 0 ? (
+                                <>
+                                    {Object.entries(item.attributes).map(([attrId, value]) => (
+                                        <span key={attrId} className="mr-1">
+                                            {value}
+                                        </span>
+                                    ))}
+                                </>
+                            ) : (
+                                <>
+                                    {item.size && `Tam: ${item.size} `} 
+                                    {item.color && `Cor: ${item.color} `}
+                                </>
+                            )}
                             x{item.quantity}
                         </p>
                     </div>

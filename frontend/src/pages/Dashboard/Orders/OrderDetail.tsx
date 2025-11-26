@@ -11,6 +11,7 @@ interface OrderItem {
   subtotal: string;
   size?: string;
   color?: string;
+  attributes?: { [key: string]: string }; // { attributeId: value }
   product?: {
     images?: Array<{ url: string; is_main: boolean }>;
     main_image_url?: string | null;
@@ -232,8 +233,21 @@ const OrderDetail: React.FC = () => {
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.product_name}</p>
                         <p className="text-sm text-gray-500 mt-1">
-                          {item.size && `Tamanho: ${item.size} `}
-                          {item.color && `Cor: ${item.color} `}
+                          {/* Exibir atributos se existirem */}
+                          {item.attributes && Object.keys(item.attributes).length > 0 ? (
+                            <>
+                              {Object.entries(item.attributes).map(([attrId, value]) => (
+                                <span key={attrId} className="mr-2">
+                                  {value}
+                                </span>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              {item.size && `Tamanho: ${item.size} `}
+                              {item.color && `Cor: ${item.color} `}
+                            </>
+                          )}
                           <span className="ml-1">Qtd: {item.quantity}</span>
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
