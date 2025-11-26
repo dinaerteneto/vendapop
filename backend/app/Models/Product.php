@@ -27,6 +27,10 @@ class Product extends Model
         // 'images', // Removed
         'is_active',
         'is_hot',
+        'action_type',
+        'affiliate_link',
+        'whatsapp_message',
+        'button_label',
         'tenant_id',
     ];
 
@@ -62,6 +66,11 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function variations()
+    {
+        return $this->hasMany(ProductVariation::class);
     }
 
     public function getMainImageUrlAttribute()
@@ -102,5 +111,34 @@ class Product extends Model
             return 'uuid';
         }
         return 'slug';
+    }
+
+    /**
+     * Retrieve the model for route model binding.
+     * For public routes, we need to resolve by slug considering the tenant.
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        // Check if current path is admin route - use UUID
+        $path = request()->path();
+        if (str_starts_with($path, 'api/admin')) {
+            return $this->where('uuid', $value)->first();
+        }
+
+        // For public routes, use slug and get tenant from route
+        $storeSlug = request()->route('storeSlug');
+        if (!$storeSlug) {
+            return null;
+        }
+
+        $tenant = \App\Models\Tenant::where('slug', $storeSlug)->first();
+        if (!$tenant) {
+            return null;
+        }
+
+        return $this->where('slug', $value)
+            ->where('tenant_id', $tenant->id)
+            ->where('is_active', true) // Apenas produtos ativos nas rotas públicas
+            ->first();
     }
 }

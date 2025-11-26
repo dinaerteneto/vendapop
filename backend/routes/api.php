@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Admin\PushSubscriptionController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\RotatingBannerController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
+use App\Http\Controllers\Api\Admin\ProductAttributeController;
 use App\Http\Controllers\Api\CustomerPushSubscriptionController;
 use App\Http\Controllers\Api\ManifestController;
 use App\Http\Controllers\Api\StoreController;
@@ -67,6 +68,9 @@ Route::prefix('admin')->group(function () {
 
         Route::apiResource('banners', RotatingBannerController::class);
         Route::post('/banners/update-order', [RotatingBannerController::class, 'updateOrder']);
+
+        // Product Attributes
+        Route::apiResource('product-attributes', ProductAttributeController::class);
     });
 });
 

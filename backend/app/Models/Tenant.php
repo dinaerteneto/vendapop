@@ -12,7 +12,6 @@ class Tenant extends Model
     protected $fillable = [
         'name',
         'slug',
-        'store_url',
         'whatsapp_number',
         'whatsapp_message',
         'logo_url',
@@ -27,6 +26,7 @@ class Tenant extends Model
         'banner_background_color',
         'address',
         'email_contact',
+        'business_sector',
     ];
 
     protected $casts = [
@@ -61,5 +61,10 @@ class Tenant extends Model
     public function rotatingBanners()
     {
         return $this->hasMany(RotatingBanner::class)->orderBy('order');
+    }
+
+    public function productAttributes()
+    {
+        return $this->hasMany(ProductAttribute::class)->orderBy('order');
     }
 }

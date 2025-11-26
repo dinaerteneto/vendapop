@@ -4,23 +4,21 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductAttribute;
 use App\Models\ProductImage;
+use App\Models\ProductVariation;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
-use App\UseCases\Admin\GetProductsUseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    private GetProductsUseCase $getProductsUseCase;
     private ProductRepositoryInterface $productRepository;
 
     public function __construct(
-        GetProductsUseCase $getProductsUseCase,
         ProductRepositoryInterface $productRepository
     ) {
-        $this->getProductsUseCase = $getProductsUseCase;
         $this->productRepository = $productRepository;
     }
 
@@ -41,7 +39,23 @@ class ProductController extends Controller
             $sortDirection = 'desc';
         }
 
-        return $this->getProductsUseCase->execute($tenant, $perPage, $sortBy, $sortDirection);
+        // Buscar produtos diretamente do repositório
+        $paginator = $this->productRepository->findByTenantWithPagination(
+            $tenant->id,
+            $perPage,
+            $sortBy,
+            $sortDirection
+        );
+
+        // Carregar variações para todos os produtos antes de transformar
+        foreach ($paginator->items() as $product) {
+            if (!$product->relationLoaded('variations')) {
+                $product->load('variations');
+            }
+        }
+
+        // Transformar usando Resource (funciona com paginators também)
+        return \App\Http\Resources\ProductResource::collection($paginator);
     }
 
     public function store(Request $request)
@@ -51,8 +65,20 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'promotional_price' => 'nullable|numeric',
             'category_id' => 'nullable',
-            'sizes' => 'required|array',
+            'sizes' => 'nullable|array',
             'colors' => 'nullable|array',
+            'attributes' => 'nullable|array',
+            'attributes.*.attributeId' => 'nullable|integer',
+            'attributes.*.attributeName' => 'nullable|string',
+            'attributes.*.values' => 'required|array',
+            'attributes.*.values.*' => 'string',
+            'variations' => 'nullable|array',
+            'variations.*.id' => 'nullable|integer',
+            'variations.*.attributes' => 'required|array',
+            'variations.*.stock' => 'nullable|integer|min:0',
+            'variations.*.price' => 'nullable|numeric|min:0',
+            'variations.*.sku' => 'nullable|string|max:255',
+            'variations.*.is_active' => 'nullable|boolean',
             'description' => 'nullable|string',
             'main_image_url' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
@@ -60,6 +86,10 @@ class ProductController extends Controller
             'images.*' => 'string',
             'is_active' => 'boolean',
             'is_hot' => 'boolean',
+            'action_type' => 'nullable|in:add_to_cart,affiliate_link,whatsapp_contact',
+            'affiliate_link' => 'nullable|string',
+            'whatsapp_message' => 'nullable|string',
+            'button_label' => 'nullable|string',
         ]);
 
         $tenant = $request->user()->tenant;
@@ -77,10 +107,28 @@ class ProductController extends Controller
         // Slug será gerado automaticamente pela biblioteca sluggable
 
         // Remove campos que não existem mais na tabela products
-        $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
+        $productData = collect($validated)->except(['main_image_url', 'image', 'images', 'sizes', 'colors', 'attributes', 'variations'])->toArray();
         $productData['tenant_id'] = $tenant->id;
 
         $product = $this->productRepository->create($productData);
+
+        // Processar variações ou atributos
+        if (!empty($validated['variations']) && is_array($validated['variations'])) {
+            // Se variações foram enviadas diretamente, usar elas
+            foreach ($validated['variations'] as $variationData) {
+                \App\Models\ProductVariation::create([
+                    'product_id' => $product->id,
+                    'attributes' => $variationData['attributes'],
+                    'stock' => $variationData['stock'] ?? null,
+                    'price' => $variationData['price'] ?? null,
+                    'sku' => $variationData['sku'] ?? null,
+                    'is_active' => $variationData['is_active'] ?? true,
+                ]);
+            }
+        } elseif (!empty($validated['attributes']) && is_array($validated['attributes'])) {
+            // Se apenas atributos foram fornecidos, gerar combinações (comportamento antigo)
+            $this->processProductAttributes($product, $validated['attributes'], $tenant);
+        }
 
         // 1. Handle Main Image
         if ($request->hasFile('image')) {
@@ -112,7 +160,8 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load('images'), 201);
+        $product->load(['category', 'images', 'variations']);
+        return (new \App\Http\Resources\ProductResource($product))->response()->setStatusCode(201);
     }
 
     public function show(Request $request, Product $product)
@@ -125,7 +174,8 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        return $product->load(['category', 'images']);
+        $product->load(['category', 'images', 'variations']);
+        return new \App\Http\Resources\ProductResource($product);
     }
 
     public function update(Request $request, Product $product)
@@ -143,8 +193,20 @@ class ProductController extends Controller
             'price' => 'numeric',
             'promotional_price' => 'nullable|numeric',
             'category_id' => 'nullable',
-            'sizes' => 'array',
+            'sizes' => 'nullable|array',
             'colors' => 'nullable|array',
+            'attributes' => 'nullable|array',
+            'attributes.*.attributeId' => 'nullable|integer',
+            'attributes.*.attributeName' => 'nullable|string',
+            'attributes.*.values' => 'required|array',
+            'attributes.*.values.*' => 'string',
+            'variations' => 'nullable|array',
+            'variations.*.id' => 'nullable|integer',
+            'variations.*.attributes' => 'required|array',
+            'variations.*.stock' => 'nullable|integer|min:0',
+            'variations.*.price' => 'nullable|numeric|min:0',
+            'variations.*.sku' => 'nullable|string|max:255',
+            'variations.*.is_active' => 'nullable|boolean',
             'description' => 'nullable|string',
             'main_image_url' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
@@ -152,6 +214,10 @@ class ProductController extends Controller
             'images.*' => 'string',
             'is_active' => 'boolean',
             'is_hot' => 'boolean',
+            'action_type' => 'nullable|in:add_to_cart,affiliate_link,whatsapp_contact',
+            'affiliate_link' => 'nullable|string',
+            'whatsapp_message' => 'nullable|string',
+            'button_label' => 'nullable|string',
         ]);
 
         // Validate category belongs to tenant if provided
@@ -167,8 +233,32 @@ class ProductController extends Controller
         // Slug será atualizado automaticamente pela biblioteca sluggable se o nome mudar
 
         // Update basic product info
-        $productData = collect($validated)->except(['main_image_url', 'image', 'images'])->toArray();
+        $productData = collect($validated)->except(['main_image_url', 'image', 'images', 'sizes', 'colors', 'attributes', 'variations'])->toArray();
         $this->productRepository->update($product, $productData);
+
+        // Processar variações ou atributos
+        if (array_key_exists('variations', $validated) && !empty($validated['variations'])) {
+            // Se variações foram enviadas diretamente, usar elas
+            $product->variations()->delete();
+
+            foreach ($validated['variations'] as $variationData) {
+                \App\Models\ProductVariation::create([
+                    'product_id' => $product->id,
+                    'attributes' => $variationData['attributes'],
+                    'stock' => $variationData['stock'] ?? null,
+                    'price' => $variationData['price'] ?? null,
+                    'sku' => $variationData['sku'] ?? null,
+                    'is_active' => $variationData['is_active'] ?? true,
+                ]);
+            }
+        } elseif (array_key_exists('attributes', $validated)) {
+            // Se apenas atributos foram fornecidos, gerar combinações (comportamento antigo)
+            $product->variations()->delete();
+
+            if (!empty($validated['attributes']) && is_array($validated['attributes'])) {
+                $this->processProductAttributes($product, $validated['attributes'], $tenant);
+            }
+        }
 
         // 1. Handle Main Image Update
         if ($request->hasFile('image')) {
@@ -251,7 +341,161 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load('images'));
+        $product->load(['category', 'images', 'variations']);
+        return new \App\Http\Resources\ProductResource($product);
+    }
+
+    /**
+     * Processa atributos do produto e cria variações simples
+     */
+    private function processProductAttributes(Product $product, array $attributesData, $tenant): void
+    {
+        // Primeiro, criar ou garantir que os atributos existam
+        $attributesMap = [];
+
+        foreach ($attributesData as $attrData) {
+            if (empty($attrData['attributeName']) || empty($attrData['values']) || !is_array($attrData['values'])) {
+                continue;
+            }
+
+            $attributeName = $attrData['attributeName'];
+            $attributeId = $attrData['attributeId'] ?? null;
+            $slug = Str::slug($attributeName);
+
+            // Se temos um ID, verificar se existe e pertence ao tenant
+            if ($attributeId) {
+                $attribute = ProductAttribute::where('id', $attributeId)
+                    ->where('tenant_id', $tenant->id)
+                    ->first();
+
+                if ($attribute) {
+                    // Atualizar nome se mudou
+                    if ($attribute->name !== $attributeName) {
+                        $attribute->update(['name' => $attributeName]);
+                    }
+                    $attributesMap[$attributeId] = $attribute;
+                } else {
+                    // ID fornecido mas não existe, criar novo
+                    $attribute = ProductAttribute::create([
+                        'tenant_id' => $tenant->id,
+                        'name' => $attributeName,
+                        'slug' => $slug,
+                        'order' => 0,
+                        'is_active' => true,
+                    ]);
+                    $attributesMap[$attribute->id] = $attribute;
+                }
+            } else {
+                // Não temos ID, verificar se existe pelo slug ou criar
+                $attribute = ProductAttribute::where('tenant_id', $tenant->id)
+                    ->where('slug', $slug)
+                    ->first();
+
+                if (!$attribute) {
+                    $attribute = ProductAttribute::create([
+                        'tenant_id' => $tenant->id,
+                        'name' => $attributeName,
+                        'slug' => $slug,
+                        'order' => 0,
+                        'is_active' => true,
+                    ]);
+                }
+                $attributesMap[$attribute->id] = $attribute;
+            }
+
+            // Valores são livres, não precisam ser pré-cadastrados
+            // Apenas validar que existem valores
+            if (empty($attrData['values']) || !is_array($attrData['values'])) {
+                continue;
+            }
+        }
+
+        // Criar variações: gerar todas as combinações possíveis usando IDs
+        $variations = $this->generateAttributeCombinations($attributesData, $attributesMap);
+
+        foreach ($variations as $variationAttrs) {
+            ProductVariation::create([
+                'product_id' => $product->id,
+                'attributes' => $variationAttrs,
+                'is_active' => true,
+            ]);
+        }
+    }
+
+    /**
+     * Gera todas as combinações possíveis de atributos usando IDs
+     */
+    private function generateAttributeCombinations(array $attributesData, array $attributesMap): array
+    {
+        if (empty($attributesData)) {
+            return [];
+        }
+
+        // Mapear attributeId ou buscar pelo nome
+        $mappedAttributes = [];
+        foreach ($attributesData as $attr) {
+            $attributeId = $attr['attributeId'] ?? null;
+
+            if ($attributeId && isset($attributesMap[$attributeId])) {
+                $mappedAttributes[] = [
+                    'id' => $attributeId,
+                    'values' => $attr['values'],
+                ];
+            } else {
+                // Buscar pelo nome/slug
+                $slug = Str::slug($attr['attributeName']);
+                $found = null;
+                foreach ($attributesMap as $id => $attribute) {
+                    if ($attribute->slug === $slug) {
+                        $found = $id;
+                        break;
+                    }
+                }
+
+                if ($found) {
+                    $mappedAttributes[] = [
+                        'id' => $found,
+                        'values' => $attr['values'],
+                    ];
+                }
+            }
+        }
+
+        if (empty($mappedAttributes)) {
+            return [];
+        }
+
+        // Se tiver apenas um atributo, criar uma variação por valor
+        if (count($mappedAttributes) === 1) {
+            $attr = $mappedAttributes[0];
+            $variations = [];
+
+            foreach ($attr['values'] as $value) {
+                $variations[] = [(string)$attr['id'] => $value];
+            }
+
+            return $variations;
+        }
+
+        // Múltiplos atributos: gerar produto cartesiano usando IDs
+        $combinations = [[]];
+
+        foreach ($mappedAttributes as $attr) {
+            $attributeId = (string)$attr['id'];
+            $newCombinations = [];
+
+            foreach ($combinations as $combination) {
+                foreach ($attr['values'] as $value) {
+                    $newCombination = $combination;
+                    $newCombination[$attributeId] = $value;
+                    $newCombinations[] = $newCombination;
+                }
+            }
+
+            $combinations = $newCombinations;
+        }
+
+        return $combinations;
     }
 
     public function destroy(Request $request, Product $product)
