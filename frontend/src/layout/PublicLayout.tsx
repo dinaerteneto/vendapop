@@ -35,8 +35,8 @@ const PublicLayout: React.FC = () => {
   const location = useLocation();
   const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
   
-  // Verificar se estamos na página de order para ocultar o banner
-  const isOrderPage = location.pathname.includes('/order');
+  // Verificar se estamos na página inicial (apenas /storeSlug, sem subcaminhos)
+  const isHomePage = location.pathname === `/${storeSlug}` || location.pathname === `/${storeSlug}/`;
 
   useEffect(() => {
     if (storeSlug) {
@@ -97,8 +97,8 @@ const PublicLayout: React.FC = () => {
           logoUrl={storeInfo?.logo_url}
         />
         
-        {/* Banner Promocional - Não exibir na página de pedido */}
-        {storeInfo?.banner_message && !isOrderPage && (
+        {/* Banner Promocional - Apenas na página inicial */}
+        {storeInfo?.banner_message && isHomePage && (
             <PromotionalBanner
                 message={storeInfo.banner_message}
                 textColor1={storeInfo.banner_text_color_1 || '#ffffff'}
@@ -107,8 +107,8 @@ const PublicLayout: React.FC = () => {
             />
         )}
 
-        {/* Banners Rotativos - Não exibir na página de pedido */}
-        {!isOrderPage && (
+        {/* Banners Rotativos - Apenas na página inicial */}
+        {isHomePage && (
           <div className="w-full max-w-6xl mx-auto px-4 pt-6">
               <RotatingBanners />
           </div>
