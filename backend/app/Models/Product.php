@@ -27,6 +27,7 @@ class Product extends Model
         // 'images', // Removed
         'is_active',
         'is_hot',
+        'stock_management_enabled',
         'action_type',
         'affiliate_link',
         'whatsapp_message',
@@ -40,6 +41,7 @@ class Product extends Model
         // 'images' => 'array', // Removed
         'is_active' => 'boolean',
         'is_hot' => 'boolean',
+        'stock_management_enabled' => 'boolean',
         'price' => 'decimal:2',
         'promotional_price' => 'decimal:2',
     ];
@@ -122,23 +124,36 @@ class Product extends Model
         // Check if current path is admin route - use UUID
         $path = request()->path();
         if (str_starts_with($path, 'api/admin')) {
-            return $this->where('uuid', $value)->first();
+            return $this->where('uuid', $value)->firstOrFail();
         }
 
         // For public routes, use slug and get tenant from route
         $storeSlug = request()->route('storeSlug');
         if (!$storeSlug) {
-            return null;
+            abort(404, 'Store not found');
         }
 
         $tenant = \App\Models\Tenant::where('slug', $storeSlug)->first();
         if (!$tenant) {
-            return null;
+            abort(404, 'Store not found');
         }
 
-        return $this->where('slug', $value)
+        // Decode URL-encoded slug (e.g., %C3%A1 becomes á)
+        $decodedSlug = urldecode($value);
+
+        // Try both encoded and decoded versions
+        $product = $this->where(function($query) use ($value, $decodedSlug) {
+                $query->where('slug', $value)
+                      ->orWhere('slug', $decodedSlug);
+            })
             ->where('tenant_id', $tenant->id)
             ->where('is_active', true) // Apenas produtos ativos nas rotas públicas
             ->first();
+
+        if (!$product) {
+            abort(404, "Product not found for store '{$storeSlug}'");
+        }
+
+        return $product;
     }
 }
