@@ -48,6 +48,7 @@ interface Product {
   images: ProductImage[] | null;
   is_hot?: boolean;
   is_active?: boolean;
+  stock_management_enabled?: boolean;
   action_type?: 'add_to_cart' | 'affiliate_link' | 'whatsapp_contact';
   affiliate_link?: string | null;
   whatsapp_message?: string | null;
@@ -73,6 +74,7 @@ const ProductDetail: React.FC = () => {
   const [productAttributes, setProductAttributes] = useState<ProductAttribute[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
   const [quantity, setQuantity] = useState<number>(1);
+  const [selectedVariation, setSelectedVariation] = useState<any>(null); // Variação selecionada atual
   const context = useOutletContext<{ storeInfo: any }>();
   const primaryColor = context?.storeInfo?.primary_color || '#7c3aed';
   
@@ -92,6 +94,7 @@ const ProductDetail: React.FC = () => {
              
              if (!productData || !productData.id) {
                  console.error('Product data is invalid:', response.data);
+                 showToast('Produto não encontrado ou inválido.', 'error');
                  return;
              }
              
@@ -111,8 +114,10 @@ const ProductDetail: React.FC = () => {
                  });
                  setSelectedAttributes(defaultSelections);
              }
-         } catch (e) {
-             console.error(e);
+         } catch (e: any) {
+             console.error('Erro ao carregar produto:', e);
+             const errorMessage = e.response?.data?.message || 'Produto não encontrado.';
+             showToast(errorMessage, 'error');
          }
      };
      if (storeSlug && productSlug) fetch();
@@ -168,12 +173,63 @@ const ProductDetail: React.FC = () => {
     }));
   };
 
+  // Função para encontrar a variação baseada nos atributos selecionados
+  const findVariationByAttributes = (attributes: { [key: number]: string }) => {
+    if (!product?.variations || product.variations.length === 0) {
+      return null;
+    }
+
+    // Comparar os atributos selecionados com as variações
+    for (const variation of product.variations) {
+      if (!variation.attributes || !variation.is_active) continue;
+
+      // Verificar se todos os atributos da variação batem com os selecionados
+      const variationAttrs = Object.keys(variation.attributes).length;
+      const selectedAttrs = Object.keys(attributes).length;
+
+      if (variationAttrs !== selectedAttrs) continue;
+
+      let matches = true;
+      for (const [attrId, value] of Object.entries(attributes)) {
+        if (variation.attributes[attrId] !== value) {
+          matches = false;
+          break;
+        }
+      }
+
+      if (matches) {
+        return variation;
+      }
+    }
+
+    return null;
+  };
+
+  // Atualizar variação selecionada quando atributos mudarem
+  useEffect(() => {
+    if (product && productAttributes.length > 0 && Object.keys(selectedAttributes).length === productAttributes.length) {
+      const variation = findVariationByAttributes(selectedAttributes);
+      setSelectedVariation(variation);
+    } else {
+      setSelectedVariation(null);
+    }
+  }, [selectedAttributes, product, productAttributes]);
+
   const showToast = (message: string, type: ToastState['type'] = 'warning') => {
     setToast({ isVisible: true, message, type });
   };
 
   const handleQuantityChange = (delta: number) => {
-      setQuantity(prev => Math.max(1, prev + delta));
+      setQuantity(prev => {
+        const newQuantity = Math.max(1, prev + delta);
+        
+        // Se controle de estoque está habilitado e há variação selecionada, limitar pela quantidade em estoque
+        if (product?.stock_management_enabled && selectedVariation && selectedVariation.stock !== null && selectedVariation.stock !== undefined) {
+          return Math.min(newQuantity, selectedVariation.stock);
+        }
+        
+        return newQuantity;
+      });
   };
 
   const addToCart = () => {
@@ -184,20 +240,38 @@ const ProductDetail: React.FC = () => {
           for (const attr of productAttributes) {
               if (!selectedAttributes[attr.attributeId]) {
                   showToast(`Por favor, selecione ${attr.attributeName.toLowerCase()}.`, 'warning');
-          return;
-      }
+                  return;
+              }
+          }
+
+          // Validar estoque se controle está habilitado
+          if (product.stock_management_enabled) {
+              if (!selectedVariation) {
+                  showToast('Variação não encontrada. Por favor, selecione novamente os atributos.', 'warning');
+                  return;
+              }
+
+              // Verificar se está disponível
+              const variationIsAvailable = selectedVariation.stock === null || selectedVariation.stock === undefined || selectedVariation.stock > 0;
+              if (!variationIsAvailable) {
+                  showToast('Produto indisponível no momento.', 'warning');
+                  return;
+              }
+
+              if (selectedVariation.stock !== null && selectedVariation.stock !== undefined && quantity > selectedVariation.stock) {
+                  showToast(`Quantidade indisponível. Máximo disponível: ${selectedVariation.stock}`, 'warning');
+                  return;
+              }
           }
       }
-
-      const finalPrice = product.promotional_price && parseFloat(product.promotional_price) > 0 
-        ? parseFloat(product.promotional_price) 
-        : parseFloat(product.price);
 
       // Preparar atributos para o carrinho (compatibilidade com formato antigo)
       const attributesPayload: { [key: string]: string } = {};
       Object.keys(selectedAttributes).forEach(attrId => {
           attributesPayload[attrId] = selectedAttributes[parseInt(attrId)];
       });
+
+      const finalPrice = getCurrentPrice();
 
       addToCartContext({
           product_id: product.id,
@@ -230,10 +304,59 @@ const ProductDetail: React.FC = () => {
       carouselImages = [product.main_image_url];
   }
 
-  // Price Logic
-  const hasPromo = product.promotional_price && parseFloat(product.promotional_price) > 0;
-  const currentPrice = hasPromo ? parseFloat(product.promotional_price!) : parseFloat(product.price);
-  const originalPrice = hasPromo ? parseFloat(product.price) : null;
+  // Price Logic - usar preço da variação se disponível, senão usar preço base
+  const getCurrentPrice = () => {
+    if (!product) return 0;
+    
+    // Se há variação selecionada e ela tem preço próprio, usar esse preço
+    if (selectedVariation && selectedVariation.price !== null && selectedVariation.price !== undefined && selectedVariation.price !== '') {
+      return parseFloat(selectedVariation.price.toString());
+    }
+    
+    // Caso contrário, usar preço base do produto
+    const hasPromo = product.promotional_price && parseFloat(product.promotional_price) > 0;
+    return hasPromo ? parseFloat(product.promotional_price!) : parseFloat(product.price);
+  };
+
+  const getOriginalPrice = () => {
+    if (!product) return null;
+    
+    // Se há variação selecionada com preço próprio, não mostrar preço original riscado
+    if (selectedVariation && selectedVariation.price !== null && selectedVariation.price !== undefined && selectedVariation.price !== '') {
+      return null;
+    }
+
+    // Para produto base, verificar se tem promoção
+    const hasPromo = product.promotional_price && parseFloat(product.promotional_price) > 0;
+    return hasPromo ? parseFloat(product.price) : null;
+  };
+
+  // Verificar disponibilidade
+  const isAvailable = () => {
+    if (!product) return true;
+    
+    // Se controle de estoque não está habilitado, sempre disponível
+    if (!product.stock_management_enabled) {
+      return true;
+    }
+
+    // Se não há variação selecionada, não podemos verificar estoque
+    if (!selectedVariation) {
+      return true; // Permitir seleção, mas validar depois
+    }
+
+    // Verificar estoque da variação
+    if (selectedVariation.stock === null || selectedVariation.stock === undefined) {
+      return true; // Sem controle de estoque para esta variação
+    }
+
+    return selectedVariation.stock > 0;
+  };
+
+  const currentPrice = getCurrentPrice();
+  const originalPrice = getOriginalPrice();
+  const isVariationAvailable = isAvailable();
+  const stockQuantity = selectedVariation?.stock ?? null;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
@@ -260,7 +383,7 @@ const ProductDetail: React.FC = () => {
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
                 
-                <div className="mb-6 flex items-baseline gap-3">
+                <div className="mb-6 flex items-baseline gap-3 flex-wrap">
                     {originalPrice && (
                         <span className="text-lg text-gray-400 line-through">
                             {formatCurrency(originalPrice)}
@@ -270,6 +393,11 @@ const ProductDetail: React.FC = () => {
                         {formatCurrency(currentPrice)}
                     </span>
                     <span className="text-sm text-gray-500">/ unidade</span>
+                    {!isVariationAvailable && product.stock_management_enabled && (
+                        <span className="ml-auto text-red-600 font-semibold text-sm">
+                            Indisponível
+                        </span>
+                    )}
                 </div>
 
                 <div className="space-y-6">
@@ -314,7 +442,8 @@ const ProductDetail: React.FC = () => {
                         <div className="flex items-center border border-gray-300 rounded-lg w-max">
                             <button 
                                 onClick={() => handleQuantityChange(-1)}
-                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg transition-colors"
+                                disabled={quantity <= 1}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 -
                             </button>
@@ -323,24 +452,45 @@ const ProductDetail: React.FC = () => {
                             </span>
                             <button 
                                 onClick={() => handleQuantityChange(1)}
-                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg transition-colors"
+                                disabled={
+                                    product.stock_management_enabled && 
+                                    selectedVariation && 
+                                    selectedVariation.stock !== null && 
+                                    selectedVariation.stock !== undefined &&
+                                    quantity >= selectedVariation.stock
+                                }
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 +
                             </button>
                         </div>
+                        {product.stock_management_enabled && stockQuantity !== null && stockQuantity !== undefined && (
+                            <p className="text-xs text-gray-500 mt-2">
+                                {stockQuantity > 0 ? `${stockQuantity} disponível${stockQuantity > 1 ? 'eis' : ''}` : 'Indisponível'}
+                            </p>
+                        )}
                     </div>
 
                     {/* Action Button (Add to Cart, WhatsApp, or Affiliate) */}
-                    <ProductActionButton
-                        actionType={product.action_type || 'add_to_cart'}
-                        affiliateLink={product.affiliate_link}
-                        whatsappMessage={product.whatsapp_message}
-                        whatsappNumber={context?.storeInfo?.whatsapp_number}
-                        buttonLabel={product.button_label}
-                        onAddToCart={addToCart}
-                        primaryColor={primaryColor}
-                        productName={product.name}
-                    />
+                    {!isVariationAvailable && product.stock_management_enabled ? (
+                        <button
+                            disabled
+                            className="w-full bg-gray-300 text-gray-500 py-3 rounded-xl font-medium text-md cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            <span>Indisponível</span>
+                        </button>
+                    ) : (
+                        <ProductActionButton
+                            actionType={product.action_type || 'add_to_cart'}
+                            affiliateLink={product.affiliate_link}
+                            whatsappMessage={product.whatsapp_message}
+                            whatsappNumber={context?.storeInfo?.whatsapp_number}
+                            buttonLabel={product.button_label}
+                            onAddToCart={addToCart}
+                            primaryColor={primaryColor}
+                            productName={product.name}
+                        />
+                    )}
 
                     {/* Share Button */}
                     <button 
