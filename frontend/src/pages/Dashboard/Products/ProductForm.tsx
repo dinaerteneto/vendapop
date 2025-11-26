@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
@@ -9,6 +9,29 @@ import ImageCropper from '../../../components/ui/ImageCropper';
 interface Category {
   id: number;
   name: string;
+}
+
+interface Attribute {
+  id: number;
+  name: string;
+  slug: string;
+  order: number;
+  is_active: boolean;
+}
+
+interface ProductAttribute {
+  attributeId: number | null;
+  attributeName: string;
+  values: string[]; // Valores como tags (livres, sem valores pré-cadastrados)
+}
+
+interface ProductVariationRow {
+  id?: number; // ID da variação se já existe
+  attributes: { [attributeId: string]: string }; // { "1": "P", "2": "Azul" }
+  stock: number | null;
+  price: number | null; // Preço específico da variação (opcional, se null usa preço base)
+  sku: string | null;
+  is_active: boolean;
 }
 
 interface ProductImage {
@@ -25,7 +48,17 @@ const ProductForm: React.FC = () => {
   const isEditMode = !!id;
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [availableAttributes, setAvailableAttributes] = useState<Attribute[]>([]);
+  const [productAttributes, setProductAttributes] = useState<ProductAttribute[]>([]);
+  const [variations, setVariations] = useState<ProductVariationRow[]>([]); // Tabela de variações
+  const [showAttributeSelect, setShowAttributeSelect] = useState(false);
+  const [attributeSearchTerm, setAttributeSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false); // Flag para evitar regenerar variações durante carregamento
+  const [variationsLoadedFromBackend, setVariationsLoadedFromBackend] = useState(false); // Flag para indicar que variações vieram do backend
+  
+  // Ref para evitar chamadas duplicadas de categorias
+  const categoriesLoadedRef = useRef(false);
 
   const [imageMode, setImageMode] = useState<'url' | 'file'>('url');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -45,20 +78,33 @@ const ProductForm: React.FC = () => {
     price: '',
     promotional_price: '',
     category_id: '',
-    sizes: '',
-    colors: '',
     description: '',
     main_image_url: '',
     is_active: true,
     is_hot: false,
+    action_type: 'add_to_cart' as 'add_to_cart' | 'affiliate_link' | 'whatsapp_contact',
+    affiliate_link: '',
+    whatsapp_message: '',
+    button_label: '',
   });
 
   useEffect(() => {
     console.log('ProductForm useEffect - isEditMode:', isEditMode, 'id:', id);
+    let isMounted = true;
+    
     const fetchData = async () => {
       try {
+        // Carregar categorias
         await loadCategories();
-        if (isEditMode && id) {
+        
+        // Só carregar atributos disponíveis se NÃO estiver em modo de edição
+        // No modo de edição, os atributos vêm no attributes_map do produto
+        if (!isEditMode) {
+          await loadAvailableAttributes();
+        }
+        
+        // Só carregar produto se ainda estiver montado e for modo de edição
+        if (isMounted && isEditMode && id) {
           console.log('Carregando produto com ID:', id);
           await loadProduct(id);
         }
@@ -66,11 +112,22 @@ const ProductForm: React.FC = () => {
         console.error('Erro ao inicializar formulário', error);
       }
     };
+    
     fetchData();
+    
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const loadCategories = async () => {
+    // Evitar chamadas duplicadas (comum no React StrictMode)
+    if (categoriesLoadedRef.current) {
+      console.log('Categorias já carregadas, pulando requisição');
+      return;
+    }
+
     try {
       const { data } = await api.get('/admin/categories');
       // Handle paginated response
@@ -81,11 +138,27 @@ const ProductForm: React.FC = () => {
       } else {
         setCategories([]);
       }
+      categoriesLoadedRef.current = true; // Marcar como carregadas
     } catch (error) {
       console.error('Erro ao carregar categorias', error);
       toast.error('Erro ao carregar categorias.');
     }
   };
+
+  const loadAvailableAttributes = async () => {
+    try {
+      const response = await api.get('/admin/product-attributes');
+      const attributes = response.data || [];
+      setAvailableAttributes(attributes);
+      return attributes;
+    } catch (error) {
+      console.error('Erro ao carregar atributos', error);
+      // Não mostrar erro, pode não ter atributos ainda
+      setAvailableAttributes([]);
+      return [];
+    }
+  };
+
 
   const loadProduct = async (productId: string | undefined) => {
     if (!productId) {
@@ -94,8 +167,13 @@ const ProductForm: React.FC = () => {
     }
     
     setLoading(true);
+    setIsLoadingProduct(true);
     try {
+      console.log('Carregando produto...', productId);
       const { data } = await api.get(`/admin/products/${productId}`);
+      console.log('Produto carregado:', data);
+      console.log('Variações:', data.variations);
+      console.log('Attributes map do backend:', data.attributes_map);
       
       // Load all images as objects
       const allImages: ProductImage[] = (data.images || []).map((img: any) => ({
@@ -117,13 +195,169 @@ const ProductForm: React.FC = () => {
         price: data.price?.toString() || '',
         promotional_price: data.promotional_price?.toString() || '',
         category_id: data.category_id?.toString() || '',
-        sizes: Array.isArray(data.sizes) ? data.sizes.join(', ') : (data.sizes || ''),
-        colors: Array.isArray(data.colors) ? data.colors.join(', ') : (data.colors || ''),
         description: data.description || '',
         main_image_url: mainImage ? mainImage.url : '',
         is_active: data.is_active !== undefined ? !!data.is_active : true,
         is_hot: data.is_hot !== undefined ? !!data.is_hot : false,
+        action_type: data.action_type || 'add_to_cart',
+        affiliate_link: data.affiliate_link || '',
+        whatsapp_message: data.whatsapp_message || '',
+        button_label: data.button_label || '',
       });
+
+      // Carregar atributos do produto a partir das variações
+      // O attributes_map já vem com todas as informações necessárias do backend
+      // NÃO precisamos fazer request adicional para product-attributes
+      if (data.variations && Array.isArray(data.variations) && data.variations.length > 0) {
+        // Converter attributes_map do backend para o formato Attribute[]
+        const attrsFromMap: Attribute[] = (data.attributes_map && Array.isArray(data.attributes_map) && data.attributes_map.length > 0)
+          ? data.attributes_map.map((attr: any) => ({
+              id: attr.id,
+              name: attr.name,
+              slug: attr.slug,
+              order: 0,
+              is_active: true,
+            }))
+          : [];
+        
+        if (attrsFromMap.length > 0) {
+          // Atualizar availableAttributes com os atributos do produto
+          // Isso evita precisar buscar depois quando for adicionar novos atributos
+          // E permite que o usuário veja todos os atributos disponíveis no select
+          setAvailableAttributes(prevAttrs => {
+            // Merge: adicionar novos atributos sem duplicar
+            const merged = [...prevAttrs];
+            attrsFromMap.forEach(newAttr => {
+              if (!merged.find(a => a.id === newAttr.id)) {
+                merged.push(newAttr);
+              }
+            });
+            return merged;
+          });
+          
+          // Extrair atributos e valores únicos das variações para popular o formulário
+          // Primeiro, coletar todos os atributos únicos e seus valores
+          const attributeValuesMap: { [attrId: number]: { attributeId: number; attributeName: string; values: Set<string> } } = {};
+          
+          data.variations.forEach((variation: any) => {
+            let attrsObj: { [key: string]: string } = {};
+            
+            // Converter para objeto se vier como array
+            if (Array.isArray(variation.attributes)) {
+              // Formato array: ["P", "Preto", ...]
+              if (Array.isArray(variation.attribute_names) && variation.attribute_names.length === variation.attributes.length) {
+                variation.attributes.forEach((value: string, index: number) => {
+                  const attrName = variation.attribute_names[index];
+                  const attrItem = attrsFromMap.find((a: Attribute) => a.name === attrName);
+                  if (attrItem) {
+                    attrsObj[attrItem.id.toString()] = value;
+                  }
+                });
+              } else if (attrsFromMap.length === variation.attributes.length) {
+                // Mapear pela ordem do attributes_map
+                variation.attributes.forEach((value: string, index: number) => {
+                  if (attrsFromMap[index]) {
+                    attrsObj[attrsFromMap[index].id.toString()] = value;
+                  }
+                });
+              }
+            } else if (variation.attributes && typeof variation.attributes === 'object') {
+              // Formato objeto: {"17": "P", "18": "Preto"}
+              attrsObj = variation.attributes;
+            }
+            
+            // Coletar valores únicos de cada atributo
+            Object.keys(attrsObj).forEach((attrIdStr) => {
+              const attrId = parseInt(attrIdStr, 10);
+              const attrItem = attrsFromMap.find((a: Attribute) => a.id === attrId);
+              if (attrItem) {
+                if (!attributeValuesMap[attrId]) {
+                  attributeValuesMap[attrId] = {
+                    attributeId: attrId,
+                    attributeName: attrItem.name,
+                    values: new Set<string>(),
+                  };
+                }
+                if (attrsObj[attrIdStr] && typeof attrsObj[attrIdStr] === 'string') {
+                  attributeValuesMap[attrId].values.add(attrsObj[attrIdStr].trim());
+                }
+              }
+            });
+          });
+          
+          // Converter para array de ProductAttribute
+          const loadedAttributes: ProductAttribute[] = Object.values(attributeValuesMap).map((attr) => ({
+            attributeId: attr.attributeId,
+            attributeName: attr.attributeName,
+            values: Array.from(attr.values).sort(),
+          }));
+          
+          console.log('=== CARREGAMENTO DE PRODUTO ===');
+          console.log('Atributos extraídos:', loadedAttributes);
+          console.log('Total de atributos:', loadedAttributes.length);
+          
+          // Carregar variações completas (com estoque, preço, SKU)
+          const loadedVariations: ProductVariationRow[] = data.variations.map((variation: any) => {
+            let normalizedAttributes: { [key: string]: string } = {};
+            
+            // Converter para objeto se vier como array
+            if (Array.isArray(variation.attributes)) {
+              if (Array.isArray(variation.attribute_names) && variation.attribute_names.length === variation.attributes.length) {
+                variation.attributes.forEach((value: string, index: number) => {
+                  const attrName = variation.attribute_names[index];
+                  const attrItem = attrsFromMap.find((a: Attribute) => a.name === attrName);
+                  if (attrItem) {
+                    normalizedAttributes[attrItem.id.toString()] = value;
+                  }
+                });
+              } else if (attrsFromMap.length === variation.attributes.length) {
+                variation.attributes.forEach((value: string, index: number) => {
+                  if (attrsFromMap[index]) {
+                    normalizedAttributes[attrsFromMap[index].id.toString()] = value;
+                  }
+                });
+              }
+            } else if (variation.attributes && typeof variation.attributes === 'object' && !Array.isArray(variation.attributes)) {
+              // Já está no formato correto (objeto com IDs)
+              normalizedAttributes = variation.attributes;
+            }
+            
+            return {
+              id: variation.id,
+              attributes: normalizedAttributes,
+              stock: variation.stock !== null && variation.stock !== undefined ? parseInt(variation.stock) : null,
+              price: variation.price !== null && variation.price !== undefined && variation.price !== '' ? parseFloat(variation.price) : null,
+              sku: variation.sku || null,
+              is_active: variation.is_active !== undefined ? variation.is_active : true,
+            };
+          });
+          
+          console.log('Variações carregadas:', loadedVariations);
+          console.log('Total de variações:', loadedVariations.length);
+          
+          // Definir variações primeiro (com isLoadingProduct ainda true)
+          setVariations(loadedVariations);
+          setVariationsLoadedFromBackend(true); // Marcar que as variações vieram do backend
+          
+          // Depois definir atributos (o useEffect não vai executar pois isLoadingProduct ainda é true)
+          setProductAttributes(loadedAttributes);
+          console.log('Atributos definidos no estado. isLoadingProduct ainda é true, então useEffect não vai executar.');
+        } else {
+          console.warn('Produto tem variações mas não tem attributes_map');
+          setProductAttributes([]);
+        }
+      } else {
+        console.log('Produto não tem variações');
+        setProductAttributes([]);
+        setVariations([]);
+        setVariationsLoadedFromBackend(false); // Não veio do backend se não tem variações
+        
+        // Se não tem variações e não temos atributos carregados ainda, 
+        // carregar atributos disponíveis apenas para usar no select (adicionar novos atributos)
+        if (availableAttributes.length === 0) {
+          await loadAvailableAttributes();
+        }
+      }
       
       if (mainImage) {
         setPreviewUrl(mainImage.url);
@@ -137,6 +371,10 @@ const ProductForm: React.FC = () => {
       // Não navegar automaticamente, deixar o usuário ver o erro
     } finally {
       setLoading(false);
+      // Aguardar um pouco antes de liberar isLoadingProduct para garantir que tudo foi setado
+      setTimeout(() => {
+        setIsLoadingProduct(false);
+      }, 100);
     }
   };
 
@@ -148,6 +386,315 @@ const ProductForm: React.FC = () => {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: checked }));
+  };
+
+  // Funções para gerenciar atributos do produto
+  const handleAddAttribute = async () => {
+    const name = attributeSearchTerm.trim();
+    if (!name) {
+      toast.error('Por favor, informe o nome do atributo.');
+      return;
+    }
+
+    // Verificar se já foi adicionado ao produto
+    if (productAttributes.some(attr => 
+      attr.attributeName.toLowerCase() === name.toLowerCase()
+    )) {
+      toast.error('Este atributo já foi adicionado ao produto.');
+      setAttributeSearchTerm('');
+      setShowAttributeSelect(false);
+      return;
+    }
+
+    // Verificar se existe nos atributos disponíveis
+    const existingAttr = availableAttributes.find(a => 
+      a.name.toLowerCase() === name.toLowerCase()
+    );
+
+    let attributeId: number | null = null;
+    let attributeName = name;
+
+    if (existingAttr) {
+      // Usar atributo existente
+      attributeId = existingAttr.id;
+      attributeName = existingAttr.name;
+    } else {
+      // Criar novo atributo
+      try {
+        const response = await api.post('/admin/product-attributes', {
+          name: name,
+        });
+        attributeId = response.data.id;
+        attributeName = response.data.name;
+        // Recarregar lista de atributos disponíveis
+        await loadAvailableAttributes();
+        toast.success('Atributo criado com sucesso!');
+      } catch (error: any) {
+        console.error('Erro ao criar atributo', error);
+        toast.error(error.response?.data?.message || 'Erro ao criar atributo.');
+        return;
+      }
+    }
+
+    // Adicionar ao produto
+    setProductAttributes([...productAttributes, {
+      attributeId: attributeId,
+      attributeName: attributeName,
+      values: [],
+    }]);
+    setVariationsLoadedFromBackend(false); // Permitir regenerar quando atributo é adicionado
+
+    setAttributeSearchTerm('');
+    setShowAttributeSelect(false);
+  };
+
+  const handleSelectExistingAttribute = async (attributeId: number) => {
+    const attribute = availableAttributes.find(a => a.id === attributeId);
+    if (!attribute) return;
+
+    // Verificar se já foi adicionado ao produto
+    if (productAttributes.some(attr => attr.attributeId === attributeId)) {
+      toast.error('Este atributo já foi adicionado ao produto.');
+      setAttributeSearchTerm('');
+      setShowAttributeSelect(false);
+      return;
+    }
+
+    setProductAttributes([...productAttributes, {
+      attributeId: attribute.id,
+      attributeName: attribute.name,
+      values: [],
+    }]);
+    setVariationsLoadedFromBackend(false); // Permitir regenerar quando atributo é adicionado
+
+    setAttributeSearchTerm('');
+    setShowAttributeSelect(false);
+  };
+
+  const handleRemoveAttribute = (index: number) => {
+    const updated = productAttributes.filter((_, i) => i !== index);
+    setProductAttributes(updated);
+    setVariationsLoadedFromBackend(false); // Permitir regenerar quando atributo é removido
+  };
+
+  const handleAddAttributeValue = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const input = e.target as HTMLInputElement;
+      const value = input.value.trim();
+      if (value) {
+        const updated = [...productAttributes];
+        if (!updated[index].values.includes(value)) {
+          updated[index].values.push(value);
+          setProductAttributes(updated);
+          setVariationsLoadedFromBackend(false); // Permitir regenerar quando valor é adicionado
+        }
+        input.value = '';
+      }
+    }
+  };
+
+  const handleRemoveAttributeValue = (index: number, valueIndex: number) => {
+    const updated = [...productAttributes];
+    updated[index].values.splice(valueIndex, 1);
+    setProductAttributes(updated);
+    setVariationsLoadedFromBackend(false); // Permitir regenerar quando valor é removido
+    // O useEffect vai regenerar automaticamente
+  };
+
+  // Função para gerar todas as combinações de atributos e criar/atualizar variações
+  const generateVariationsFromAttributes = (attrs: ProductAttribute[]) => {
+    // Filtrar atributos que têm valores
+    const attrsWithValues = attrs.filter(attr => attr.values.length > 0);
+    
+    if (attrsWithValues.length === 0) {
+      setVariations([]);
+      return;
+    }
+
+    // Gerar produto cartesiano de todos os valores
+    const combinations: { [key: string]: string }[] = [];
+    
+    // Função recursiva para gerar combinações
+    const generateCombinations = (current: { [key: string]: string }, remaining: ProductAttribute[], index: number) => {
+      if (index >= remaining.length) {
+        combinations.push({ ...current });
+        return;
+      }
+      
+      const attr = remaining[index];
+      const attrId = attr.attributeId?.toString() || '';
+      
+      if (attr.values.length === 0) {
+        generateCombinations(current, remaining, index + 1);
+      } else {
+        attr.values.forEach(value => {
+          generateCombinations({ ...current, [attrId]: value }, remaining, index + 1);
+        });
+      }
+    };
+
+    generateCombinations({}, attrsWithValues, 0);
+
+    // Para cada combinação, verificar se já existe uma variação com esses atributos
+    const newVariations: ProductVariationRow[] = combinations.map(combo => {
+      // Tentar encontrar variação existente com mesma combinação de atributos
+      const existing = variations.find(v => {
+        const vKeys = Object.keys(v.attributes).sort();
+        const comboKeys = Object.keys(combo).sort();
+        
+        if (vKeys.length !== comboKeys.length) return false;
+        
+        return vKeys.every(key => 
+          v.attributes[key] === combo[key]
+        );
+      });
+
+      if (existing) {
+        // Manter dados existentes (estoque, preço, SKU)
+        return existing;
+      }
+
+      // Criar nova variação
+      return {
+        attributes: combo,
+        stock: null,
+        price: null,
+        sku: null,
+        is_active: true,
+      };
+    });
+
+    setVariations(newVariations);
+  };
+
+  // Atualizar variação individual
+  const handleVariationChange = (index: number, field: 'stock' | 'price' | 'sku' | 'is_active', value: any) => {
+    const updated = [...variations];
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    };
+    setVariations(updated);
+  };
+
+  // Função para formatar a combinação de atributos como texto
+  const formatVariationAttributes = (variation: ProductVariationRow): string => {
+    const parts: string[] = [];
+    
+    // Ordenar os atributos pela ordem dos productAttributes para manter consistência
+    productAttributes.forEach(attr => {
+      const attrId = attr.attributeId?.toString() || '';
+      const value = variation.attributes[attrId];
+      if (value) {
+        parts.push(value);
+      }
+    });
+    
+    return parts.join(', ') || '-';
+  };
+
+  // Efeito para regenerar combinações quando atributos/valores mudarem
+  useEffect(() => {
+    // Não regenerar se estivermos carregando um produto (para não perder dados existentes)
+    if (isLoadingProduct) {
+      console.log('useEffect - Pulando regeneração (carregando produto)');
+      return;
+    }
+    
+    // Não regenerar se as variações já vieram do backend e ainda estão lá
+    // Isso preserva as variações existentes (com estoque, preço, SKU) ao editar um produto
+    if (variationsLoadedFromBackend && variations.length > 0) {
+      console.log('useEffect - Pulando regeneração (variações já carregadas do backend)');
+      // Se os atributos mudaram manualmente (não foi carregamento), resetar a flag
+      // Mas primeiro vamos verificar se os atributos atuais batem com as variações existentes
+      return;
+    }
+    
+    console.log('useEffect - Regenerando variações, productAttributes:', productAttributes);
+    console.log('useEffect - Variações atuais:', variations);
+    
+    if (productAttributes.length > 0) {
+      const hasValues = productAttributes.some(attr => attr.values.length > 0);
+      if (hasValues) {
+        console.log('useEffect - Gerando variações a partir de atributos');
+        generateVariationsFromAttributes(productAttributes);
+        setVariationsLoadedFromBackend(false); // Marcamos que foram geradas localmente
+      } else {
+        console.log('useEffect - Sem valores, limpando variações');
+        setVariations([]);
+        setVariationsLoadedFromBackend(false);
+      }
+    } else {
+      console.log('useEffect - Sem atributos, limpando variações');
+      setVariations([]);
+      setVariationsLoadedFromBackend(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productAttributes, isLoadingProduct]);
+
+
+  // Função para extrair atributos das variações (agora usando IDs)
+  const extractAttributesFromVariations = (variations: any[], availableAttrs: Attribute[]): ProductAttribute[] => {
+    console.log('extractAttributesFromVariations - variações:', variations);
+    console.log('extractAttributesFromVariations - atributos disponíveis:', availableAttrs);
+    
+    const attributesMap: { [key: number]: { attributeId: number; attributeName: string; values: Set<string> } } = {};
+
+    // Percorrer todas as variações
+    variations.forEach((variation, index) => {
+      console.log(`Processando variação ${index}:`, variation);
+      if (variation.attributes && typeof variation.attributes === 'object') {
+        Object.keys(variation.attributes).forEach((attrKey) => {
+          const attrValue = variation.attributes[attrKey];
+          console.log(`  - Atributo chave: ${attrKey}, valor: ${attrValue}`);
+          
+          // A chave agora é o ID do atributo (string ou number)
+          const attributeId = parseInt(attrKey, 10);
+          
+          if (isNaN(attributeId)) {
+            console.warn(`  - Chave de atributo inválida: ${attrKey}`);
+            return;
+          }
+          
+          // Buscar o atributo pelo ID
+          const foundAttr = availableAttrs.find(a => a.id === attributeId);
+          
+          if (!foundAttr) {
+            // Se não encontrou pelo ID, pular (atributo pode ter sido removido)
+            console.warn(`  - Atributo com ID ${attributeId} não encontrado nos atributos disponíveis`);
+            return;
+          }
+          
+          console.log(`  - Atributo encontrado: ${foundAttr.name} (ID: ${foundAttr.id})`);
+          
+          if (!attributesMap[attributeId]) {
+            attributesMap[attributeId] = {
+              attributeId: foundAttr.id,
+              attributeName: foundAttr.name,
+              values: new Set<string>(),
+            };
+          }
+          
+          if (attrValue && typeof attrValue === 'string' && attrValue.trim()) {
+            attributesMap[attributeId].values.add(attrValue.trim());
+            console.log(`  - Valor adicionado: ${attrValue.trim()}`);
+          }
+        });
+      } else {
+        console.log(`  - Variação ${index} não tem atributos ou não é um objeto`);
+      }
+    });
+
+    // Converter o Map para array e ordenar valores
+    const result = Object.values(attributesMap).map((attr) => ({
+      attributeId: attr.attributeId,
+      attributeName: attr.attributeName,
+      values: Array.from(attr.values).sort(),
+    }));
+    
+    console.log('extractAttributesFromVariations - resultado:', result);
+    return result;
   };
 
   // Dropzone
@@ -293,8 +840,32 @@ const ProductForm: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    const sizesArray = formData.sizes.split(',').map(s => s.trim()).filter(s => s !== '');
-    const colorsArray = formData.colors.split(',').map(c => c.trim()).filter(c => c !== '');
+    // Preparar atributos e variações para envio
+    // Se houver variações, enviar as variações completas
+    // Senão, enviar apenas os atributos (para gerar combinações no backend)
+    const attributesPayload = variations.length > 0 
+      ? productAttributes.map(attr => ({
+          attributeId: attr.attributeId || null,
+          attributeName: attr.attributeName,
+          values: attr.values,
+        }))
+      : productAttributes.map(attr => ({
+          attributeId: attr.attributeId || null,
+          attributeName: attr.attributeName,
+          values: attr.values,
+        }));
+    
+    // Preparar variações com estoque, preço e SKU
+    const variationsPayload = variations.length > 0 
+      ? variations.map(variation => ({
+          id: variation.id || null, // ID se já existe (para update)
+          attributes: variation.attributes,
+          stock: variation.stock,
+          price: variation.price,
+          sku: variation.sku,
+          is_active: variation.is_active,
+        }))
+      : [];
 
     // If file is present, use FormData
     if (imageMode === 'file' && imageFile) {
@@ -304,11 +875,17 @@ const ProductForm: React.FC = () => {
         if(formData.promotional_price) data.append('promotional_price', formData.promotional_price.toString().replace(',', '.'));
         
         if(formData.category_id) data.append('category_id', formData.category_id);
-        sizesArray.forEach((size, index) => data.append(`sizes[${index}]`, size));
-        colorsArray.forEach((color, index) => data.append(`colors[${index}]`, color));
+        data.append('attributes', JSON.stringify(attributesPayload));
+        if (variationsPayload.length > 0) {
+          data.append('variations', JSON.stringify(variationsPayload));
+        }
         data.append('description', formData.description);
         data.append('is_active', formData.is_active ? '1' : '0');
         data.append('is_hot', formData.is_hot ? '1' : '0');
+        data.append('action_type', formData.action_type);
+        if (formData.affiliate_link) data.append('affiliate_link', formData.affiliate_link);
+        if (formData.whatsapp_message) data.append('whatsapp_message', formData.whatsapp_message);
+        if (formData.button_label) data.append('button_label', formData.button_label);
         data.append('image', imageFile);
 
         // Gallery Images (only non-main images that are URLs, not files)
@@ -348,9 +925,13 @@ const ProductForm: React.FC = () => {
             price: parseFloat(formData.price.toString().replace(',', '.')),
             promotional_price: formData.promotional_price ? parseFloat(formData.promotional_price.toString().replace(',', '.')) : null,
             category_id: formData.category_id ? parseInt(formData.category_id) : null,
-            sizes: sizesArray,
-            colors: colorsArray,
+            attributes: attributesPayload,
+            variations: variationsPayload.length > 0 ? variationsPayload : undefined,
             main_image_url: imageMode === 'url' ? formData.main_image_url : null,
+            action_type: formData.action_type,
+            affiliate_link: formData.action_type === 'affiliate_link' ? formData.affiliate_link : null,
+            whatsapp_message: formData.action_type === 'whatsapp_contact' ? (formData.whatsapp_message || null) : null,
+            button_label: formData.action_type === 'whatsapp_contact' ? (formData.button_label || null) : null,
             // Send all images in order (main first, then gallery)
             // Backend will handle syncing - existing images with IDs are kept, new URLs are added
             images: productImages
@@ -484,31 +1065,225 @@ const ProductForm: React.FC = () => {
               </select>
             </div>
 
-            {/* Tamanhos */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tamanhos (separados por vírgula)</label>
-              <input
-                type="text"
-                name="sizes"
-                value={formData.sizes}
-                onChange={handleChange}
-                placeholder="Ex: P, M, G, GG"
-                required
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
+            {/* Atributos do Produto */}
+            <div className="col-span-2 border-t pt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Atributos</h3>
+              
+              {/* Select estilo Select2 para adicionar atributos */}
+              <div className="mb-6 relative">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Adicionar Atributo
+                </label>
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        value={attributeSearchTerm}
+                        onChange={(e) => {
+                          setAttributeSearchTerm(e.target.value);
+                          setShowAttributeSelect(true);
+                        }}
+                        onFocus={() => setShowAttributeSelect(true)}
+                        placeholder="Busque um atributo existente ou digite um novo nome"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                      {showAttributeSelect && (
+                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+                          {availableAttributes
+                            .filter(attr => 
+                              attr.name.toLowerCase().includes(attributeSearchTerm.toLowerCase()) &&
+                              !productAttributes.some(pa => pa.attributeId === attr.id)
+                            )
+                            .map(attr => (
+                              <div
+                                key={attr.id}
+                                onClick={() => handleSelectExistingAttribute(attr.id)}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                              >
+                                {attr.name}
+                              </div>
+                            ))}
+                          {attributeSearchTerm.trim() && 
+                           !availableAttributes.some(attr => 
+                             attr.name.toLowerCase() === attributeSearchTerm.trim().toLowerCase()
+                           ) && (
+                            <div
+                              onClick={handleAddAttribute}
+                              className="px-4 py-2 hover:bg-purple-50 cursor-pointer border-t border-gray-200 text-purple-600 font-medium"
+                            >
+                              + Criar "{attributeSearchTerm.trim()}"
+                            </div>
+                          )}
+                          {availableAttributes.filter(attr => 
+                            attr.name.toLowerCase().includes(attributeSearchTerm.toLowerCase()) &&
+                            !productAttributes.some(pa => pa.attributeId === attr.id)
+                          ).length === 0 && 
+                          (!attributeSearchTerm.trim() || availableAttributes.some(attr => 
+                            attr.name.toLowerCase() === attributeSearchTerm.trim().toLowerCase()
+                          )) && (
+                            <div className="px-4 py-2 text-gray-500 text-sm">
+                              Nenhum resultado encontrado
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddAttribute}
+                      disabled={!attributeSearchTerm.trim()}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+                </div>
+                {/* Click outside para fechar dropdown */}
+                {showAttributeSelect && (
+                  <div 
+                    className="fixed inset-0 z-0" 
+                    onClick={() => setShowAttributeSelect(false)}
+                  />
+                )}
+              </div>
 
-            {/* Cores */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Cores (separadas por vírgula)</label>
-              <input
-                type="text"
-                name="colors"
-                value={formData.colors}
-                onChange={handleChange}
-                placeholder="Ex: Azul, Vermelho, Preto"
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
+              {/* Lista de atributos adicionados */}
+              {(() => {
+                console.log('Renderizando atributos. Total:', productAttributes.length, productAttributes);
+                return null;
+              })()}
+              {productAttributes.length === 0 ? (
+                <p className="text-sm text-gray-500 italic mb-4">Nenhum atributo adicionado ainda.</p>
+              ) : (
+                <div className="space-y-4">
+                  {productAttributes.map((productAttr, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-sm font-medium text-gray-700">
+                          {productAttr.attributeName}
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveAttribute(index)}
+                          className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                        >
+                          Remover
+                        </button>
+                      </div>
+
+                      {/* Valores do Atributo (Tags) */}
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-2">
+                          Valores (digite e pressione Enter)
+                        </label>
+                        <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-lg bg-white min-h-[50px]">
+                          {productAttr.values.map((value, valueIndex) => (
+                            <span
+                              key={valueIndex}
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+                            >
+                              {value}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveAttributeValue(index, valueIndex)}
+                                className="text-purple-600 hover:text-purple-800 font-bold"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                          <input
+                            type="text"
+                            onKeyDown={(e) => handleAddAttributeValue(index, e)}
+                            placeholder="Digite e pressione Enter"
+                            className="flex-1 min-w-[150px] border-0 focus:ring-0 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Tabela de Variações - Mostrar apenas se houver variações geradas */}
+              {variations.length > 0 && (
+                <div className="mt-6 border-t pt-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Variações do Produto</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Configure o estoque, preço e SKU para cada combinação de atributos. 
+                    Se o preço estiver vazio, será usado o preço base do produto.
+                  </p>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 border border-gray-300 rounded-lg">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Variação
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Estoque
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider border-r border-gray-200">
+                            Preço (R$)
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                            SKU
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {variations.map((variation, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            {/* Combinação de atributos */}
+                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 border-r border-gray-200">
+                              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                                {formatVariationAttributes(variation)}
+                              </span>
+                            </td>
+                            
+                            {/* Estoque */}
+                            <td className="px-4 py-3 whitespace-nowrap border-r border-gray-200">
+                              <input
+                                type="number"
+                                min="0"
+                                value={variation.stock ?? ''}
+                                onChange={(e) => handleVariationChange(index, 'stock', e.target.value ? parseInt(e.target.value) : null)}
+                                placeholder="0"
+                                className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              />
+                            </td>
+                            
+                            {/* Preço */}
+                            <td className="px-4 py-3 whitespace-nowrap border-r border-gray-200">
+                              <CurrencyInput
+                                placeholder="R$ 0,00"
+                                value={variation.price?.toString() || ''}
+                                decimalsLimit={2}
+                                onValueChange={(value) => handleVariationChange(index, 'price', value ? parseFloat(value.replace(',', '.')) : null)}
+                                prefix="R$ "
+                                className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              />
+                            </td>
+                            
+                            {/* SKU */}
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <input
+                                type="text"
+                                value={variation.sku || ''}
+                                onChange={(e) => handleVariationChange(index, 'sku', e.target.value || null)}
+                                placeholder="SKU"
+                                className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Imagem: Toggle File vs URL */}
@@ -696,6 +1471,114 @@ const ProductForm: React.FC = () => {
                 onChange={handleChange}
                 className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
+            </div>
+
+            {/* Ação do Botão (CTA) */}
+            <div className="col-span-2 border-t pt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Ação do Botão</h3>
+              
+              <div className="space-y-4">
+                {/* Tipo de Ação */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tipo de Ação *
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="action_type"
+                        value="add_to_cart"
+                        checked={formData.action_type === 'add_to_cart'}
+                        onChange={handleChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Adicionar ao Carrinho (padrão)</span>
+                    </label>
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="action_type"
+                        value="affiliate_link"
+                        checked={formData.action_type === 'affiliate_link'}
+                        onChange={handleChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Link de Afiliado (abre link externo)</span>
+                    </label>
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="action_type"
+                        value="whatsapp_contact"
+                        checked={formData.action_type === 'whatsapp_contact'}
+                        onChange={handleChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Contato WhatsApp (abre WhatsApp do vendedor)</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Link de Afiliado (se action_type = affiliate_link) */}
+                {formData.action_type === 'affiliate_link' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Link de Afiliado *
+                    </label>
+                    <input
+                      type="url"
+                      name="affiliate_link"
+                      value={formData.affiliate_link}
+                      onChange={handleChange}
+                      placeholder="https://exemplo.com/produto?ref=123"
+                      className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      URL para onde o cliente será redirecionado ao clicar no botão
+                    </p>
+                  </div>
+                )}
+
+                {/* Mensagem WhatsApp (se action_type = whatsapp_contact) */}
+                {formData.action_type === 'whatsapp_contact' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Mensagem Personalizada do WhatsApp
+                      </label>
+                      <textarea
+                        name="whatsapp_message"
+                        value={formData.whatsapp_message}
+                        onChange={handleChange}
+                        rows={3}
+                        placeholder="Olá! Tenho interesse em {nome do produto}. Poderia me enviar mais informações?"
+                        className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Mensagem que será enviada ao abrir o WhatsApp. Deixe em branco para usar a mensagem padrão da loja.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Label do Botão (opcional)
+                      </label>
+                      <input
+                        type="text"
+                        name="button_label"
+                        value={formData.button_label}
+                        onChange={handleChange}
+                        placeholder="Ex: Fale com um Corretor, Fale com um Vendedor"
+                        className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Texto personalizado do botão. Se deixar em branco, será usado "Fale com um Vendedor"
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Tags e Status */}
