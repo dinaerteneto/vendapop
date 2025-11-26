@@ -3,82 +3,78 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\Interfaces\CategoryRepositoryInterface;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Repositories\Interfaces\RotatingBannerRepositoryInterface;
+use App\Repositories\Interfaces\TenantRepositoryInterface;
 use App\UseCases\Store\CreateOrderUseCase;
-use App\UseCases\Store\GetBannersUseCase;
-use App\UseCases\Store\GetCategoriesUseCase;
 use App\UseCases\Store\GetOrderUseCase;
-use App\UseCases\Store\GetProductDetailsUseCase;
-use App\UseCases\Store\GetProductsUseCase;
-use App\UseCases\Store\GetStoreInfoUseCase;
 use Illuminate\Http\Request;
 
 class StoreController extends Controller
 {
-    private GetStoreInfoUseCase $getStoreInfoUseCase;
-    private GetCategoriesUseCase $getCategoriesUseCase;
-    private GetProductsUseCase $getProductsUseCase;
-    private GetProductDetailsUseCase $getProductDetailsUseCase;
+    private TenantRepositoryInterface $tenantRepository;
+    private CategoryRepositoryInterface $categoryRepository;
+    private ProductRepositoryInterface $productRepository;
+    private RotatingBannerRepositoryInterface $bannerRepository;
     private CreateOrderUseCase $createOrderUseCase;
     private GetOrderUseCase $getOrderUseCase;
-    private GetBannersUseCase $getBannersUseCase;
 
     public function __construct(
-        GetStoreInfoUseCase $getStoreInfoUseCase,
-        GetCategoriesUseCase $getCategoriesUseCase,
-        GetProductsUseCase $getProductsUseCase,
-        GetProductDetailsUseCase $getProductDetailsUseCase,
+        TenantRepositoryInterface $tenantRepository,
+        CategoryRepositoryInterface $categoryRepository,
+        ProductRepositoryInterface $productRepository,
+        RotatingBannerRepositoryInterface $bannerRepository,
         CreateOrderUseCase $createOrderUseCase,
-        GetOrderUseCase $getOrderUseCase,
-        GetBannersUseCase $getBannersUseCase
+        GetOrderUseCase $getOrderUseCase
     ) {
-        $this->getStoreInfoUseCase = $getStoreInfoUseCase;
-        $this->getCategoriesUseCase = $getCategoriesUseCase;
-        $this->getProductsUseCase = $getProductsUseCase;
-        $this->getProductDetailsUseCase = $getProductDetailsUseCase;
+        $this->tenantRepository = $tenantRepository;
+        $this->categoryRepository = $categoryRepository;
+        $this->productRepository = $productRepository;
+        $this->bannerRepository = $bannerRepository;
         $this->createOrderUseCase = $createOrderUseCase;
         $this->getOrderUseCase = $getOrderUseCase;
-        $this->getBannersUseCase = $getBannersUseCase;
     }
 
     public function storeInfo(Request $request, $storeSlug)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
 
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
 
+        $tenant->load('socials');
         return response()->json($tenant);
     }
 
     public function banners(Request $request, $storeSlug)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
 
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
 
-        $banners = $this->getBannersUseCase->execute($tenant);
+        $banners = $this->bannerRepository->findActiveByTenant($tenant->id);
         return response()->json($banners);
     }
 
     public function categories(Request $request, $storeSlug)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
 
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
 
-        $categories = $this->getCategoriesUseCase->execute($tenant);
-
+        $categories = $this->categoryRepository->findByTenant($tenant->id);
         return response()->json($categories);
     }
 
     public function products(Request $request, $storeSlug)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
 
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
@@ -87,9 +83,19 @@ class StoreController extends Controller
         $search = $request->get('search');
         $categoryId = $request->get('category_id');
 
-        $products = $this->getProductsUseCase->execute($tenant, $search, $categoryId);
+        // Buscar produtos diretamente do repositório
+        if ($search) {
+            $products = $this->productRepository->searchByTenant($tenant->id, $search);
+        } elseif ($categoryId) {
+            $products = $this->productRepository->filterByCategory($tenant->id, $categoryId);
+        } else {
+            $products = $this->productRepository->findActiveByTenant($tenant->id);
+        }
 
-        return response()->json($products);
+        // Carregar variações antes de transformar
+        $products->load('variations');
+
+        return \App\Http\Resources\ProductResource::collection($products);
     }
 
     // ... rest of the controller (productDetail, checkout) remain the same
@@ -99,19 +105,17 @@ class StoreController extends Controller
 
     public function productDetail(Request $request, $storeSlug, \App\Models\Product $product)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
-
-        if (!$tenant) {
-            return response()->json(['message' => 'Store not found'], 404);
-        }
-
         // Product is already resolved by route model binding using slug
-        // Ensure product belongs to tenant and is active
-        if ($product->tenant_id !== $tenant->id || !$product->is_active) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
+        // The resolveRouteBinding method already filters by tenant_id and is_active
+        // So if we got here, the product exists, belongs to the tenant and is active
 
-        return response()->json($product);
+        // Load relationships if needed
+        $product->load(['category', 'images', 'variations']);
+
+        // Retornar Resource - Laravel retorna { data: {...} } para recursos únicos
+        // Precisamos acessar response()->json() para retornar diretamente
+        $resource = new \App\Http\Resources\ProductResource($product);
+        return response()->json($resource->toArray($request));
     }
 
     public function checkout(Request $request, $storeSlug)
@@ -134,7 +138,7 @@ class StoreController extends Controller
         }
 
         // Buscar tenant diretamente do slug
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
@@ -161,7 +165,7 @@ class StoreController extends Controller
 
     public function getOrder(Request $request, $storeSlug, $uuid)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
@@ -176,7 +180,7 @@ class StoreController extends Controller
 
     public function getWhatsAppLink(Request $request, $storeSlug, $uuid)
     {
-        $tenant = $this->getStoreInfoUseCase->execute($storeSlug);
+        $tenant = $this->tenantRepository->findBySlug($storeSlug);
         if (!$tenant) {
             return response()->json(['message' => 'Store not found'], 404);
         }
