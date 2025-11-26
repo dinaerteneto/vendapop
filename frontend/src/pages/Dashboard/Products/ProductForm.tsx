@@ -82,6 +82,7 @@ const ProductForm: React.FC = () => {
     main_image_url: '',
     is_active: true,
     is_hot: false,
+    stock_management_enabled: false,
     action_type: 'add_to_cart' as 'add_to_cart' | 'affiliate_link' | 'whatsapp_contact',
     affiliate_link: '',
     whatsapp_message: '',
@@ -199,6 +200,7 @@ const ProductForm: React.FC = () => {
         main_image_url: mainImage ? mainImage.url : '',
         is_active: data.is_active !== undefined ? !!data.is_active : true,
         is_hot: data.is_hot !== undefined ? !!data.is_hot : false,
+        stock_management_enabled: data.stock_management_enabled !== undefined ? !!data.stock_management_enabled : false,
         action_type: data.action_type || 'add_to_cart',
         affiliate_link: data.affiliate_link || '',
         whatsapp_message: data.whatsapp_message || '',
@@ -882,6 +884,7 @@ const ProductForm: React.FC = () => {
         data.append('description', formData.description);
         data.append('is_active', formData.is_active ? '1' : '0');
         data.append('is_hot', formData.is_hot ? '1' : '0');
+        data.append('stock_management_enabled', formData.stock_management_enabled ? '1' : '0');
         data.append('action_type', formData.action_type);
         if (formData.affiliate_link) data.append('affiliate_link', formData.affiliate_link);
         if (formData.whatsapp_message) data.append('whatsapp_message', formData.whatsapp_message);
@@ -932,6 +935,7 @@ const ProductForm: React.FC = () => {
             affiliate_link: formData.action_type === 'affiliate_link' ? formData.affiliate_link : null,
             whatsapp_message: formData.action_type === 'whatsapp_contact' ? (formData.whatsapp_message || null) : null,
             button_label: formData.action_type === 'whatsapp_contact' ? (formData.button_label || null) : null,
+            stock_management_enabled: formData.stock_management_enabled,
             // Send all images in order (main first, then gallery)
             // Backend will handle syncing - existing images with IDs are kept, new URLs are added
             images: productImages
@@ -1610,6 +1614,21 @@ const ProductForm: React.FC = () => {
                 />
                 <label htmlFor="is_hot" className="ml-2 block text-sm text-gray-900 cursor-pointer font-medium text-red-600 flex items-center gap-1">
                     🔥 Produto HOT / Destaque
+                </label>
+                </div>
+
+                {/* Controle de Estoque */}
+                <div className="flex items-center">
+                <input
+                    type="checkbox"
+                    name="stock_management_enabled"
+                    id="stock_management_enabled"
+                    checked={formData.stock_management_enabled}
+                    onChange={handleCheckboxChange}
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <label htmlFor="stock_management_enabled" className="ml-2 block text-sm text-gray-900 cursor-pointer">
+                    📦 Controlar Estoque (verificar disponibilidade nas variações)
                 </label>
                 </div>
             </div>
