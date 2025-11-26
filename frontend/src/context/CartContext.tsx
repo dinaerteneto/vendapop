@@ -55,23 +55,37 @@ export const CartProvider: React.FC<{ children: React.ReactNode; storeSlug?: str
       const existingItemIndex = prev.findIndex((i) => {
         if (i.product_id !== item.product_id) return false;
         
-        // Se tiver attributes, comparar por attributes
-        if (item.attributes && Object.keys(item.attributes).length > 0) {
-          const itemAttrsStr = JSON.stringify(item.attributes);
-          const iAttrsStr = i.attributes ? JSON.stringify(i.attributes) : '';
-          return itemAttrsStr === iAttrsStr;
+        // Normalizar atributos para comparação (tratar undefined, null e objetos vazios)
+        const itemAttrs = item.attributes || {};
+        const iAttrs = i.attributes || {};
+        const itemHasAttrs = item.attributes !== undefined && Object.keys(itemAttrs).length > 0;
+        const iHasAttrs = i.attributes !== undefined && Object.keys(iAttrs).length > 0;
+        
+        // Se o produto tem atributos definidos (não undefined), sempre comparar por attributes
+        // Isso garante que produtos sem atributos não sejam agrupados incorretamente
+        if (item.attributes !== undefined || i.attributes !== undefined) {
+          // Se ambos têm atributos definidos, comparar strings
+          if (itemHasAttrs && iHasAttrs) {
+            const itemAttrsStr = JSON.stringify(itemAttrs);
+            const iAttrsStr = JSON.stringify(iAttrs);
+            return itemAttrsStr === iAttrsStr;
+          }
+          // Se um tem e outro não, são diferentes
+          return false;
         }
         
-        // Fallback para size/color (compatibilidade)
+        // Se nenhum tem atributos definidos, usar fallback para size/color (compatibilidade)
         return i.size === item.size && i.color === item.color;
       });
 
       if (existingItemIndex >= 0) {
         const newCart = [...prev];
+        // Somar a quantidade nova à existente
         newCart[existingItemIndex].quantity += item.quantity;
         return newCart;
       }
       
+      // Adicionar novo item
       return [...prev, item];
     });
   };
