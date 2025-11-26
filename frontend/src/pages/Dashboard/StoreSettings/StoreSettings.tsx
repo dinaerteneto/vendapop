@@ -40,6 +40,7 @@ interface StoreSettings {
   banner_background_color: string | null;
   address: string | null;
   email_contact: string | null;
+  business_sector: string | null;
   socials: Social[];
 }
 
@@ -63,6 +64,7 @@ const StoreSettings: React.FC = () => {
     banner_background_color: '#000000',
     address: '',
     email_contact: '',
+    business_sector: '',
   });
 
   const [socials, setSocials] = useState<Social[]>([]);
@@ -101,6 +103,7 @@ const StoreSettings: React.FC = () => {
         banner_background_color: data.banner_background_color || '#000000',
         address: data.address || '',
         email_contact: data.email_contact || '',
+        business_sector: data.business_sector || '',
       });
 
       if (data.logo_url) {
@@ -271,6 +274,7 @@ const StoreSettings: React.FC = () => {
         if (formData.banner_background_color) formDataToSend.append('banner_background_color', formData.banner_background_color.trim());
         if (formData.address) formDataToSend.append('address', formData.address.trim());
         if (formData.email_contact) formDataToSend.append('email_contact', formData.email_contact.trim());
+        if (formData.business_sector) formDataToSend.append('business_sector', formData.business_sector.trim());
         
         // Logo file and URL - append AFTER required fields
         formDataToSend.append('logo', logoFile);
@@ -378,20 +382,20 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="store_url" className="block text-sm font-medium text-gray-700 mb-2">
-                URL da Loja (ou Slug)
+              <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                URL da Loja (Slug)
               </label>
               <input
                 type="text"
-                id="store_url"
-                name="store_url"
-                value={formData.store_url}
-                onChange={handleChange}
-                placeholder="exemplo ou https://exemplo.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                id="slug"
+                name="slug"
+                value={storeSettings?.slug || ''}
+                readOnly
+                disabled
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600 cursor-not-allowed"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Pode ser um slug simples (ex: minha-loja) ou uma URL completa
+                Seu slug: <strong>{storeSettings?.slug || 'carregando...'}</strong> | Acesse sua loja em: <strong>{window.location.origin}/{storeSettings?.slug || ''}</strong>
               </p>
             </div>
             
@@ -456,6 +460,32 @@ const StoreSettings: React.FC = () => {
                 placeholder="Descreva sua loja..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
+            </div>
+
+            <div className="md:col-span-2">
+              <label htmlFor="business_sector" className="block text-sm font-medium text-gray-700 mb-2">
+                Ramo de Atividade
+              </label>
+              <select
+                id="business_sector"
+                name="business_sector"
+                value={formData.business_sector}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Selecione seu ramo de atividade</option>
+                <option value="fashion">Roupas/Moda</option>
+                <option value="electronics">Eletrônicos</option>
+                <option value="jewelry">Joias</option>
+                <option value="real_estate">Imobiliária</option>
+                <option value="food">Bolos/Comida</option>
+                <option value="custom_orders">Encomendas Personalizadas</option>
+                <option value="affiliates">Afiliados</option>
+                <option value="other">Outros</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Ao selecionar um ramo, o sistema criará automaticamente atributos padrão para seus produtos (ex: Tamanho, Cor, etc.)
+              </p>
             </div>
 
             <div className="md:col-span-2">

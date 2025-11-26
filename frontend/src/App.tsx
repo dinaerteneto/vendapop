@@ -25,6 +25,7 @@ import StoreSettings from './pages/Dashboard/StoreSettings/StoreSettings';
 import ChangePassword from './pages/Dashboard/ChangePassword/ChangePassword';
 import BannerList from './pages/Dashboard/Banners/BannerList';
 import BannerForm from './pages/Dashboard/Banners/BannerForm';
+import AttributeList from './pages/Dashboard/Attributes/AttributeList';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -71,6 +72,8 @@ function App() {
             <Route path="categories" element={<CategoryList />} />
             <Route path="categories/new" element={<CategoryForm />} />
             <Route path="categories/:id" element={<CategoryForm />} />
+
+            <Route path="attributes" element={<AttributeList />} />
 
             <Route path="orders" element={<OrderList />} />
             <Route path="orders/:id" element={<OrderDetail />} />

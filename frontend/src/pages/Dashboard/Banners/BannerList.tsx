@@ -18,6 +18,8 @@ const BannerList: React.FC = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isReordering, setIsReordering] = useState(false);
 
   useEffect(() => {
     loadBanners();
@@ -63,6 +65,52 @@ const BannerList: React.FC = () => {
     }
   };
 
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const newBanners = [...banners];
+    const dragged = newBanners[draggedIndex];
+    newBanners.splice(draggedIndex, 1);
+    newBanners.splice(dropIndex, 0, dragged);
+
+    // Update order values
+    const updatedBanners = newBanners.map((banner, index) => ({
+      ...banner,
+      order: index,
+    }));
+
+    setBanners(updatedBanners);
+    setDraggedIndex(null);
+
+    // Save to backend
+    try {
+      setIsReordering(true);
+      await api.post('/admin/banners/update-order', {
+        banners: updatedBanners.map(b => ({ id: b.id, order: b.order })),
+      });
+      toast.success('Ordem dos banners atualizada!');
+    } catch (error) {
+      console.error('Erro ao atualizar ordem', error);
+      toast.error('Erro ao atualizar ordem dos banners.');
+      // Reload on error
+      loadBanners();
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -95,10 +143,18 @@ const BannerList: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {banners.map((banner) => (
+          {banners.map((banner, index) => (
             <div
               key={banner.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
+              className={`bg-white rounded-lg shadow-md overflow-hidden border-2 transition-all cursor-move ${
+                draggedIndex === index 
+                  ? 'border-blue-500 opacity-50' 
+                  : 'border-gray-200 hover:border-blue-300'
+              } ${isReordering ? 'opacity-75' : ''}`}
             >
               <div className="relative" style={{ aspectRatio: '16/9' }}>
                 <img
@@ -127,7 +183,10 @@ const BannerList: React.FC = () => {
                     Link: {banner.link_url}
                   </p>
                 )}
-                <p className="text-xs text-gray-500 mb-3">Ordem: {banner.order}</p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs text-gray-500">Ordem: {banner.order}</span>
+                  <span className="text-xs text-blue-600 font-medium">🔄 Arraste para reordenar</span>
+                </div>
                 <div className="flex gap-2">
                   <Link
                     to={`/admin/banners/${banner.id}`}

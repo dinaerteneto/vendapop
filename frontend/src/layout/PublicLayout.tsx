@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import Footer from '../components/common/Footer';
 import { CartProvider } from '../context/CartContext';
@@ -32,7 +32,11 @@ interface StoreInfo {
 // Wrapper component to provide context and layout
 const PublicLayout: React.FC = () => {
   const { storeSlug } = useParams();
+  const location = useLocation();
   const [storeInfo, setStoreInfo] = useState<StoreInfo | null>(null);
+  
+  // Verificar se estamos na página de order para ocultar o banner
+  const isOrderPage = location.pathname.includes('/order');
 
   useEffect(() => {
     if (storeSlug) {
@@ -93,7 +97,8 @@ const PublicLayout: React.FC = () => {
           logoUrl={storeInfo?.logo_url}
         />
         
-        {storeInfo?.banner_message && (
+        {/* Banner Promocional - Não exibir na página de pedido */}
+        {storeInfo?.banner_message && !isOrderPage && (
             <PromotionalBanner
                 message={storeInfo.banner_message}
                 textColor1={storeInfo.banner_text_color_1 || '#ffffff'}
@@ -102,10 +107,12 @@ const PublicLayout: React.FC = () => {
             />
         )}
 
-        {/* Banners Rotativos */}
-        <div className="w-full max-w-6xl mx-auto px-4 pt-6">
-            <RotatingBanners />
-        </div>
+        {/* Banners Rotativos - Não exibir na página de pedido */}
+        {!isOrderPage && (
+          <div className="w-full max-w-6xl mx-auto px-4 pt-6">
+              <RotatingBanners />
+          </div>
+        )}
         
         <main className="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
             <Outlet context={{ storeInfo }} />
