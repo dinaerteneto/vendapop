@@ -1,0 +1,33 @@
+FROM php:8.2-fpm-alpine AS base
+
+RUN apk add --no-cache \
+    libzip-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    $PHPIZE_DEPS \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath zip \
+    && apk del $PHPIZE_DEPS
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --no-progress
+
+COPY . .
+RUN composer dump-autoload --optimize \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
+
+FROM base AS fpm
+EXPOSE 9000
+CMD ["php-fpm"]
+
+FROM base AS worker
+CMD ["php", "artisan", "queue:work", "database", "--sleep=3", "--tries=3", "--max-time=3600"]
