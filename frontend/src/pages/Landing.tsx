@@ -77,7 +77,7 @@ const Landing = () => {
         {/* Link para loja de exemplo */}
         <div className="mb-12 relative z-10">
           <a
-            href="https://vestezap.com.br/modachic"
+            href="/modachic"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 bg-purple-500/20 backdrop-blur-sm border-2 border-white/30 text-white rounded-lg font-semibold hover:bg-purple-500/30 hover:border-white/50 transition shadow-lg hover:scale-105"
@@ -133,7 +133,7 @@ const Landing = () => {
             Explore nossa loja de exemplo e veja como seus clientes vão interagir com seus produtos
           </p>
           <a
-            href="https://vestezap.com.br/modachic"
+            href="/modachic"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-bold text-lg hover:from-purple-700 hover:to-indigo-700 transition shadow-xl hover:scale-105"
