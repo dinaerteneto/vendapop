@@ -2,6 +2,29 @@
 
 ## 📋 Histórico de Versões
 
+### v1.6.0 (11 de Junho de 2026)
+
+**Novas Funcionalidades:**
+- 🐳 Setup de produção Docker headless (fpm, worker, nginx, mysql, backup) atrás do edge compartilhado
+- 🏷️ Rodapé "Desenvolvido por Dyna Solutions" com link para dynasolutions.com.br
+
+**Build:**
+- ⚡ Typecheck desacoplado do build de produção (reduz tempo de rebuild em CI/deploy)
+
+**Correções:**
+- ✅ Build do frontend direto em imagem nginx (remove dependência de volume compartilhado)
+- ✅ Landing page: caminho relativo `/modachic` em vez de URL absoluta
+- ✅ Não cachear config no build (corrige fallback para sqlite em produção)
+
+**Notas Técnicas:**
+- Stack de produção: Docker Compose com PHP-FPM, Nginx, MySQL 8, queue worker (database driver)
+- Imagens multi-stage: `Dockerfile.backend` (fpm + worker targets) e `Dockerfile.frontend` (build-only)
+- Conectado à rede `web` para edge proxy Caddy compartilhado
+- Domínio: `vestezap.dynasolutions.com.br`
+- .env.production.example com todas as variáveis documentadas
+
+---
+
 ### v1.5.1 (10 de Junho de 2026)
 
 **Correções:**
