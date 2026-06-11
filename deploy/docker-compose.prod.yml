@@ -57,8 +57,8 @@ services:
       - MAIL_PORT=${MAIL_PORT:-587}
       - MAIL_USERNAME=${MAIL_USERNAME:-}
       - MAIL_PASSWORD=${MAIL_PASSWORD:-}
-      - MAIL_ENCRYPTION=tls
-      - MAIL_FROM_ADDRESS=noreply@${DOMAIN}
+      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-noreply@${DOMAIN}}
       - MAIL_FROM_NAME=VesteZap
       - LOG_LEVEL=${LOG_LEVEL:-notice}
     volumes:
@@ -89,7 +89,12 @@ services:
       - QUEUE_CONNECTION=database
       - CACHE_STORE=database
       - MAIL_MAILER=${MAIL_MAILER:-smtp}
-      - MAIL_FROM_ADDRESS=noreply@${DOMAIN}
+      - MAIL_HOST=${MAIL_HOST:-}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-noreply@${DOMAIN}}
       - MAIL_FROM_NAME=VesteZap
     volumes:
       - backend_storage:/var/www/html/storage
