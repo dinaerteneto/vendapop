@@ -16,10 +16,10 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --no-progress
 
 COPY . .
-RUN composer dump-autoload --optimize \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# NÃO cachear config/route/view no build: as variáveis de runtime (DB, etc.)
+# ainda não existem aqui. config:cache congelaria o padrão sqlite e o runtime
+# passaria a ser ignorado. O config é lido do ambiente em runtime.
+RUN composer dump-autoload --optimize
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
