@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             $table->enum('action_type', ['add_to_cart', 'affiliate_link', 'whatsapp_contact'])
-                ->default('add_to_cart')
-                ->after('is_hot');
+                ->default('add_to_cart');
             $table->string('affiliate_link')->nullable()->after('action_type');
             $table->text('whatsapp_message')->nullable()->after('affiliate_link');
         });

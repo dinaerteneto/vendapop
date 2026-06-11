@@ -2,6 +2,24 @@
 
 ## 📋 Histórico de Versões
 
+### v1.5.1 (10 de Junho de 2026)
+
+**Correções:**
+- ✅ Docker: entrypoint.sh injeta env vars no `.env` para compatibilidade com PHP built-in server
+- ✅ Docker: volume anônimo para `vendor/` evitar sobrescrita pelo bind mount
+- ✅ Docker: removido `APP_KEY` fixa do compose (gerada automaticamente)
+- ✅ Docker: `.dockerignore` criado para evitar `.env` local no build
+- ✅ Migrations: removido `->after('is_hot')` em colunas que não existem mais
+- ✅ Seeders: removidas referências a `sizes`, `colors`, `is_hot` (substituídos por atributos)
+- ✅ `.env.example`: corrigidos valores VAPID inválidos que quebravam o parser
+
+**Notas Técnicas:**
+- PHP built-in server (`php artisan serve`) não herda env vars do shell
+- Entrypoint agora escreve todas as configs DB diretamente no `.env`
+- Necessário rebuild da imagem: `docker compose build backend --no-cache`
+
+---
+
 ### v1.5.0 (27 de Janeiro de 2025)
 
 **Novas Funcionalidades:**

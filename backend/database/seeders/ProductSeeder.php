@@ -31,8 +31,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Vestido perfeito para o verão.',
                     'description' => 'Vestido longo com estampa floral, tecido leve e confortável. Ideal para dias quentes e passeios ao ar livre.',
                     'price' => 129.90,
-                    'sizes' => ['P', 'M', 'G'],
-                    'colors' => ['Rosa', 'Azul'],
                     'is_active' => true,
                 ]
             );
@@ -54,8 +52,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Elegância para a noite.',
                     'description' => 'Vestido midi preto básico, tecido encorpado. Perfeito para jantares e eventos sociais.',
                     'price' => 159.90,
-                    'sizes' => ['M', 'G'],
-                    'colors' => ['Preto'],
                     'is_active' => true,
                 ]
             );
@@ -74,8 +70,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Brilhe muito nas festas!',
                     'description' => 'Vestido curto todo em paetê, alças finas e decote v. Disponível em diversas cores.',
                     'price' => 299.90,
-                    'sizes' => ['P', 'M', 'G'],
-                    'colors' => ['Dourado', 'Prata', 'Preto'],
                     'is_active' => true,
                 ]
             );
@@ -98,8 +92,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Peça essencial no guarda-roupa.',
                     'description' => 'Blusa branca de algodão, corte moderno e versátil.',
                     'price' => 49.90,
-                    'sizes' => ['P', 'M', 'G', 'GG'],
-                    'colors' => ['Branco', 'Preto', 'Off-white'],
                     'is_active' => true,
                 ]
             );
@@ -119,8 +111,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Estilo e frescor.',
                     'description' => 'Cropped com estampa tropical, tecido viscose.',
                     'price' => 59.90,
-                    'sizes' => ['P', 'M'],
-                    'colors' => ['Verde', 'Laranja'],
                     'is_active' => true,
                 ]
             );
@@ -142,8 +132,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Jeans confortável com elastano.',
                     'description' => 'Calça jeans modelagem skinny, lavagem escura. Cintura alta.',
                     'price' => 89.90,
-                    'sizes' => ['36', '38', '40', '42', '44'],
-                    'colors' => ['Jeans Escuro'],
                     'is_active' => true,
                 ]
             );
@@ -162,8 +150,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Elegância e conforto.',
                     'description' => 'Calça pantalona em linho misto, cor bege. Ótima para look office.',
                     'price' => 139.90,
-                    'sizes' => ['38', '40', '42'],
-                    'colors' => ['Bege'],
                     'is_active' => true,
                 ]
             );
@@ -186,8 +172,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Moderno e sofisticado.',
                     'description' => 'Conjunto de blazer cropped e short saia em alfaiataria rosa.',
                     'price' => 219.90,
-                    'sizes' => ['P', 'M'],
-                    'colors' => ['Rosa'],
                     'is_active' => true,
                 ]
             );
@@ -209,8 +193,6 @@ class ProductSeeder extends Seeder
                     'short_description' => 'Leveza para o dia a dia.',
                     'description' => 'Macaquinho soltinho com estampa floral.',
                     'price' => 89.90,
-                    'sizes' => ['U'],
-                    'colors' => ['Estampado'],
                     'is_active' => true,
                 ]
             );
@@ -253,21 +235,6 @@ class ProductSeeder extends Seeder
             'Exclusivo', 'Premium', 'Básico', 'Colorido', 'Neutro',
         ];
 
-        $colors = [
-            'Preto', 'Branco', 'Bege', 'Rosa', 'Azul',
-            'Verde', 'Amarelo', 'Vermelho', 'Roxo', 'Laranja',
-            'Cinza', 'Marrom', 'Coral', 'Lilás', 'Turquesa',
-        ];
-
-        $sizes = [
-            ['P', 'M', 'G'],
-            ['M', 'G', 'GG'],
-            ['P', 'M'],
-            ['36', '38', '40'],
-            ['38', '40', '42', '44'],
-            ['U'],
-        ];
-
         $prices = [29.90, 39.90, 49.90, 59.90, 69.90, 79.90, 89.90, 99.90, 109.90, 119.90, 129.90, 139.90, 149.90, 159.90, 179.90, 199.90, 219.90, 249.90, 279.90, 299.90];
 
         $imageUrls = [
@@ -287,12 +254,10 @@ class ProductSeeder extends Seeder
             $category = $categories[array_rand($categories)];
             $productName = $productNames[array_rand($productNames)];
             $adjective = $adjectives[array_rand($adjectives)];
-            $color = $colors[array_rand($colors)];
-            $sizeSet = $sizes[array_rand($sizes)];
             $price = $prices[array_rand($prices)];
             $mainImage = $imageUrls[array_rand($imageUrls)];
             
-            $name = "$adjective $productName $color";
+            $name = "$adjective $productName";
             $slug = 'produto-' . $i . '-' . strtolower(str_replace(' ', '-', $name));
             
             $product = Product::updateOrCreate(
@@ -304,10 +269,7 @@ class ProductSeeder extends Seeder
                     'description' => "Descrição detalhada do $name. Produto de alta qualidade, perfeito para o seu guarda-roupa.",
                     'price' => $price,
                     'promotional_price' => (rand(0, 100) > 70) ? $price * 0.8 : null, // 30% chance de ter promoção
-                    'sizes' => $sizeSet,
-                    'colors' => [$color, $colors[array_rand($colors)]],
                     'is_active' => true,
-                    'is_hot' => (rand(0, 100) > 85), // 15% chance de ser HOT
                 ]
             );
 
