@@ -2,6 +2,47 @@
 
 ## 📋 Histórico de Versões
 
+### v1.7.0 (12 de Junho de 2026)
+
+**Novas Funcionalidades:**
+- 🔄 Reenvio inline de e-mail de verificação na tela de login (com reCAPTCHA v3, opcional em local)
+- 🔐 Login com Google OAuth via Laravel Socialite
+  - Diálogo de vinculação para contas existentes com e-mail não verificado
+  - Onboarding pós-Google para novos usuários
+- 📧 Login sem senha via OTP de 6 dígitos + Magic Link
+  - Código OTP e link mágico enviados no mesmo e-mail
+  - Página de auto-autenticação via magic link
+- 🧹 Comando `auth:cleanup-expired-tokens` para limpeza de tokens expirados (cron diário)
+
+**Melhorias:**
+- 🛡️ reCAPTCHA v3 opcional em ambiente local (3 endpoints: cadastro, reenvio, OTP)
+- 📬 E-mails OTP e de verificação enviados via MailHog em desenvolvimento
+- 🔧 Entrypoint Docker agora injeta `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT` no `.env`
+
+**Correções:**
+- ✅ Resend de verificação não regenera mais a senha do usuário
+- ✅ Google OAuth retorna 302 redirect (não mais JSON) para fluxo OAuth correto
+- ✅ User data (nome/email) salvo corretamente no localStorage após login Google
+
+**Notas Técnicas:**
+- Backend:
+  - Migration `add_google_auth_fields_to_users_table`: colunas `google_id`, `google_token`, `google_refresh_token`
+  - Migration `create_otp_tokens_table`: tabela para OTP + magic link tokens
+  - Model `OtpToken` com casts de data e fillable
+  - `GoogleAuthService` + `GoogleAuthController`: fluxo OAuth completo com `stateless()`
+  - `OTPAuthService` + `OTPAuthController`: geração, verificação e expiração de tokens
+  - `OTPMail` + `emails/otp.blade.php`: template de e-mail com código OTP e botão magic link
+  - `CleanupExpiredTokens`: comando artisan + schedule diário
+  - `WelcomeMail`: construtor com password opcional (`?string $password = null`)
+  - Dependência: `laravel/socialite ^5.27`
+- Frontend:
+  - `SignIn.tsx`: reenvio inline, botão Google, toggle OTP com input de 6 dígitos
+  - `GoogleCallback.tsx`: processa callback + diálogo de vinculação
+  - `GoogleOnboarding.tsx`: formulário pós-Google para novos usuários
+  - `MagicLogin.tsx`: página que autentica automaticamente via magic link
+
+---
+
 ### v1.6.0 (11 de Junho de 2026)
 
 **Novas Funcionalidades:**
