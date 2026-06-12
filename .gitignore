@@ -74,6 +74,9 @@ jspm_packages/
 .vscode/
 .idea/
 
+# Compozy task artifacts
+.compozy/
+
 # Temporary folders
 tmp/
 temp/
