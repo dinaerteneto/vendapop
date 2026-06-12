@@ -301,6 +301,12 @@ const SignInForm: React.FC = () => {
                 Cadastre-se
               </Link>
             </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Ao usar nossos serviços, você concorda com nossos{' '}
+              <Link to="/termos" className="text-blue-600 hover:underline">Termos de Uso</Link>
+              {' '}e{' '}
+              <Link to="/privacidade" className="text-blue-600 hover:underline">Política de Privacidade</Link>.
+            </p>
           </div>
         )}
       </div>

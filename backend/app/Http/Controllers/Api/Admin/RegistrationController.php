@@ -23,6 +23,7 @@ class RegistrationController extends Controller
             'store_slug' => 'required|string|max:255|unique:tenants,slug',
             'whatsapp_number' => 'required|string',
             'email' => 'required|email|max:255|unique:users,email',
+            'terms_accepted' => 'required|accepted',
         ];
 
         if (!app()->environment('local')) {
@@ -78,6 +79,7 @@ class RegistrationController extends Controller
             'password' => Hash::make($generatedPassword),
             'is_owner' => true,
             'email_verified_at' => null,
+            'terms_accepted_at' => now(),
         ]);
 
         // Create default social networks with icons

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { formatWhatsAppNumber } from '../../utils/whatsapp';
 
 interface StoreInfo {
@@ -78,6 +79,16 @@ const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
                 {(!storeInfo.socials || storeInfo.socials.length === 0) && (
                     <span className="text-gray-400 italic text-sm">Sem redes sociais cadastradas.</span>
                 )}
+            </div>
+
+            <div className="mt-8">
+              <h3 className="text-gray-500 font-semibold mb-4 uppercase text-sm">Legal</h3>
+              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
+                <Link to="/privacidade" className="hover:text-purple-600 transition">Política de Privacidade</Link>
+                <Link to="/termos" className="hover:text-purple-600 transition">Termos de Uso</Link>
+                <Link to="/cookies" className="hover:text-purple-600 transition">Política de Cookies</Link>
+                <Link to="/direitos-lgpd" className="hover:text-purple-600 transition">Seus Direitos (LGPD)</Link>
+              </div>
             </div>
 
             <div className="mt-8 flex items-center text-green-600 font-bold">

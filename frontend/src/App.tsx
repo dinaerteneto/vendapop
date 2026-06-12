@@ -36,6 +36,12 @@ import Cart from './pages/Shop/Cart';
 import Checkout from './pages/Shop/Checkout';
 import OrderTracking from './pages/Shop/OrderTracking';
 
+// Legal Pages
+import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/legal/TermsOfServicePage';
+import CookiePolicyPage from './pages/legal/CookiePolicyPage';
+import LgpdRightsPage from './pages/legal/LgpdRightsPage';
+
 // Landing Page
 import Landing from './pages/Landing';
 
@@ -51,6 +57,12 @@ function App() {
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
+        {/* Legal Pages */}
+        <Route path="/privacidade" element={<PrivacyPolicyPage />} />
+        <Route path="/termos" element={<TermsOfServicePage />} />
+        <Route path="/cookies" element={<CookiePolicyPage />} />
+        <Route path="/direitos-lgpd" element={<LgpdRightsPage />} />
+
         {/* Landing Page */}
         <Route path="/" element={<Landing />} />
 

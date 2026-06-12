@@ -22,6 +22,7 @@ class User extends Authenticatable
         'google_id',
         'google_token',
         'google_refresh_token',
+        'terms_accepted_at',
     ];
 
     protected $hidden = [
@@ -35,6 +36,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_owner' => 'boolean',
+            'terms_accepted_at' => 'datetime',
         ];
     }
 }
