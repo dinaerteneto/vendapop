@@ -1,3 +1,5 @@
+name: vestezap
+
 services:
   frontend:
     build:
