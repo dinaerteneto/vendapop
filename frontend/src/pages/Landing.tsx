@@ -307,6 +307,12 @@ const Landing = () => {
               Registrar
             </Link>
           </div>
+          <div className="flex justify-center gap-6 mt-4 text-sm text-gray-500">
+            <Link to="/privacidade" className="hover:text-white transition">Privacidade</Link>
+            <Link to="/termos" className="hover:text-white transition">Termos</Link>
+            <Link to="/cookies" className="hover:text-white transition">Cookies</Link>
+            <Link to="/direitos-lgpd" className="hover:text-white transition">LGPD</Link>
+          </div>
         </div>
       </footer>
     </div>
