@@ -7,6 +7,7 @@ services:
       dockerfile: ../deploy/Dockerfile.frontend
       args:
         - VITE_API_BASE_URL=https://${DOMAIN}/api
+        - VITE_RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}
     restart: unless-stopped
     volumes:
       - ./nginx/frontend.conf:/etc/nginx/conf.d/default.conf:ro
@@ -63,6 +64,7 @@ services:
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-noreply@${DOMAIN}}
       - MAIL_FROM_NAME=VesteZap
       - LOG_LEVEL=${LOG_LEVEL:-notice}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY:-}
     volumes:
       - backend_storage:/var/www/html/storage
     depends_on:
