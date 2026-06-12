@@ -19,6 +19,9 @@ class User extends Authenticatable
         'password',
         'is_owner',
         'email_verified_at',
+        'google_id',
+        'google_token',
+        'google_refresh_token',
     ];
 
     protected $hidden = [

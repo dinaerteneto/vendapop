@@ -12,6 +12,9 @@ import Register from './pages/AuthPages/Register';
 import ForgotPassword from './pages/AuthPages/ForgotPassword';
 import ResetPassword from './pages/AuthPages/ResetPassword';
 import VerifyEmail from './pages/AuthPages/VerifyEmail';
+import GoogleCallback from './pages/AuthPages/GoogleCallback';
+import GoogleOnboarding from './pages/AuthPages/GoogleOnboarding';
+import MagicLogin from './pages/AuthPages/MagicLogin';
 import ECommerce from './pages/Dashboard/ECommerce';
 import AdminProductList from './pages/Dashboard/Products/ProductList';
 import ProductForm from './pages/Dashboard/Products/ProductForm';
@@ -57,6 +60,9 @@ function App() {
         <Route path="/admin/forgot-password" element={<ForgotPassword />} />
         <Route path="/admin/reset-password" element={<ResetPassword />} />
         <Route path="/admin/verify-email" element={<VerifyEmail />} />
+        <Route path="/admin/auth/google/callback" element={<GoogleCallback />} />
+        <Route path="/admin/onboarding" element={<GoogleOnboarding />} />
+        <Route path="/admin/magic-login" element={<MagicLogin />} />
         
         <Route path="/admin" element={
             <ProtectedRoute>

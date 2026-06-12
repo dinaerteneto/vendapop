@@ -18,30 +18,34 @@ class RegistrationController extends Controller
 {
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'store_name' => 'required|string|max:255',
             'store_slug' => 'required|string|max:255|unique:tenants,slug',
             'whatsapp_number' => 'required|string',
             'email' => 'required|email|max:255|unique:users,email',
-            'recaptcha_token' => 'required|string',
-        ]);
+        ];
 
-        // Verify reCAPTCHA v3
-        $recaptchaSecret = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'); // Test secret for development
-        $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=' . $recaptchaSecret . '&response=' . $validated['recaptcha_token'];
-        $context = stream_context_create(['http' => ['timeout' => 5, 'ignore_errors' => true]]);
-        $recaptchaResponse = @file_get_contents($verifyUrl, false, $context);
-        $recaptchaData = $recaptchaResponse ? json_decode($recaptchaResponse, true) : null;
+        if (!app()->environment('local')) {
+            $rules['recaptcha_token'] = 'required|string';
+        }
 
-        // reCAPTCHA v3 returns a score (0.0 to 1.0)
-        // Score < 0.5 is considered suspicious
-        $score = $recaptchaData['score'] ?? 0;
+        $validated = $request->validate($rules);
 
-        if (!$recaptchaData || empty($recaptchaData['success']) || $score < 0.5) {
-            return response()->json([
-                'message' => 'Verificação reCAPTCHA falhou. Tente novamente.',
-                'errors' => ['recaptcha' => ['Verificação reCAPTCHA falhou.']]
-            ], 422);
+        // Verify reCAPTCHA v3 (skip in local environment)
+        if (!app()->environment('local')) {
+            $recaptchaSecret = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe');
+            $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=' . $recaptchaSecret . '&response=' . $validated['recaptcha_token'];
+            $context = stream_context_create(['http' => ['timeout' => 5, 'ignore_errors' => true]]);
+            $recaptchaResponse = @file_get_contents($verifyUrl, false, $context);
+            $recaptchaData = $recaptchaResponse ? json_decode($recaptchaResponse, true) : null;
+            $score = $recaptchaData['score'] ?? 0;
+
+            if (!$recaptchaData || empty($recaptchaData['success']) || $score < 0.5) {
+                return response()->json([
+                    'message' => 'Verificação reCAPTCHA falhou. Tente novamente.',
+                    'errors' => ['recaptcha' => ['Verificação reCAPTCHA falhou.']]
+                ], 422);
+            }
         }
 
         // Create Tenant
