@@ -12,6 +12,7 @@ const RegisterForm: React.FC = () => {
     email: '',
   });
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const navigate = useNavigate();
 
@@ -25,6 +26,11 @@ const RegisterForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!termsAccepted) {
+      toast.error('Você precisa aceitar os Termos de Uso e a Política de Privacidade.');
+      return;
+    }
+
     if (!executeRecaptcha) {
       toast.error('reCAPTCHA não está pronto. Aguarde um momento.');
       return;
@@ -38,6 +44,7 @@ const RegisterForm: React.FC = () => {
       
       await api.post('/admin/register', {
         ...formData,
+        terms_accepted: true,
         recaptcha_token: recaptchaToken,
       });
       toast.success('Loja cadastrada com sucesso! Verifique seu e-mail para ativar sua conta e receber sua senha.');
@@ -156,6 +163,28 @@ const RegisterForm: React.FC = () => {
             <p className="mt-1 text-xs text-gray-500">
               Você receberá sua senha por e-mail após a verificação
             </p>
+          </div>
+
+          <div className="mb-4">
+            <label className="flex items-start gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                required
+              />
+              <span>
+                Li e aceito os{' '}
+                <Link to="/termos" target="_blank" className="text-blue-600 hover:underline">
+                  Termos de Uso
+                </Link>
+                {' '}e a{' '}
+                <Link to="/privacidade" target="_blank" className="text-blue-600 hover:underline">
+                  Política de Privacidade
+                </Link>
+              </span>
+            </label>
           </div>
 
           <button
