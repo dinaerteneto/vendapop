@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController
 use App\Http\Controllers\Api\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\EmailVerificationController;
+use App\Http\Controllers\Api\Admin\GoogleAuthController;
+use App\Http\Controllers\Api\Admin\OTPAuthController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PasswordResetController;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
@@ -34,6 +36,18 @@ Route::prefix('admin')->group(function () {
     Route::post('/reset-password', [PasswordResetController::class, 'reset']);
     Route::post('/verify-email', [EmailVerificationController::class, 'verify']);
     Route::post('/resend-verification', [EmailVerificationController::class, 'resend']);
+
+    // Google OAuth
+    Route::get('/auth/google', [GoogleAuthController::class, 'redirect']);
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+    Route::post('/auth/google/link', [GoogleAuthController::class, 'link']);
+    Route::post('/onboarding', [GoogleAuthController::class, 'onboarding']);
+
+    // OTP + Magic Link
+    Route::post('/otp/send', [OTPAuthController::class, 'send']);
+    Route::post('/otp/verify', [OTPAuthController::class, 'verify']);
+    Route::get('/magic-login', [OTPAuthController::class, 'magicLogin']);
+
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
     // Rotas protegidas do Admin

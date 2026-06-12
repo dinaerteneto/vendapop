@@ -3,6 +3,7 @@
 
 Sua loja **{{ $user->tenant->name }}** foi criada com sucesso!
 
+@if($password)
 ## Suas Credenciais de Acesso
 
 **E-mail:** {{ $user->email }}
@@ -10,6 +11,7 @@ Sua loja **{{ $user->tenant->name }}** foi criada com sucesso!
 **Senha:** {{ $password }}
 
 ⚠️ **Importante:** Guarde esta senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
+@endif
 
 ## Verificação de E-mail
 

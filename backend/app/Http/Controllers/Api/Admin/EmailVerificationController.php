@@ -75,12 +75,34 @@ class EmailVerificationController extends Controller
 
     public function resend(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $rules = ['email' => 'required|email'];
+
+        if (!app()->environment('local')) {
+            $rules['recaptcha_token'] = 'required|string';
+        }
+
+        $request->validate($rules);
+
+        // Verify reCAPTCHA v3 (skip in local environment)
+        if (!app()->environment('local')) {
+            $recaptchaSecret = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe');
+            $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify?secret=' . $recaptchaSecret . '&response=' . $request->recaptcha_token;
+            $context = stream_context_create(['http' => ['timeout' => 5, 'ignore_errors' => true]]);
+            $recaptchaResponse = @file_get_contents($verifyUrl, false, $context);
+            $recaptchaData = $recaptchaResponse ? json_decode($recaptchaResponse, true) : null;
+            $score = $recaptchaData['score'] ?? 0;
+
+            if (!$recaptchaData || empty($recaptchaData['success']) || $score < 0.5) {
+                return response()->json([
+                    'message' => 'Verificação reCAPTCHA falhou. Tente novamente.',
+                    'errors' => ['recaptcha' => ['Verificação reCAPTCHA falhou.']]
+                ], 422);
+            }
+        }
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            // Don't reveal if email exists for security
             return response()->json([
                 'message' => 'Se o e-mail existir, um novo link será enviado.'
             ], 200);
@@ -102,17 +124,12 @@ class EmailVerificationController extends Controller
             'created_at' => now(),
         ]);
 
-        // Send welcome email with verification link
+        // Send email with verification link (no password regeneration)
         $frontendUrl = config('services.frontend_url', 'http://localhost:5173');
         $verificationUrl = $frontendUrl . '/admin/verify-email?token=' . $verificationToken . '&email=' . urlencode($user->email);
 
-        // Generate new password for resend
-        $generatedPassword = \Illuminate\Support\Str::random(12);
-        $user->password = \Illuminate\Support\Facades\Hash::make($generatedPassword);
-        $user->save();
-
         try {
-            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeMail($user, $verificationUrl, $generatedPassword));
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\WelcomeMail($user, $verificationUrl));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Erro ao reenviar email de verificação: ' . $e->getMessage());
         }
