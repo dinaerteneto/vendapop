@@ -65,6 +65,8 @@ services:
       - MAIL_FROM_NAME=VesteZap
       - LOG_LEVEL=${LOG_LEVEL:-notice}
       - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY:-}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     volumes:
       - backend_storage:/var/www/html/storage
     depends_on:
@@ -100,6 +102,8 @@ services:
       - MAIL_ENCRYPTION=${MAIL_ENCRYPTION:-tls}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-noreply@${DOMAIN}}
       - MAIL_FROM_NAME=VesteZap
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     volumes:
       - backend_storage:/var/www/html/storage
     depends_on:
