@@ -2,6 +2,28 @@
 
 ## 📋 Histórico de Versões
 
+### v1.8.0 (12 de Junho de 2026)
+
+**Novas Funcionalidades:**
+- 📄 Páginas legais: Política de Privacidade, Termos de Uso, Política de Cookies e Seus Direitos LGPD
+- 🏛️ Componente `LegalPage` reutilizável com sumário automático, navegação por âncoras e botão de impressão
+- 🔗 Links legais no rodapé das lojas, landing page e tela de login
+- ✅ Checkbox obrigatório de aceite dos Termos e Privacidade no cadastro do lojista
+- 🗄️ Registro de `terms_accepted_at` no banco de dados para trilha de auditoria
+
+**Melhorias:**
+- 🔒 Conteúdo adaptado para contexto de e-commerce (produtos, pedidos, dados de clientes)
+- 📧 Canais de contato: `contato@vestezap.com.br` (geral) e `privacidade@vestezap.com.br` (DPO)
+- 🧪 Testes de feature para validação de aceite dos termos no registro
+
+**Notas Técnicas:**
+- Rotas públicas: `/privacidade`, `/termos`, `/cookies`, `/direitos-lgpd`
+- Migração: `add_terms_accepted_at_to_users_table` (nullable timestamp)
+- Validação: `terms_accepted` como `required|accepted` no endpoint `/api/admin/register`
+- Conteúdo estático em JSX (sem CMS) — alterações requerem deploy
+
+---
+
 ### v1.7.0 (12 de Junho de 2026)
 
 **Novas Funcionalidades:**
