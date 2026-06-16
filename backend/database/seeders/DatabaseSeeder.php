@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             BoloCaseiroSeeder::class,
             EncomendasSeeder::class,
             AfiliadosSeeder::class,
+            PizzariaSeeder::class,
         ]);
     }
 }
