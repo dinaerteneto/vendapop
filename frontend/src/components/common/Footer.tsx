@@ -103,7 +103,7 @@ const Footer: React.FC<FooterProps> = ({ storeInfo }) => {
         </div>
       </div>
       <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t border-gray-200">
-        VesteZap © 2025 - Todos os direitos reservados.
+        PopVenda © 2025 - Todos os direitos reservados.
         <p className="mt-2">
           Desenvolvido por{' '}
           <a href="https://dynasolutions.com.br" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">

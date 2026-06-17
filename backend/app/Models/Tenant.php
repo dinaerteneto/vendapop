@@ -27,6 +27,7 @@ class Tenant extends Model
         'address',
         'email_contact',
         'business_sector',
+        'plan_expiry_banner_dismissed_at',
     ];
 
     protected $casts = [
@@ -66,5 +67,15 @@ class Tenant extends Model
     public function productAttributes()
     {
         return $this->hasMany(ProductAttribute::class)->orderBy('order');
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function trackings()
+    {
+        return $this->hasMany(TenantTracking::class);
     }
 }

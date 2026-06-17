@@ -1,4 +1,4 @@
-# Release Notes - VesteZap
+# Release Notes - PopVenda
 
 ## 📋 Histórico de Versões
 
@@ -13,7 +13,7 @@
 
 **Melhorias:**
 - 🔒 Conteúdo adaptado para contexto de e-commerce (produtos, pedidos, dados de clientes)
-- 📧 Canais de contato: `contato@vestezap.com.br` (geral) e `privacidade@vestezap.com.br` (DPO)
+- 📧 Canais de contato: `contato@popvenda.com.br` (geral) e `privacidade@popvenda.com.br` (DPO)
 - 🧪 Testes de feature para validação de aceite dos termos no registro
 
 **Notas Técnicas:**
@@ -83,7 +83,7 @@
 - Stack de produção: Docker Compose com PHP-FPM, Nginx, MySQL 8, queue worker (database driver)
 - Imagens multi-stage: `Dockerfile.backend` (fpm + worker targets) e `Dockerfile.frontend` (build-only)
 - Conectado à rede `web` para edge proxy Caddy compartilhado
-- Domínio: `vestezap.dynasolutions.com.br`
+- Domínio: `popvenda.dynasolutions.com.br`
 - .env.production.example com todas as variáveis documentadas
 
 ---
@@ -535,13 +535,13 @@
 
 ---
 
-# Release Notes - VesteZap v1.0.0 🎉
+# Release Notes - PopVenda v1.0.0 🎉
 
 **Data de Lançamento:** 20 de Novembro de 2025
 
 ## 🎊 Primeira Versão Completa!
 
-Esta é a primeira versão completa do VesteZap, uma plataforma SaaS multi-tenant para lojistas de moda feminina com finalização de pedidos via WhatsApp.
+Esta é a primeira versão completa do PopVenda, uma plataforma SaaS multi-tenant para lojistas de moda feminina com finalização de pedidos via WhatsApp.
 
 ---
 
@@ -851,7 +851,7 @@ Funcionalidades planejadas para versões futuras:
 
 ## 🙏 Agradecimentos
 
-Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
+Agradecemos a todos que contribuíram para esta primeira versão do PopVenda!
 
 ---
 
@@ -892,7 +892,7 @@ Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
 **Melhorias:**
 - ✅ Adicionada meta tag `mobile-web-app-capable` (nova especificação)
 - 📚 Documentação melhorada para configuração do reCAPTCHA v3 no frontend e backend
-- 🔧 Instruções atualizadas para usar subdomínio `api.vestezap.com.br`
+- 🔧 Instruções atualizadas para usar subdomínio `api.popvenda.com.br`
 
 **Notas Técnicas:**
 - ManifestController agora retorna JSON válido corretamente
@@ -938,5 +938,5 @@ Agradecemos a todos que contribuíram para esta primeira versão do VesteZap!
 
 ---
 
-**VesteZap v1.0.0** - Transformando vendas de moda com WhatsApp! 💖
+**PopVenda v1.0.0** - Transformando vendas de moda com WhatsApp! 💖
 

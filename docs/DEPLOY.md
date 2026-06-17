@@ -1,6 +1,6 @@
-# 🚀 Guia de Deploy - VesteZap em VPS (Sem Docker)
+# 🚀 Guia de Deploy - PopVenda em VPS (Sem Docker)
 
-Este guia detalha a instalação completa do VesteZap em uma VPS Ubuntu/Debian sem Docker, incluindo todas as dependências, configurações e SSL gratuito.
+Este guia detalha a instalação completa do PopVenda em uma VPS Ubuntu/Debian sem Docker, incluindo todas as dependências, configurações e SSL gratuito.
 
 ---
 
@@ -8,7 +8,7 @@ Este guia detalha a instalação completa do VesteZap em uma VPS Ubuntu/Debian s
 
 - VPS com Ubuntu 22.04 LTS ou Debian 12
 - Acesso root ou usuário com sudo
-- Domínio apontado para o IP da VPS (vestezap.com.br)
+- Domínio apontado para o IP da VPS (popvenda.com.br)
 - Mínimo 2GB RAM recomendado
 - Mínimo 20GB de armazenamento
 
@@ -217,8 +217,8 @@ sudo git clone git@bitbucket.org:codigo101/vestezap.git
 cd vestezap
 
 # Dar permissões corretas
-sudo chown -R www-data:www-data /var/www/vestezap
-sudo chmod -R 755 /var/www/vestezap
+sudo chown -R www-data:www-data /var/www/popvenda
+sudo chmod -R 755 /var/www/popvenda
 ```
 
 **⚠️ NOTA:** Se você estiver usando SSH para clonar, certifique-se de que as chaves SSH estão configuradas no servidor. Alternativamente, você pode usar HTTPS:
@@ -233,7 +233,7 @@ sudo git clone https://bitbucket.org/codigo101/vestezap.git
 ## ⚙️ Passo 8: Configuração do Backend (Laravel)
 
 ```bash
-cd /var/www/vestezap/backend
+cd /var/www/popvenda/backend
 
 # Instalar dependências do Composer
 sudo -u www-data composer install --no-dev --optimize-autoloader
@@ -256,17 +256,17 @@ sudo -u www-data php artisan storage:link
 
 ```bash
 # Editar arquivo .env
-sudo nano /var/www/vestezap/backend/.env
+sudo nano /var/www/popvenda/backend/.env
 ```
 
 Configure as seguintes variáveis (substitua pelos seus valores):
 
 ```env
-APP_NAME="VesteZap"
+APP_NAME="PopVenda"
 APP_ENV=production
 APP_KEY=base64:GERADO_PELO_ARTISAN_KEY_GENERATE
 APP_DEBUG=false
-APP_URL=https://vestezap.com.br
+APP_URL=https://popvenda.com.br
 
 LOG_CHANNEL=stack
 LOG_DEPRECATIONS_CHANNEL=null
@@ -289,13 +289,13 @@ SESSION_LIFETIME=120
 MAIL_MAILER=smtp
 MAIL_HOST=seu-servidor-smtp.com
 MAIL_PORT=587
-MAIL_USERNAME=seu-email@vestezap.com.br
+MAIL_USERNAME=seu-email@popvenda.com.br
 MAIL_PASSWORD=SUA_SENHA_EMAIL_AQUI
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="noreply@vestezap.com.br"
+MAIL_FROM_ADDRESS="noreply@popvenda.com.br"
 MAIL_FROM_NAME="${APP_NAME}"
 
-FRONTEND_URL=https://vestezap.com.br
+FRONTEND_URL=https://popvenda.com.br
 
 # reCAPTCHA v3 - Secret Key (obter em https://www.google.com/recaptcha/admin)
 RECAPTCHA_SECRET_KEY=SUA_CHAVE_SECRET_KEY_AQUI
@@ -307,7 +307,7 @@ RECAPTCHA_SECRET_KEY=SUA_CHAVE_SECRET_KEY_AQUI
 - **Configurar reCAPTCHA v3:**
   1. Acesse: https://www.google.com/recaptcha/admin/create
   2. Selecione "reCAPTCHA v3"
-  3. Adicione os domínios: `vestezap.com.br` e `api.vestezap.com.br`
+  3. Adicione os domínios: `popvenda.com.br` e `api.popvenda.com.br`
   4. Copie a **Site Key** → use no frontend (`.env.production`)
   5. Copie a **Secret Key** → use no backend (`.env` acima)
 
@@ -342,7 +342,7 @@ sudo -u www-data composer install --optimize-autoloader --no-dev
 ## 🎨 Passo 9: Build do Frontend
 
 ```bash
-cd /var/www/vestezap/frontend
+cd /var/www/popvenda/frontend
 
 # Instalar dependências
 sudo npm install
@@ -354,8 +354,8 @@ sudo nano .env.production
 Crie o arquivo `.env.production` com:
 
 ```env
-# URL da API (subdomínio api.vestezap.com.br)
-VITE_API_BASE_URL=https://api.vestezap.com.br/api
+# URL da API (subdomínio api.popvenda.com.br)
+VITE_API_BASE_URL=https://api.popvenda.com.br/api
 
 # Chave Site Key do reCAPTCHA v3 (obter em https://www.google.com/recaptcha/admin/create)
 VITE_RECAPTCHA_SITE_KEY=sua_chave_site_key_aqui
@@ -365,20 +365,20 @@ VITE_RECAPTCHA_SITE_KEY=sua_chave_site_key_aqui
 
 1. Acesse: https://www.google.com/recaptcha/admin/create
 2. Selecione "reCAPTCHA v3"
-3. Adicione o domínio: `vestezap.com.br`
+3. Adicione o domínio: `popvenda.com.br`
 4. Copie a **Site Key** e cole em `VITE_RECAPTCHA_SITE_KEY`
 5. Copie a **Secret Key** e configure no backend (ver seção Backend)
 
-**⚠️ NOTA:** Se você usa subdomínio separado para API (`api.vestezap.com.br`), certifique-se de adicionar ambos os domínios no reCAPTCHA:
-- `vestezap.com.br`
-- `api.vestezap.com.br` (se necessário)
+**⚠️ NOTA:** Se você usa subdomínio separado para API (`api.popvenda.com.br`), certifique-se de adicionar ambos os domínios no reCAPTCHA:
+- `popvenda.com.br`
+- `api.popvenda.com.br` (se necessário)
 
 ```bash
 # Build para produção
 sudo npm run build
 
 # Dar permissões corretas
-sudo chown -R www-data:www-data /var/www/vestezap/frontend/dist
+sudo chown -R www-data:www-data /var/www/popvenda/frontend/dist
 ```
 
 ---
@@ -396,8 +396,8 @@ Adicione a seguinte configuração:
 ```nginx
 server {
     listen 80;
-    server_name api.vestezap.com.br;
-    root /var/www/vestezap/backend/public;
+    server_name api.popvenda.com.br;
+    root /var/www/popvenda/backend/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
     add_header X-Content-Type-Options "nosniff";
@@ -438,8 +438,8 @@ Adicione a seguinte configuração:
 ```nginx
 server {
     listen 80;
-    server_name vestezap.com.br www.vestezap.com.br;
-    root /var/www/vestezap/frontend/dist;
+    server_name popvenda.com.br www.popvenda.com.br;
+    root /var/www/popvenda/frontend/dist;
 
     index index.html;
 
@@ -503,10 +503,10 @@ sudo systemctl reload nginx
 sudo nala install -y certbot python3-certbot-nginx
 
 # Obter certificado SSL para o domínio principal
-sudo certbot --nginx -d vestezap.com.br -d www.vestezap.com.br
+sudo certbot --nginx -d popvenda.com.br -d www.popvenda.com.br
 
 # Obter certificado SSL para subdomínio da API (se usar)
-sudo certbot --nginx -d api.vestezap.com.br
+sudo certbot --nginx -d api.popvenda.com.br
 
 # Durante a configuração:
 # - Digite seu email
@@ -540,13 +540,13 @@ Adicione:
 
 ```ini
 [Unit]
-Description=VesteZap API Service
+Description=PopVenda API Service
 After=network.target
 
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/vestezap/backend
+WorkingDirectory=/var/www/popvenda/backend
 ExecStart=/usr/bin/php artisan serve --host=127.0.0.1 --port=8000
 Restart=always
 RestartSec=10
@@ -605,8 +605,8 @@ sudo systemctl status mysql
 
 ### Testar aplicação
 
-1. Acesse `https://vestezap.com.br` no navegador
-2. Acesse `https://vestezap.com.br/admin/login` para o painel admin
+1. Acesse `https://popvenda.com.br` no navegador
+2. Acesse `https://popvenda.com.br/admin/login` para o painel admin
 3. Verifique se o SSL está funcionando (cadeado verde)
 
 ### Verificar logs
@@ -617,7 +617,7 @@ sudo tail -f /var/log/nginx/error.log
 sudo tail -f /var/log/nginx/access.log
 
 # Logs do Laravel
-sudo tail -f /var/www/vestezap/backend/storage/logs/laravel.log
+sudo tail -f /var/www/popvenda/backend/storage/logs/laravel.log
 
 # Logs do PHP-FPM
 sudo tail -f /var/log/php8.2-fpm.log
@@ -630,7 +630,7 @@ sudo tail -f /var/log/php8.2-fpm.log
 ### Atualizar aplicação
 
 ```bash
-cd /var/www/vestezap
+cd /var/www/popvenda
 
 # Atualizar código
 sudo git pull origin main
@@ -658,7 +658,7 @@ sudo systemctl reload php8.2-fpm
 ### Limpar cache
 
 ```bash
-cd /var/www/vestezap/backend
+cd /var/www/popvenda/backend
 
 # Limpar todos os caches
 sudo -u www-data php artisan cache:clear
@@ -719,10 +719,10 @@ sudo tail -f /var/log/nginx/error.log
 
 ```bash
 # Corrigir permissões
-sudo chown -R www-data:www-data /var/www/vestezap
-sudo chmod -R 755 /var/www/vestezap
-sudo chmod -R 775 /var/www/vestezap/backend/storage
-sudo chmod -R 775 /var/www/vestezap/backend/bootstrap/cache
+sudo chown -R www-data:www-data /var/www/popvenda
+sudo chmod -R 755 /var/www/popvenda
+sudo chmod -R 775 /var/www/popvenda/backend/storage
+sudo chmod -R 775 /var/www/popvenda/backend/bootstrap/cache
 ```
 
 ### Erro de conexão com banco
@@ -737,7 +737,7 @@ sudo systemctl status mysql
 sudo mysql -u vestezap_user -p vestezap_db
 
 # Verificar configuração no .env
-sudo nano /var/www/vestezap/backend/.env
+sudo nano /var/www/popvenda/backend/.env
 ```
 
 ### SSL não funciona
@@ -758,7 +758,7 @@ sudo nginx -t
 Se aparecer o erro `Cannot find module @rollup/rollup-linux-x64-gnu`:
 
 ```bash
-cd /var/www/vestezap/frontend
+cd /var/www/popvenda/frontend
 
 # Instalar dependência opcional do Rollup
 sudo npm install @rollup/rollup-linux-x64-gnu --save-optional --force
@@ -829,7 +829,7 @@ Em caso de problemas:
 
 ---
 
-**🎉 Parabéns! Seu VesteZap está no ar!**
+**🎉 Parabéns! Seu PopVenda está no ar!**
 
-Acesse: `https://vestezap.com.br`
+Acesse: `https://popvenda.com.br`
 

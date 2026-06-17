@@ -1,4 +1,4 @@
-# Todo - Fluxo de Compras Vestezap
+# Todo - Fluxo de Compras PopVenda
 
 ## Fluxo de Pedido
 

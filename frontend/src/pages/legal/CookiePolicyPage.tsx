@@ -11,7 +11,7 @@ const sections: LegalSection[] = [
           Cookies são pequenos arquivos de texto que são armazenados em seu dispositivo (computador, tablet ou smartphone) quando você visita um site ou utiliza uma aplicação web. Eles são amplamente utilizados para fazer os sites funcionarem de maneira mais eficiente e fornecer informações aos proprietários do site.
         </p>
         <p className="mt-4">
-          Esta Política de Cookies explica como o <strong>VesteZap</strong> utiliza cookies e tecnologias semelhantes.
+          Esta Política de Cookies explica como o <strong>PopVenda</strong> utiliza cookies e tecnologias semelhantes.
         </p>
       </>
     ),
@@ -61,7 +61,7 @@ const sections: LegalSection[] = [
           Estes cookies permitem que a plataforma lembre das escolhas que você faz (como seu nome de usuário, idioma ou região) e forneça recursos aprimorados e personalizados.
         </p>
         <p className="mt-3">
-          Atualmente, o VesteZap <strong>não utiliza cookies de preferências</strong> além dos essenciais.
+          Atualmente, o PopVenda <strong>não utiliza cookies de preferências</strong> além dos essenciais.
         </p>
 
         <h3 className="text-base font-semibold mt-6 mb-3">2.3 Cookies de Analytics</h3>
@@ -69,7 +69,7 @@ const sections: LegalSection[] = [
           Cookies de analytics nos ajudam a entender como os visitantes interagem com a plataforma, coletando e reportando informações de forma anônima.
         </p>
         <p className="mt-3">
-          Atualmente, o VesteZap <strong>não utiliza cookies de analytics de terceiros</strong>. Podemos implementar analytics próprios no futuro para melhorar o serviço, sempre respeitando sua privacidade.
+          Atualmente, o PopVenda <strong>não utiliza cookies de analytics de terceiros</strong>. Podemos implementar analytics próprios no futuro para melhorar o serviço, sempre respeitando sua privacidade.
         </p>
 
         <h3 className="text-base font-semibold mt-6 mb-3">2.4 Cookies de Marketing</h3>
@@ -77,7 +77,7 @@ const sections: LegalSection[] = [
           Cookies de marketing são utilizados para rastrear visitantes em sites e exibir anúncios relevantes.
         </p>
         <p className="mt-3">
-          O VesteZap <strong>não utiliza cookies de marketing</strong>. Não rastreamos seu comportamento em outros sites nem exibimos anúncios personalizados.
+          O PopVenda <strong>não utiliza cookies de marketing</strong>. Não rastreamos seu comportamento em outros sites nem exibimos anúncios personalizados.
         </p>
       </>
     ),
@@ -127,7 +127,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Se você optar por desativar os cookies, algumas funcionalidades do VesteZap podem não estar disponíveis:
+          Se você optar por desativar os cookies, algumas funcionalidades do PopVenda podem não estar disponíveis:
         </p>
         <ul className="list-disc pl-6 space-y-1">
           <li>Você não conseguirá fazer login ou manter sua sessão ativa</li>
@@ -149,7 +149,7 @@ const sections: LegalSection[] = [
           Em alguns casos, utilizamos cookies fornecidos por terceiros confiáveis. A seção abaixo detalha quais cookies de terceiros você pode encontrar neste site:
         </p>
         <p className="mt-4">
-          Atualmente, o VesteZap <strong>não utiliza cookies de terceiros</strong>. Caso implementemos serviços de terceiros no futuro (como Google Analytics, por exemplo), atualizaremos esta política e, se necessário, solicitaremos seu consentimento.
+          Atualmente, o PopVenda <strong>não utiliza cookies de terceiros</strong>. Caso implementemos serviços de terceiros no futuro (como Google Analytics, por exemplo), atualizaremos esta política e, se necessário, solicitaremos seu consentimento.
         </p>
       </>
     ),
@@ -177,7 +177,7 @@ const sections: LegalSection[] = [
           Se você tiver dúvidas sobre nossa utilização de cookies ou sobre esta Política de Cookies, entre em contato:
         </p>
         <ul className="list-none pl-0 mt-4 space-y-2">
-          <li><strong>E-mail:</strong> contato@vestezap.com.br</li>
+          <li><strong>E-mail:</strong> contato@popvenda.com.br</li>
         </ul>
       </>
     ),

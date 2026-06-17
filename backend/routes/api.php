@@ -15,7 +15,12 @@ use App\Http\Controllers\Api\Admin\PushSubscriptionController;
 use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\RotatingBannerController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
+use App\Http\Controllers\Api\Admin\InviteController;
 use App\Http\Controllers\Api\Admin\ProductAttributeController;
+use App\Http\Controllers\Api\Admin\SubscriptionController;
+use App\Http\Controllers\Api\Admin\TrackingController;
+use App\Http\Controllers\Api\Admin\WaitlistAdminController;
+use App\Http\Controllers\Api\Admin\WaitlistController;
 use App\Http\Controllers\Api\CustomerPushSubscriptionController;
 use App\Http\Controllers\Api\ManifestController;
 use App\Http\Controllers\Api\StoreController;
@@ -47,6 +52,11 @@ Route::prefix('admin')->group(function () {
     Route::post('/otp/send', [OTPAuthController::class, 'send']);
     Route::post('/otp/verify', [OTPAuthController::class, 'verify']);
     Route::get('/magic-login', [OTPAuthController::class, 'magicLogin']);
+
+    Route::get('/invites/validate/{code}', [InviteController::class, 'validateCode']);
+
+    // Waitlist
+    Route::post('/waitlist', [WaitlistController::class, 'store']);
 
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
@@ -85,6 +95,26 @@ Route::prefix('admin')->group(function () {
 
         // Product Attributes
         Route::apiResource('product-attributes', ProductAttributeController::class);
+
+        // Invites
+        Route::get('/invites', [InviteController::class, 'index']);
+        Route::post('/invites', [InviteController::class, 'store']);
+        Route::get('/invites/remaining', [InviteController::class, 'remaining']);
+        Route::post('/invites/public', [InviteController::class, 'createPublicLink']);
+        Route::get('/invites/public', [InviteController::class, 'listPublicLinks']);
+
+        // Subscription
+        Route::get('/subscription', [SubscriptionController::class, 'show']);
+        Route::post('/subscription/dismiss-banner', [SubscriptionController::class, 'dismissBanner']);
+
+        // Waitlist (admin)
+        Route::get('/waitlist', [WaitlistAdminController::class, 'index']);
+        Route::get('/waitlist/count', [WaitlistAdminController::class, 'count']);
+
+        // Tracking
+        Route::get('/trackings', [TrackingController::class, 'index']);
+        Route::post('/trackings', [TrackingController::class, 'store']);
+        Route::delete('/trackings/{id}', [TrackingController::class, 'destroy']);
     });
 });
 
@@ -93,6 +123,7 @@ Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
     Route::get('/manifest.json', [ManifestController::class, 'show']); // Dynamic PWA Manifest
     Route::get('/', [StoreController::class, 'storeInfo']); // Nova rota para info da loja
     Route::get('/banners', [StoreController::class, 'banners']); // Banners rotativos ativos
+    Route::get('/trackings', [TrackingController::class, 'show']); // Tracking scripts por loja
     Route::get('/categories', [StoreController::class, 'categories']);
     Route::get('/products', [StoreController::class, 'products']);
     Route::get('/products/{product}', [StoreController::class, 'productDetail']);

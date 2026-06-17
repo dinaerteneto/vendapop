@@ -8,7 +8,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Ao criar uma conta e utilizar os serviços do <strong>VesteZap</strong>, você declara ter lido, compreendido e aceito integralmente estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá utilizar nossos serviços.
+          Ao criar uma conta e utilizar os serviços do <strong>PopVenda</strong>, você declara ter lido, compreendido e aceito integralmente estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá utilizar nossos serviços.
         </p>
       </>
     ),
@@ -19,7 +19,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          O VesteZap é uma plataforma de loja virtual que permite aos lojistas:
+          O PopVenda é uma plataforma de loja virtual que permite aos lojistas:
         </p>
         <ul className="list-disc pl-6 space-y-1">
           <li>Criar e gerenciar sua loja online</li>
@@ -58,7 +58,7 @@ const sections: LegalSection[] = [
     title: '4. Obrigações do Usuário',
     content: (
       <>
-        <p>Ao utilizar o VesteZap, você se compromete a:</p>
+        <p>Ao utilizar o PopVenda, você se compromete a:</p>
         <ul className="list-disc pl-6 space-y-1">
           <li>Fornecer dados precisos sobre sua loja e produtos</li>
           <li>Não utilizar o serviço para fins ilegais ou não autorizados</li>
@@ -78,7 +78,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          O VesteZap é uma plataforma tecnológica que conecta lojistas a seus clientes. <strong>O lojista é o único responsável</strong> por:
+          O PopVenda é uma plataforma tecnológica que conecta lojistas a seus clientes. <strong>O lojista é o único responsável</strong> por:
         </p>
         <ul className="list-disc pl-6 space-y-1">
           <li>A precisão das informações dos produtos (descrição, preço, fotos)</li>
@@ -89,7 +89,7 @@ const sections: LegalSection[] = [
           <li>A conformidade com o Código de Defesa do Consumidor</li>
         </ul>
         <p className="mt-4">
-          O VesteZap não se responsabiliza por disputas entre lojistas e clientes, agindo apenas como intermediário tecnológico.
+          O PopVenda não se responsabiliza por disputas entre lojistas e clientes, agindo apenas como intermediário tecnológico.
         </p>
       </>
     ),
@@ -100,7 +100,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Todo o conteúdo, design, código-fonte, logos, interfaces e funcionalidades do VesteZap são de nossa propriedade exclusiva ou de nossos licenciadores, estando protegidos pelas leis de direitos autorais, marcas e propriedade intelectual.
+          Todo o conteúdo, design, código-fonte, logos, interfaces e funcionalidades do PopVenda são de nossa propriedade exclusiva ou de nossos licenciadores, estando protegidos pelas leis de direitos autorais, marcas e propriedade intelectual.
         </p>
         <p className="mt-4">
           Você não adquire qualquer direito de propriedade intelectual sobre o serviço, exceto o direito limitado de uso pessoal e comercial conforme estes termos. Os conteúdos que você publicar em sua loja continuam sendo de sua propriedade.
@@ -165,7 +165,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Na máxima extensão permitida por lei, o VesteZap <strong>não será responsável</strong> por:
+          Na máxima extensão permitida por lei, o PopVenda <strong>não será responsável</strong> por:
         </p>
         <ul className="list-disc pl-6 space-y-1">
           <li>Perdas indiretas, incidentais, especiais ou consequenciais</li>
@@ -220,7 +220,7 @@ const sections: LegalSection[] = [
       <>
         <ul className="list-disc pl-6 space-y-2">
           <li>
-            <strong>Integralidade:</strong> Estes termos constituem o acordo completo entre você e o VesteZap sobre o uso do serviço.
+            <strong>Integralidade:</strong> Estes termos constituem o acordo completo entre você e o PopVenda sobre o uso do serviço.
           </li>
           <li>
             <strong>Separabilidade:</strong> Se qualquer disposição for considerada inválida, as demais permanecerão em pleno vigor.
@@ -244,7 +244,7 @@ const sections: LegalSection[] = [
           Para dúvidas sobre estes Termos de Uso, entre em contato:
         </p>
         <ul className="list-none pl-0 mt-4 space-y-2">
-          <li><strong>E-mail:</strong> contato@vestezap.com.br</li>
+          <li><strong>E-mail:</strong> contato@popvenda.com.br</li>
         </ul>
       </>
     ),

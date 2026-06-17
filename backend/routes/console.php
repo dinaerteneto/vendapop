@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('auth:cleanup-expired-tokens')->daily();
+Schedule::job(\App\Jobs\TrialExpirationJob::class)->daily();

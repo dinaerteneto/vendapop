@@ -93,7 +93,7 @@ const GoogleOnboarding: React.FC = () => {
             <label className="mb-2 block font-medium text-gray-700">URL da Loja</label>
             <div className="flex items-center">
               <span className="rounded-l border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 text-gray-600">
-                vestezap/
+                popvenda/
               </span>
               <input
                 type="text"
