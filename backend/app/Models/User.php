@@ -23,6 +23,8 @@ class User extends Authenticatable
         'google_token',
         'google_refresh_token',
         'terms_accepted_at',
+        'is_super_admin',
+        'last_login_at',
     ];
 
     protected $hidden = [
@@ -37,6 +39,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_owner' => 'boolean',
             'terms_accepted_at' => 'datetime',
+            'is_super_admin' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 }

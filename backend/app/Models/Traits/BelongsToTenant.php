@@ -13,7 +13,9 @@ trait BelongsToTenant
         static::addGlobalScope(new TenantScope);
 
         static::creating(function ($model) {
-            if (!$model->tenant_id && $tenantId = app(TenantService::class)->getTenantId()) {
+            if (!$model->tenant_id
+                && !array_key_exists('tenant_id', $model->getAttributes())
+                && $tenantId = app(TenantService::class)->getTenantId()) {
                 $model->tenant_id = $tenantId;
             }
         });
