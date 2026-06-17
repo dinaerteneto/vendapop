@@ -26,30 +26,32 @@ class PizzariaSeeder extends Seeder
     public function run(): void
     {
         // Limpa dados antigos do tenant para reseed limpo
-        $existing = Tenant::where('slug', 'primo-giuseppe')->first();
-        if ($existing) {
-            ProductVariation::whereIn('product_id', Product::where('tenant_id', $existing->id)->pluck('id'))->delete();
-            Product::where('tenant_id', $existing->id)->delete();
-            RotatingBanner::where('tenant_id', $existing->id)->delete();
-            Category::where('tenant_id', $existing->id)->delete();
-            ProductAttribute::where('tenant_id', $existing->id)->delete();
+        foreach (['primo-giuseppe', 'forno-a-lenha', 'boa-massa'] as $slug) {
+            $existing = Tenant::where('slug', $slug)->first();
+            if ($existing) {
+                ProductVariation::whereIn('product_id', Product::where('tenant_id', $existing->id)->pluck('id'))->delete();
+                Product::where('tenant_id', $existing->id)->delete();
+                RotatingBanner::where('tenant_id', $existing->id)->delete();
+                Category::where('tenant_id', $existing->id)->delete();
+                ProductAttribute::where('tenant_id', $existing->id)->delete();
+            }
         }
 
         $this->tenant = Tenant::firstOrCreate(
-            ['slug' => 'primo-giuseppe'],
+            ['slug' => 'boa-massa'],
             [
-                'name' => 'Primo Giuseppe',
-                'slug' => 'primo-giuseppe',
-                'whatsapp_number' => '5579999999999',
-                'description' => 'Pizzas artesanais com ingredientes selecionados. Tradição italiana em cada fatia!',
-                'banner_message' => '🍕 PRIMO GIUSEPPE — PIZZA ARTESANAL 🍕',
+                'name' => 'Boa Massa',
+                'slug' => 'boa-massa',
+                'whatsapp_number' => '5511988776655',
+                'description' => 'Pizzas artesanais com massa leve e ingredientes frescos. Sabor de verdade em cada fatia!',
+                'banner_message' => '🍕 BOA MASSA — PIZZA DE VERDADE 🍕',
                 'banner_text_color_1' => '#ffffff',
                 'banner_text_color_2' => '#FFD700',
                 'banner_background_color' => '#8B0000',
                 'primary_color' => '#8B0000',
                 'secondary_color' => '#FFF8E1',
-                'address' => 'Aracaju/SE',
-                'email_contact' => 'contato@primogiuseppe.com.br',
+                'address' => 'Rua das Oliveiras, 123 - Bairro Jardim, São Paulo/SP',
+                'email_contact' => 'contato@boamassa.com.br',
                 'business_sector' => 'food',
             ]
         );
@@ -67,10 +69,10 @@ class PizzariaSeeder extends Seeder
         $this->attrSabor4Id = ProductAttribute::where('tenant_id', $this->tenant->id)->where('slug', 'sabor-4')->value('id');
 
         User::updateOrCreate(
-            ['email' => 'admin@primogiuseppe.com.br'],
+            ['email' => 'admin@fornoalenha.com.br'],
             [
                 'tenant_id' => $this->tenant->id,
-                'name' => 'Primo Giuseppe',
+                'name' => 'Seu Antônio',
                 'password' => Hash::make('password'),
                 'is_owner' => true,
                 'email_verified_at' => now(),
@@ -97,7 +99,7 @@ class PizzariaSeeder extends Seeder
         $this->createBebidas($catBebidas);
         $this->createBanners();
 
-        $this->command->info('Seeder da Primo Giuseppe criado com sucesso!');
+        $this->command->info('Seeder da Boa Massa criado com sucesso!');
     }
 
     // ═══════════════════════════════════════════════
@@ -173,7 +175,7 @@ class PizzariaSeeder extends Seeder
             'Poderosa'                => [40.00, 45.00, 60.00, 70.00],
             'Portuguesa'              => $base,
             'Presunto'                => $base,
-            'Primo Giuseppe'          => [45.00, 50.00, 65.00, 75.00],
+            'Pizza da Casa'           => [42.00, 48.00, 65.00, 75.00],
             'Quatro Queijos'          => [40.00, 45.00, 60.00, 70.00],
             'Sabor Paulista'          => [40.00, 45.00, 60.00, 70.00],
             'Sergipana'               => [45.00, 50.00, 65.00, 75.00],
@@ -356,7 +358,7 @@ class PizzariaSeeder extends Seeder
                     'is_hot'           => false,
                 ])
             );
-            $this->syncImages($product);
+            $this->syncDrinkImages($product);
         }
     }
 
@@ -386,10 +388,46 @@ class PizzariaSeeder extends Seeder
     {
         $product->images()->delete();
 
-        $urls = [
-            'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=600&fit=crop',
-        ];
+        static $pool = null;
+        static $idx = 0;
+
+        if ($pool === null) {
+            $pool = [
+                ['https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&h=600&fit=crop'],
+                ['https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&h=600&fit=crop'],
+                ['https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=800&h=600&fit=crop'],
+                ['https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1506354666786-959d6d497f1a?w=800&h=600&fit=crop'],
+            ];
+        }
+
+        $urls = $pool[$idx % count($pool)];
+        $idx++;
+
+        $product->images()->create(['url' => $urls[0], 'is_external' => true, 'is_main' => true]);
+
+        foreach ($urls as $url) {
+            $product->images()->create(['url' => $url, 'is_external' => true, 'is_main' => false]);
+        }
+    }
+
+    private function syncDrinkImages(Product $product): void
+    {
+        $product->images()->delete();
+
+        static $pool = null;
+        static $idx = 0;
+
+        if ($pool === null) {
+            $pool = [
+                ['https://images.unsplash.com/photo-1527960471264-932f39eb5846?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=800&h=600&fit=crop'],
+                ['https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800&h=600&fit=crop'],
+                ['https://images.unsplash.com/photo-1581636625402-29b2a704ef13?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=800&h=600&fit=crop'],
+                ['https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=800&h=600&fit=crop', 'https://images.unsplash.com/photo-1527960471264-932f39eb5846?w=800&h=600&fit=crop'],
+            ];
+        }
+
+        $urls = $pool[$idx % count($pool)];
+        $idx++;
 
         $product->images()->create(['url' => $urls[0], 'is_external' => true, 'is_main' => true]);
 
@@ -410,8 +448,8 @@ class PizzariaSeeder extends Seeder
                 'is_active'   => true,
             ],
             [
-                'title'       => 'Primo Giuseppe',
-                'description' => 'Tradição italiana em cada fatia. Peça já!',
+                'title'       => 'Boa Massa',
+                'description' => 'Massa leve, ingredientes frescos, assada na hora. Peça já!',
                 'image_url'   => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=600&fit=crop',
                 'link_url'    => null,
                 'order'       => 1,

@@ -20,6 +20,12 @@ class ProductResource extends JsonResource
     public static $wrap = null;
 
     /**
+     * Preserva chaves numéricas nos arrays (ex: IDs de atributos nas variações).
+     * Sem isso, removeMissingValues() chama array_values() e destrói as chaves.
+     */
+    public $preserveKeys = true;
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
