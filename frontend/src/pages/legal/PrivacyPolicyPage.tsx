@@ -8,7 +8,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Esta Política de Privacidade descreve como o <strong>PopVenda</strong> ("nós", "nosso" ou "plataforma") coleta, usa, armazena e protege seus dados pessoais em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018).
+          Esta Política de Privacidade descreve como o <strong>VendaPop</strong> ("nós", "nosso" ou "plataforma") coleta, usa, armazena e protege seus dados pessoais em conformidade com a Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018).
         </p>
         <p>
           Ao utilizar nossos serviços, você concorda com as práticas descritas nesta política. Se você não concordar com algum aspecto desta política, por favor, não utilize nossos serviços.
@@ -22,10 +22,10 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          O controlador dos seus dados pessoais é o <strong>PopVenda</strong>.
+          O controlador dos seus dados pessoais é o <strong>VendaPop</strong>.
         </p>
         <p>
-          Para dúvidas sobre proteção de dados ou para exercer seus direitos, entre em contato através do e-mail: <strong>privacidade@popvenda.com.br</strong>
+          Para dúvidas sobre proteção de dados ou para exercer seus direitos, entre em contato através do e-mail: <strong>privacidade@vendapop.com.br</strong>
         </p>
       </>
     ),
@@ -143,7 +143,7 @@ const sections: LegalSection[] = [
           <li><strong>Revogação do consentimento</strong></li>
         </ul>
         <p className="mt-4">
-          Para exercer seus direitos, entre em contato através de: <strong>privacidade@popvenda.com.br</strong>
+          Para exercer seus direitos, entre em contato através de: <strong>privacidade@vendapop.com.br</strong>
         </p>
         <p>
           Sua solicitação será atendida sem custos, no prazo máximo de 15 dias úteis.
@@ -207,8 +207,8 @@ const sections: LegalSection[] = [
           Se você tiver dúvidas sobre esta Política de Privacidade ou sobre o tratamento de seus dados pessoais, entre em contato conosco:
         </p>
         <ul className="list-none pl-0 mt-4 space-y-2">
-          <li><strong>E-mail (geral):</strong> contato@popvenda.com.br</li>
-          <li><strong>E-mail (DPO):</strong> privacidade@popvenda.com.br</li>
+          <li><strong>E-mail (geral):</strong> contato@vendapop.com.br</li>
+          <li><strong>E-mail (DPO):</strong> privacidade@vendapop.com.br</li>
           <li><strong>Assunto:</strong> Proteção de Dados / LGPD</li>
         </ul>
         <p className="mt-4">

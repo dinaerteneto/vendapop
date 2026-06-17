@@ -1,7 +1,7 @@
 <x-mail::message>
-# Você foi convidado para o PopVenda! 🎉
+# Você foi convidado para o {{ config('app.name') }}! 🎉
 
-Olá! Sua inscrição na lista de espera do **PopVenda** foi aprovada.
+Olá! Sua inscrição na lista de espera do **{{ config('app.name') }}** foi aprovada.
 
 Use o código abaixo para criar sua loja:
 
@@ -20,5 +20,5 @@ Se o botão não funcionar, copie e cole o link abaixo no navegador:
 [{{ $inviteLink }}]({{ $inviteLink }})
 
 Obrigado,<br>
-Equipe PopVenda
+Equipe {{ config('app.name') }}
 </x-mail::message>

@@ -1,4 +1,4 @@
-# Release Notes - PopVenda
+# Release Notes - VendaPop
 
 ## 📋 Histórico de Versões
 
@@ -9,7 +9,7 @@
 - 👤 Identificação via flag `is_super_admin` no modelo User existente
 - 🔐 Login/logout independente em `/api/superadmin/login`
 - 🛡️ Middleware `CheckSuperAdmin` que bypassa o escopo de tenant
-- 🌱 Seeder `SuperAdminSeeder` (superadmin@popvenda.com.br)
+- 🌱 Seeder `SuperAdminSeeder` (superadmin@vendapop.com.br)
 
 **Gestão de Tenants:**
 - 📋 Lista paginada com busca por nome/slug
@@ -29,7 +29,7 @@
 - ✅ Marcar como lido/resolvido com um clique
 
 **Convites Aprimorados:**
-- 🔗 Link copiável (`popvenda.com.br/convite/CODE`) em cada invite
+- 🔗 Link copiável (`vendapop.com.br/convite/CODE`) em cada invite
 - 🔘 Toggle ativar/desativar invite (validação rejeita inativos)
 - 📋 Lista de convites com status: ativo, expirado, esgotado, inativo
 
@@ -57,7 +57,7 @@
 ### v1.9.0 (17 de Junho de 2026) — Lançamento Beta
 
 **Rebrand:**
-- 🔄 Renomeado de VesteZap para PopVenda (todos os arquivos, configs, docs)
+- 🔄 Renomeado de VesteZap para VendaPop (todos os arquivos, configs, docs)
 - 🎨 Nova landing page componentizada (Hero, Cases, Como Funciona, Features, Waitlist)
 - 🖼️ Screenshots reais das lojas demo (Moda Chic, Casa & Lar, TechStore, Pizzaria)
 - 📱 Mockup de celular no Hero com screenshot real da loja
@@ -68,7 +68,7 @@
 - 🔗 Links públicos com vagas limitadas: fecha automaticamente ao esgotar
 - 🚫 Apenas founders manuais (selecionados pelo admin) podem gerar convites
 - ⌨️ Comando `php artisan invite:create manual|public` para gerar convites via CLI
-- 🖥️ Comando `php artisan popvenda:admin` para criar tenant + usuário admin
+- 🖥️ Comando `php artisan vendapop:admin` para criar tenant + usuário admin
 
 **Planos e Assinaturas:**
 - 💎 Tabela `subscriptions` com rastreamento de origem e expiração
@@ -95,7 +95,7 @@
 
 **Documentação:**
 - 📚 Docs consolidados em `docs/` (ROADMAP, SPEC, RELEASE_NOTES, todo, brainstorm, estudo-concorrentes, playbook, testes-manuais)
-- 📋 PRD, TechSpec e ADRs em `.compozy/tasks/lancamento-popvenda/`
+- 📋 PRD, TechSpec e ADRs em `.compozy/tasks/lancamento-vendapop/`
 
 ### v1.8.0 (12 de Junho de 2026)
 
@@ -108,7 +108,7 @@
 
 **Melhorias:**
 - 🔒 Conteúdo adaptado para contexto de e-commerce (produtos, pedidos, dados de clientes)
-- 📧 Canais de contato: `contato@popvenda.com.br` (geral) e `privacidade@popvenda.com.br` (DPO)
+- 📧 Canais de contato: `contato@vendapop.com.br` (geral) e `privacidade@vendapop.com.br` (DPO)
 - 🧪 Testes de feature para validação de aceite dos termos no registro
 
 **Notas Técnicas:**
@@ -178,7 +178,7 @@
 - Stack de produção: Docker Compose com PHP-FPM, Nginx, MySQL 8, queue worker (database driver)
 - Imagens multi-stage: `Dockerfile.backend` (fpm + worker targets) e `Dockerfile.frontend` (build-only)
 - Conectado à rede `web` para edge proxy Caddy compartilhado
-- Domínio: `popvenda.dynasolutions.com.br`
+- Domínio: `vendapop.dynasolutions.com.br`
 - .env.production.example com todas as variáveis documentadas
 
 ---
@@ -630,13 +630,13 @@
 
 ---
 
-# Release Notes - PopVenda v1.0.0 🎉
+# Release Notes - VendaPop v1.0.0 🎉
 
 **Data de Lançamento:** 20 de Novembro de 2025
 
 ## 🎊 Primeira Versão Completa!
 
-Esta é a primeira versão completa do PopVenda, uma plataforma SaaS multi-tenant para lojistas de moda feminina com finalização de pedidos via WhatsApp.
+Esta é a primeira versão completa do VendaPop, uma plataforma SaaS multi-tenant para lojistas de moda feminina com finalização de pedidos via WhatsApp.
 
 ---
 
@@ -946,7 +946,7 @@ Funcionalidades planejadas para versões futuras:
 
 ## 🙏 Agradecimentos
 
-Agradecemos a todos que contribuíram para esta primeira versão do PopVenda!
+Agradecemos a todos que contribuíram para esta primeira versão do VendaPop!
 
 ---
 
@@ -987,7 +987,7 @@ Agradecemos a todos que contribuíram para esta primeira versão do PopVenda!
 **Melhorias:**
 - ✅ Adicionada meta tag `mobile-web-app-capable` (nova especificação)
 - 📚 Documentação melhorada para configuração do reCAPTCHA v3 no frontend e backend
-- 🔧 Instruções atualizadas para usar subdomínio `api.popvenda.com.br`
+- 🔧 Instruções atualizadas para usar subdomínio `api.vendapop.com.br`
 
 **Notas Técnicas:**
 - ManifestController agora retorna JSON válido corretamente
@@ -1033,5 +1033,5 @@ Agradecemos a todos que contribuíram para esta primeira versão do PopVenda!
 
 ---
 
-**PopVenda v1.0.0** - Transformando vendas de moda com WhatsApp! 💖
+**VendaPop v1.0.0** - Transformando vendas de moda com WhatsApp! 💖
 

@@ -1,12 +1,12 @@
 services:
   mailhog:
     image: mailhog/mailhog:latest
-    container_name: popvenda-mailhog
+    container_name: vendapop-mailhog
     ports:
       - "1025:1025"  # SMTP
       - "8025:8025"  # Web UI
     networks:
-      - popvenda-network
+      - vendapop-network
 
   backend:
     build:
@@ -30,8 +30,8 @@ services:
       MAIL_USERNAME: null
       MAIL_PASSWORD: null
       MAIL_ENCRYPTION: null
-      MAIL_FROM_ADDRESS: "noreply@popvenda.com"
-      MAIL_FROM_NAME: "PopVenda"
+      MAIL_FROM_ADDRESS: "noreply@vendapop.com"
+      MAIL_FROM_NAME: "VendaPop"
       FRONTEND_URL: "http://localhost:5173"
     volumes:
       - ./backend:/var/www/html
@@ -40,7 +40,7 @@ services:
       - db
       - mailhog
     networks:
-      - popvenda-network
+      - vendapop-network
 
   frontend:
     build:
@@ -60,7 +60,7 @@ services:
     depends_on:
       - backend
     networks:
-      - popvenda-network
+      - vendapop-network
 
   db:
     image: mysql:8.0
@@ -76,10 +76,10 @@ services:
     volumes:
       - moda_db_data:/var/lib/mysql
     networks:
-      - popvenda-network
+      - vendapop-network
 
 networks:
-  popvenda-network:
+  vendapop-network:
     driver: bridge
 
 volumes:

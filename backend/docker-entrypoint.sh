@@ -30,7 +30,7 @@ for pair in \
     "MAIL_HOST=${MAIL_HOST:-127.0.0.1}" \
     "MAIL_PORT=${MAIL_PORT:-2525}" \
     "MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-hello@example.com}" \
-    "MAIL_FROM_NAME=${MAIL_FROM_NAME:-PopVenda}" \
+    "MAIL_FROM_NAME=${MAIL_FROM_NAME:-VendaPop}" \
 ; do
     key="${pair%%=*}"
     if grep -q "^${key}=" .env 2>/dev/null; then

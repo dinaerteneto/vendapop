@@ -21,7 +21,7 @@ class TrialExpiringMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Seu período Premium está acabando — PopVenda',
+            subject: 'Seu período Premium está acabando — ' . config('app.name'),
         );
     }
 

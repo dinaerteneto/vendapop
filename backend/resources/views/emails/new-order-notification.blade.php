@@ -38,5 +38,5 @@ Ou copie e cole este link no seu navegador:
 {{ $orderUrl }}
 
 Obrigado,<br>
-Equipe PopVenda
+Equipe {{ config('app.name') }}
 </x-mail::message>

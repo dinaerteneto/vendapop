@@ -1,5 +1,5 @@
 <x-mail::message>
-# Bem-vindo ao PopVenda, {{ $user->name }}!
+# Bem-vindo ao {{ config('app.name') }}, {{ $user->name }}!
 
 Sua loja **{{ $user->tenant->name }}** foi criada com sucesso!
 
@@ -35,5 +35,5 @@ Após verificar seu e-mail, você poderá:
 Se você não criou esta conta, ignore este e-mail.
 
 Obrigado,<br>
-Equipe PopVenda
+Equipe {{ config('app.name') }}
 </x-mail::message>

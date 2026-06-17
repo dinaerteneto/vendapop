@@ -11,7 +11,7 @@ const FooterSection: React.FC = () => {
           <Link to="/lgpd" className="hover:text-white transition">Seus Direitos LGPD</Link>
         </div>
         <p className="text-xs">
-          © {new Date().getFullYear()} PopVenda. Desenvolvido por{' '}
+          © {new Date().getFullYear()} VendaPop. Desenvolvido por{' '}
           <a href="https://dynasolutions.com.br" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">
             Dyna Solutions
           </a>

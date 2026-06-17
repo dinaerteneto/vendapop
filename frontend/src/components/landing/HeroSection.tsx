@@ -4,7 +4,7 @@ const HeroSection: React.FC = () => {
   return (
     <section className="bg-white min-h-[85vh] flex flex-col">
       <header className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <span className="text-xl font-bold text-purple-700">PopVenda</span>
+        <span className="text-xl font-bold text-purple-700">VendaPop</span>
         <Link
           to="/admin/login"
           className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-purple-700 transition"
@@ -49,7 +49,7 @@ const HeroSection: React.FC = () => {
                 <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
                   <img
                     src="/images/stores/modachic.png"
-                    alt="Exemplo de loja no PopVenda"
+                    alt="Exemplo de loja no VendaPop"
                     className="w-full h-full object-cover object-top"
                   />
                 </div>

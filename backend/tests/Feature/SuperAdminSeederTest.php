@@ -15,7 +15,7 @@ class SuperAdminSeederTest extends TestCase
     {
         $this->seed(SuperAdminSeeder::class);
 
-        $user = User::where('email', 'superadmin@popvenda.com.br')->first();
+        $user = User::where('email', 'superadmin@vendapop.com.br')->first();
 
         $this->assertNotNull($user);
         $this->assertEquals('Super Admin', $user->name);
@@ -29,7 +29,7 @@ class SuperAdminSeederTest extends TestCase
         $this->seed(SuperAdminSeeder::class);
         $this->seed(SuperAdminSeeder::class);
 
-        $count = User::where('email', 'superadmin@popvenda.com.br')->count();
+        $count = User::where('email', 'superadmin@vendapop.com.br')->count();
         $this->assertEquals(1, $count);
     }
 

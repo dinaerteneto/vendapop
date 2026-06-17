@@ -49,7 +49,7 @@ const InvitePanel: React.FC = () => {
   };
 
   const handleCopy = (url: string) => {
-    const fullUrl = `https://popvenda.com.br/convite/${url}`;
+    const fullUrl = `${window.location.origin}/convite/${url}`;
     navigator.clipboard.writeText(fullUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -90,7 +90,7 @@ const InvitePanel: React.FC = () => {
               <input
                 type="text"
                 readOnly
-                value={`https://popvenda.com.br/convite/${lastCode}`}
+                value={`${window.location.origin}/convite/${lastCode}`}
                 className="flex-1 text-xs bg-white border border-green-300 rounded px-2 py-1 text-gray-700"
               />
               <button

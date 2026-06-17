@@ -34,7 +34,7 @@ const SuperAdminLogin: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <div className="max-w-md w-full bg-gray-800 rounded-lg shadow-xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white">PopVenda SuperAdmin</h1>
+          <h1 className="text-2xl font-bold text-white">VendaPop SuperAdmin</h1>
           <p className="text-gray-400 mt-2">Painel de administração da plataforma</p>
         </div>
 
@@ -52,7 +52,7 @@ const SuperAdminLogin: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
-              placeholder="superadmin@popvenda.com.br"
+              placeholder="superadmin@vendapop.com.br"
               required
             />
           </div>

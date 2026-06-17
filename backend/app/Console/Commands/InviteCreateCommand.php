@@ -38,16 +38,16 @@ class InviteCreateCommand extends Command
         $this->info("Generating {$count} manual invite(s)...");
 
         // Create a dummy tenant for the admin to generate invites
-        $adminTenant = \App\Models\Tenant::where('slug', 'popvenda')->first();
+        $adminTenant = \App\Models\Tenant::where('slug', 'vendapop')->first();
         if (!$adminTenant) {
-            $this->error("Run 'php artisan popvenda:admin' first to create the admin tenant.");
+            $this->error("Run 'php artisan vendapop:admin' first to create the admin tenant.");
             return self::FAILURE;
         }
 
         for ($i = 1; $i <= $count; $i++) {
             $invites = $inviteService->generateManual($adminTenant, 1);
             $invite = $invites[0];
-            $url = config('app.frontend_url', 'http://localhost:5173') . "/convite/{$invite->code}";
+            $url = config('services.frontend_url') . "/convite/{$invite->code}";
             $this->line("  [{$i}] {$invite->code} → {$url}");
         }
 
@@ -62,7 +62,7 @@ class InviteCreateCommand extends Command
         $hours = (int) $this->option('hours');
 
         $invite = $inviteService->createPublicLink($slots, $hours);
-        $url = config('app.frontend_url', 'http://localhost:5173') . "/convite/{$invite->code}";
+        $url = config('services.frontend_url') . "/convite/{$invite->code}";
 
         $this->info("Public link created:");
         $this->line("  Code: {$invite->code}");

@@ -11,7 +11,7 @@ class SuperAdminSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'superadmin@popvenda.com.br'],
+            ['email' => 'superadmin@' . parse_url(config('app.url', 'http://localhost'), PHP_URL_HOST)],
             [
                 'name' => 'Super Admin',
                 'password' => Hash::make('password'),
