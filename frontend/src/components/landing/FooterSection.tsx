@@ -8,7 +8,7 @@ const FooterSection: React.FC = () => {
           <Link to="/privacidade" className="hover:text-white transition">Privacidade</Link>
           <Link to="/termos" className="hover:text-white transition">Termos de Uso</Link>
           <Link to="/cookies" className="hover:text-white transition">Cookies</Link>
-          <Link to="/lgpd" className="hover:text-white transition">Seus Direitos LGPD</Link>
+          <Link to="/direitos-lgpd" className="hover:text-white transition">Seus Direitos LGPD</Link>
         </div>
         <p className="text-xs">
           © {new Date().getFullYear()} VendaPop. Desenvolvido por{' '}
