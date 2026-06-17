@@ -272,5 +272,5 @@ Sem alteração de estrutura. O campo `is_external` permanece mas, com o novo fl
 |-------|---------------|---------|-----------|
 | CORS bloqueia fetch de URL de imagem no frontend | Alta | Médio | Criar endpoint proxy no backend para fazer o fetch server-side |
 | Lojista não entende que deve substituir os dados demo | Média | Baixo | Banner informativo no Passo 2 + flag `is_demo` visível nos cards |
-| Iframe de preview bloqueado por X-Frame-Options | Baixa | Alto | Verificar/configurar header no frontend antes de implementar |
+| Iframe de preview bloqueado por X-Frame-Options | Resolvido | — | Nginx define `SAMEORIGIN`. Admin e loja estão em `vendapop.com.br` — mesma origem. Iframe funciona sem alteração. Única exceção: acesso via `vendapop.dynasolutions.com.br` (evitar nos convites). |
 | Imagens do Unsplash mudam de URL ao longo do tempo | Baixa | Baixo | Usar IDs fixos da API Unsplash ou baixar as imagens para o storage no seeder |
