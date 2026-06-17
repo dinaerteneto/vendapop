@@ -37,12 +37,9 @@ const HeroSection: React.FC = () => {
               <div className="w-72 h-[500px] bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
                 <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
                   <img
-                    src="/modachic-screenshot.png"
+                    src="/images/stores/modachic.png"
                     alt="Exemplo de loja no PopVenda"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+                    className="w-full h-full object-cover object-top"
                   />
                 </div>
               </div>

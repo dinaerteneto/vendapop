@@ -6,28 +6,28 @@ const cases = [
     slug: 'modachic',
     sector: 'Moda Feminina',
     products: 59,
-    color: '#6A040F',
+    image: '/images/stores/modachic.png',
   },
   {
     name: 'Casa & Lar Imóveis',
     slug: 'casa-lar-imoveis',
     sector: 'Imobiliária',
     products: 6,
-    color: '#1a472a',
+    image: '/images/stores/casa-lar-imoveis.png',
   },
   {
     name: 'TechStore Brasil',
     slug: 'techstore-brasil',
     sector: 'Eletrônicos',
     products: 6,
-    color: '#0066cc',
+    image: '/images/stores/techstore-brasil.png',
   },
   {
     name: 'Pizzaria Boa Massa',
     slug: 'pizzaria-boa-massa',
     sector: 'Alimentação',
     products: 6,
-    color: '#C62828',
+    image: '/images/stores/pizzaria-boa-massa.png',
   },
 ];
 
@@ -45,11 +45,12 @@ const CaseSection: React.FC = () => {
               target="_blank"
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition group"
             >
-              <div
-                className="h-32 flex items-center justify-center text-white text-3xl font-bold"
-                style={{ backgroundColor: c.color }}
-              >
-                {c.name.charAt(0)}
+              <div className="h-48 bg-gray-100 overflow-hidden">
+                <img
+                  src={c.image}
+                  alt={`Loja ${c.name}`}
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
               <div className="p-4 text-left">
                 <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition">
@@ -66,7 +67,5 @@ const CaseSection: React.FC = () => {
     </section>
   );
 };
-
-export default CaseSection;
 
 export default CaseSection;
