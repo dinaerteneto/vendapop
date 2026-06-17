@@ -45,7 +45,7 @@ class ManageWaitlistUseCase
 
         $inviteLink = config('services.frontend_url') . '/convite/' . $invite->code;
 
-        Mail::to($entry->email)->queue(new WaitlistInviteMail($invite->code, $inviteLink));
+        Mail::to($entry->email)->send(new WaitlistInviteMail($invite->code, $inviteLink));
 
         return [
             'entry' => $entry->fresh(),

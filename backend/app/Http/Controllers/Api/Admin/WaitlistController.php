@@ -27,7 +27,7 @@ class WaitlistController extends Controller
 
         WaitlistEntry::create(['email' => $validated['email']]);
 
-        Mail::to($validated['email'])->queue(new WaitlistConfirmationMail($validated['email']));
+        Mail::to($validated['email'])->send(new WaitlistConfirmationMail($validated['email']));
 
         return response()->json([
             'message' => 'Email cadastrado com sucesso! Entraremos em contato.',
