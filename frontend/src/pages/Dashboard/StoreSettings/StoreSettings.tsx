@@ -933,8 +933,8 @@ const StoreSettings: React.FC = () => {
         </div>
 
         {/* Tags de Rastreamento */}
-        <div className="mb-8">
-          <h2 className="mb-4 text-xl font-semibold text-gray-800">📊 Google Analytics & Facebook Pixel</h2>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="mb-4 text-lg font-semibold text-gray-800">📊 Google Analytics & Facebook Pixel</h2>
           <p className="text-sm text-gray-500 mb-4">Adicione suas tags para medir o tráfego da sua loja. Você pode usar os dois ao mesmo tempo.</p>
 
           <div className="space-y-4">
