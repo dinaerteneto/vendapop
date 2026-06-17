@@ -82,9 +82,11 @@ class SuperAdminWaitlistTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $response->assertJsonStructure(['entry', 'invite_code']);
+        $response->assertJsonStructure(['entry', 'invite_code', 'invite_link', 'email_sent']);
         $this->assertEquals('approved', $response->json('entry.status'));
         $this->assertNotNull($response->json('invite_code'));
+        $this->assertTrue($response->json('email_sent'));
+        $this->assertStringContainsString('/convite/', $response->json('invite_link'));
 
         $this->assertDatabaseHas('invites', ['code' => $response->json('invite_code')]);
         $this->assertDatabaseHas('waitlist_entries', [

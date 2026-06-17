@@ -17,6 +17,7 @@ const Waitlist: React.FC = () => {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [inviteCodes, setInviteCodes] = useState<Record<number, string>>({});
+  const [emailSent, setEmailSent] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     loadEntries();
@@ -41,6 +42,9 @@ const Waitlist: React.FC = () => {
     try {
       const res = await api.put(`/superadmin/waitlist/${id}`, { status: 'approved' });
       setInviteCodes(prev => ({ ...prev, [id]: res.data.invite_code }));
+      if (res.data.email_sent) {
+        setEmailSent(prev => ({ ...prev, [id]: true }));
+      }
       loadEntries();
     } catch (err) {
       console.error('Erro ao aprovar', err);
@@ -153,7 +157,12 @@ const Waitlist: React.FC = () => {
                       </div>
                     )}
                     {inviteCodes[entry.id] && (
-                      <code className="text-xs bg-gray-100 px-2 py-0.5 rounded mt-1 inline-block">{inviteCodes[entry.id]}</code>
+                      <div className="mt-1">
+                        <code className="text-xs bg-gray-100 px-2 py-0.5 rounded inline-block">{inviteCodes[entry.id]}</code>
+                        {emailSent[entry.id] && (
+                          <span className="text-xs text-green-600 ml-1">✓ Email enviado</span>
+                        )}
+                      </div>
                     )}
                   </td>
                 </tr>
