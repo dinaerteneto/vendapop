@@ -62,6 +62,12 @@ class InviteService implements InviteServiceInterface
             ]);
         }
 
+        if ($invite->isInactive()) {
+            throw ValidationException::withMessages([
+                'invite_code' => ['Este convite foi desativado.'],
+            ]);
+        }
+
         return $invite;
     }
 
