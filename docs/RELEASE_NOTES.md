@@ -2,6 +2,49 @@
 
 ## 📋 Histórico de Versões
 
+### v1.9.0 (17 de Junho de 2026) — Lançamento Beta
+
+**Rebrand:**
+- 🔄 Renomeado de VesteZap para PopVenda (todos os arquivos, configs, docs)
+- 🎨 Nova landing page componentizada (Hero, Cases, Como Funciona, Features, Waitlist)
+- 🖼️ Screenshots reais das lojas demo (Moda Chic, Casa & Lar, TechStore, Pizzaria)
+- 📱 Mockup de celular no Hero com screenshot real da loja
+- 🚪 Header com "Entrar" para lojistas existentes
+
+**Sistema de Convites:**
+- 📨 Convites manuais: admin gera códigos individuais para founders selecionados
+- 🔗 Links públicos com vagas limitadas: fecha automaticamente ao esgotar
+- 🚫 Apenas founders manuais (selecionados pelo admin) podem gerar convites
+- ⌨️ Comando `php artisan invite:create manual|public` para gerar convites via CLI
+- 🖥️ Comando `php artisan popvenda:admin` para criar tenant + usuário admin
+
+**Planos e Assinaturas:**
+- 💎 Tabela `subscriptions` com rastreamento de origem e expiração
+- ♾️ Founders manuais recebem Premium vitalício
+- ⏳ Convidados e links públicos recebem Premium por 60 dias (trial)
+- 📧 Notificação por email 7 dias antes da expiração do trial
+- 🎯 Banner de aviso no painel admin nos últimos 14 dias de trial
+
+**Tags de Rastreamento:**
+- 📊 Google Analytics (GA4) por loja — injetado automaticamente na vitrine
+- 📈 Facebook Pixel por loja — injetado automaticamente na vitrine
+- 🎛️ Interface no Store Settings: dois campos separados, salva automático
+
+**Lista de Espera:**
+- 📧 Captura de email na landing page
+- 📋 Painel admin para visualizar inscritos
+
+**Técnico:**
+- 🗄️ 5 novas migrations (`invites`, `subscriptions`, `tenant_trackings`, `waitlist_entries`, coluna banner)
+- 🧪 40 testes (16 migrations + 9 invite service + 8 invite controller + 7 existentes)
+- 🗃️ Testes isolados com SQLite in-memory — não tocam mais o banco de dev
+- 🪝 Middleware `CheckSubscription` preparado para enforcement de limites
+- ⏰ `TrialExpirationJob` registrado no Scheduler diário
+
+**Documentação:**
+- 📚 Docs consolidados em `docs/` (ROADMAP, SPEC, RELEASE_NOTES, todo, brainstorm, estudo-concorrentes, playbook, testes-manuais)
+- 📋 PRD, TechSpec e ADRs em `.compozy/tasks/lancamento-popvenda/`
+
 ### v1.8.0 (12 de Junho de 2026)
 
 **Novas Funcionalidades:**
