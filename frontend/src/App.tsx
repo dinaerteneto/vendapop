@@ -5,6 +5,10 @@ import 'react-toastify/dist/ReactToastify.css';
 // Layouts
 import PublicLayout from './layout/PublicLayout';
 import AppLayout from './layout/AppLayout';
+import SuperAdminLayout from './layout/SuperAdminLayout';
+
+// Auth
+import ProtectedSuperAdminRoute from './components/auth/ProtectedSuperAdminRoute';
 
 // Pages Admin
 import SignIn from './pages/AuthPages/SignIn';
@@ -28,6 +32,14 @@ import StoreSettings from './pages/Dashboard/StoreSettings/StoreSettings';
 import ChangePassword from './pages/Dashboard/ChangePassword/ChangePassword';
 import BannerList from './pages/Dashboard/Banners/BannerList';
 import BannerForm from './pages/Dashboard/Banners/BannerForm';
+
+// Pages SuperAdmin
+import SuperAdminLogin from './pages/SuperAdmin/SuperAdminLogin';
+import TenantList from './pages/SuperAdmin/TenantList';
+import TenantDetail from './pages/SuperAdmin/TenantDetail';
+import Waitlist from './pages/SuperAdmin/Waitlist';
+import FeedbackInbox from './pages/SuperAdmin/FeedbackInbox';
+import InviteList from './pages/SuperAdmin/InviteList';
 
 // Pages Shop
 import ProductList from './pages/Shop/ProductList';
@@ -109,6 +121,20 @@ function App() {
             <Route path="banners" element={<BannerList />} />
             <Route path="banners/new" element={<BannerForm />} />
             <Route path="banners/:id" element={<BannerForm />} />
+        </Route>
+
+        {/* Rotas SuperAdmin */}
+        <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+        <Route path="/superadmin" element={
+            <ProtectedSuperAdminRoute>
+                <SuperAdminLayout />
+            </ProtectedSuperAdminRoute>
+        }>
+            <Route index element={<TenantList />} />
+            <Route path="tenants/:id" element={<TenantDetail />} />
+            <Route path="waitlist" element={<Waitlist />} />
+            <Route path="feedback" element={<FeedbackInbox />} />
+            <Route path="invites" element={<InviteList />} />
         </Route>
 
         {/* Rotas Públicas (Loja) */}
