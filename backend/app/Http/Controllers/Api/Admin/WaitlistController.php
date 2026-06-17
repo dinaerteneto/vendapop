@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WaitlistConfirmationMail;
 use App\Models\WaitlistEntry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class WaitlistController extends Controller
 {
@@ -24,6 +26,8 @@ class WaitlistController extends Controller
         }
 
         WaitlistEntry::create(['email' => $validated['email']]);
+
+        Mail::to($validated['email'])->queue(new WaitlistConfirmationMail($validated['email']));
 
         return response()->json([
             'message' => 'Email cadastrado com sucesso! Entraremos em contato.',
