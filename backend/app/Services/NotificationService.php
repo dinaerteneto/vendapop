@@ -231,7 +231,7 @@ class NotificationService
 
             $vapidPublicKey = env('VAPID_PUBLIC_KEY');
             $vapidPrivateKey = env('VAPID_PRIVATE_KEY');
-            $vapidSubject = env('VAPID_SUBJECT', 'mailto:notificacoes@vestezap.com.br');
+            $vapidSubject = env('VAPID_SUBJECT', 'mailto:notificacoes@popvenda.com.br');
 
             if (empty($vapidPublicKey) || empty($vapidPrivateKey)) {
                 Log::warning('VAPID keys não configuradas. Push notifications não serão enviadas.');

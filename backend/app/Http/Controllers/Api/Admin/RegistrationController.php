@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeMail;
+use App\Models\Invite;
 use App\Models\Tenant;
 use App\Models\TenantSocial;
 use App\Models\User;
+use App\Services\InviteService;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +19,11 @@ use Illuminate\Support\Str;
 
 class RegistrationController extends Controller
 {
+    public function __construct(
+        private InviteService $inviteService,
+        private SubscriptionService $subscriptionService
+    ) {}
+
     public function store(Request $request)
     {
         $rules = [
@@ -24,6 +32,7 @@ class RegistrationController extends Controller
             'whatsapp_number' => 'required|string',
             'email' => 'required|email|max:255|unique:users,email',
             'terms_accepted' => 'required|accepted',
+            'invite_code' => 'nullable|string|max:8',
         ];
 
         if (!app()->environment('local')) {
@@ -49,14 +58,37 @@ class RegistrationController extends Controller
             }
         }
 
-        // Create Tenant
-        $tenant = Tenant::create([
-            'name' => $validated['store_name'],
-            'slug' => Str::slug($validated['store_slug']),
-            'whatsapp_number' => $validated['whatsapp_number'],
-            'primary_color' => '#7c3aed', // Default purple
-            'secondary_color' => '#f3e8ff',
-        ]);
+        // Create Tenant in a transaction with invite validation
+        try {
+            $invite = null;
+
+            $tenant = DB::transaction(function () use ($validated, &$invite) {
+                // Validate invite code if provided
+                if (!empty($validated['invite_code'])) {
+                    $invite = $this->inviteService->validate($validated['invite_code']);
+                }
+
+                $tenant = Tenant::create([
+                    'name' => $validated['store_name'],
+                    'slug' => Str::slug($validated['store_slug']),
+                    'whatsapp_number' => $validated['whatsapp_number'],
+                    'primary_color' => '#7c3aed',
+                    'secondary_color' => '#f3e8ff',
+                ]);
+
+                if ($invite) {
+                    $this->subscriptionService->createFromInvite($tenant, $invite);
+                    $this->inviteService->consume($invite, $tenant);
+                }
+
+                return $tenant;
+            });
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         // Generate random password
         $generatedPassword = Str::random(12);
@@ -127,6 +159,8 @@ class RegistrationController extends Controller
 
         return response()->json([
             'message' => 'Loja criada com sucesso! Verifique seu e-mail para ativar sua conta e receber sua senha.',
+            'plan_type' => $tenant->subscriptions()->latest()->first()?->plan_type ?? 'free',
+            'trial_ends_at' => $tenant->subscriptions()->latest()->first()?->ends_at,
         ], 201);
     }
 }

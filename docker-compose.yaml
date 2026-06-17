@@ -1,12 +1,12 @@
 services:
   mailhog:
     image: mailhog/mailhog:latest
-    container_name: vestezap-mailhog
+    container_name: popvenda-mailhog
     ports:
       - "1025:1025"  # SMTP
       - "8025:8025"  # Web UI
     networks:
-      - vestezap-network
+      - popvenda-network
 
   backend:
     build:
@@ -30,8 +30,8 @@ services:
       MAIL_USERNAME: null
       MAIL_PASSWORD: null
       MAIL_ENCRYPTION: null
-      MAIL_FROM_ADDRESS: "noreply@vestezap.com"
-      MAIL_FROM_NAME: "VesteZap"
+      MAIL_FROM_ADDRESS: "noreply@popvenda.com"
+      MAIL_FROM_NAME: "PopVenda"
       FRONTEND_URL: "http://localhost:5173"
     volumes:
       - ./backend:/var/www/html
@@ -40,7 +40,7 @@ services:
       - db
       - mailhog
     networks:
-      - vestezap-network
+      - popvenda-network
 
   frontend:
     build:
@@ -60,7 +60,7 @@ services:
     depends_on:
       - backend
     networks:
-      - vestezap-network
+      - popvenda-network
 
   db:
     image: mysql:8.0
@@ -76,10 +76,10 @@ services:
     volumes:
       - moda_db_data:/var/lib/mysql
     networks:
-      - vestezap-network
+      - popvenda-network
 
 networks:
-  vestezap-network:
+  popvenda-network:
     driver: bridge
 
 volumes:

@@ -3,7 +3,7 @@
 
 Olá {{ $user->name }},
 
-Você solicitou a redefinição de senha para sua conta no VesteZap.
+Você solicitou a redefinição de senha para sua conta no PopVenda.
 
 Clique no botão abaixo para redefinir sua senha:
 

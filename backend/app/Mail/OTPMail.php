@@ -26,7 +26,7 @@ class OTPMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Seu código de acesso - VesteZap',
+            subject: 'Seu código de acesso - PopVenda',
         );
     }
 

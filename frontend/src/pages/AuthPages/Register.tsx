@@ -118,7 +118,7 @@ const RegisterForm: React.FC = () => {
             </label>
             <div className="flex items-center">
               <span className="rounded-l border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 text-gray-600">
-                vestezap/
+                popvenda/
               </span>
               <input
                 type="text"
@@ -133,7 +133,7 @@ const RegisterForm: React.FC = () => {
               />
             </div>
             <p className="mt-1 text-xs text-gray-500">
-              A URL será: vestezap/{formData.store_slug || 'nomeDaLoja'}
+              A URL será: popvenda/{formData.store_slug || 'nomeDaLoja'}
             </p>
           </div>
 

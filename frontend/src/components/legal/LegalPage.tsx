@@ -83,7 +83,7 @@ export default function LegalPage({ title, lastUpdated, sections }: LegalPagePro
         </article>
 
         <footer className="mt-12 pt-8 border-t border-gray-200 text-center text-sm text-gray-500 print:hidden">
-          <p>© 2026 VesteZap. Todos os direitos reservados.</p>
+          <p>© 2026 PopVenda. Todos os direitos reservados.</p>
         </footer>
       </div>
     </div>

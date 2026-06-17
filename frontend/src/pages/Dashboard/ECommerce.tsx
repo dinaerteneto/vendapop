@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+import InvitePanel from '../../components/admin/InvitePanel';
 
 interface DashboardStats {
   sales_today: string;
@@ -155,6 +156,10 @@ const ECommerce: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <InvitePanel />
       </div>
     </div>
   );

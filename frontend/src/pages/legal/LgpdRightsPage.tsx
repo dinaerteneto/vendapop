@@ -8,7 +8,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          A Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018) garante a você uma série de direitos em relação aos seus dados pessoais tratados pelo <strong>VesteZap</strong>.
+          A Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018) garante a você uma série de direitos em relação aos seus dados pessoais tratados pelo <strong>PopVenda</strong>.
         </p>
         <p className="mt-4">
           Esta página explica cada um desses direitos e como você pode exercê-los de forma simples e gratuita.
@@ -22,11 +22,11 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          <strong>O que é:</strong> Você tem o direito de solicitar confirmação se o VesteZap trata ou não seus dados pessoais.
+          <strong>O que é:</strong> Você tem o direito de solicitar confirmação se o PopVenda trata ou não seus dados pessoais.
         </p>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Confirmação de Tratamento"</li>
           <li>Informe seu nome completo e e-mail cadastrado</li>
         </ol>
@@ -42,7 +42,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          <strong>O que é:</strong> Você tem o direito de acessar todos os dados pessoais que o VesteZap possui sobre você.
+          <strong>O que é:</strong> Você tem o direito de acessar todos os dados pessoais que o PopVenda possui sobre você.
         </p>
         <h3 className="text-base font-semibold mt-4 mb-2">O que você receberá:</h3>
         <ul className="list-disc pl-6 space-y-1">
@@ -53,7 +53,7 @@ const sections: LegalSection[] = [
         </ul>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Acesso aos Dados"</li>
           <li>Informe seu nome completo e e-mail cadastrado</li>
         </ol>
@@ -89,7 +89,7 @@ const sections: LegalSection[] = [
           <strong>Opção 2 - Por e-mail:</strong>
         </p>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Correção de Dados"</li>
           <li>Informe o dado que deseja corrigir e a informação correta</li>
         </ol>
@@ -120,7 +120,7 @@ const sections: LegalSection[] = [
         </ul>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Anonimização/Bloqueio/Eliminação"</li>
           <li>Especifique qual ação deseja e quais dados</li>
         </ol>
@@ -148,7 +148,7 @@ const sections: LegalSection[] = [
         </ul>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Portabilidade de Dados"</li>
           <li>Informe seu nome completo e e-mail cadastrado</li>
         </ol>
@@ -171,7 +171,7 @@ const sections: LegalSection[] = [
         </p>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Eliminação de Dados"</li>
           <li>Confirme que deseja a exclusão completa da sua conta e dados</li>
         </ol>
@@ -193,16 +193,16 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          <strong>O que é:</strong> Você tem o direito de saber com quais entidades públicas e privadas o VesteZap compartilhou seus dados pessoais.
+          <strong>O que é:</strong> Você tem o direito de saber com quais entidades públicas e privadas o PopVenda compartilhou seus dados pessoais.
         </p>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Informação sobre Compartilhamento"</li>
           <li>Informe seu nome completo e e-mail cadastrado</li>
         </ol>
         <p className="mt-4">
-          <strong>Nota:</strong> Atualmente, o VesteZap <strong>não compartilha seus dados pessoais com terceiros</strong> para fins comerciais ou de marketing.
+          <strong>Nota:</strong> Atualmente, o PopVenda <strong>não compartilha seus dados pessoais com terceiros</strong> para fins comerciais ou de marketing.
         </p>
         <p className="mt-2">
           <strong>Prazo de resposta:</strong> Em até 15 dias.
@@ -220,7 +220,7 @@ const sections: LegalSection[] = [
         </p>
         <h3 className="text-base font-semibold mt-4 mb-2">Consequências da negativa:</h3>
         <p>
-          Se você optar por não fornecer consentimento para o tratamento de dados pessoais essenciais, <strong>não será possível utilizar os serviços do VesteZap</strong>, pois o tratamento de dados é necessário para:
+          Se você optar por não fornecer consentimento para o tratamento de dados pessoais essenciais, <strong>não será possível utilizar os serviços do PopVenda</strong>, pois o tratamento de dados é necessário para:
         </p>
         <ul className="list-disc pl-6 space-y-1 mt-2">
           <li>Criar e manter sua conta</li>
@@ -241,7 +241,7 @@ const sections: LegalSection[] = [
         </p>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Revogação de Consentimento"</li>
           <li>Informe quais consentimentos deseja revogar</li>
         </ol>
@@ -262,13 +262,13 @@ const sections: LegalSection[] = [
         <p>
           <strong>O que é:</strong> Você tem o direito de solicitar a revisão de decisões tomadas unicamente com base em tratamento automatizado de dados pessoais que afetem seus interesses.
         </p>
-        <h3 className="text-base font-semibold mt-4 mb-2">Decisões automatizadas no VesteZap:</h3>
+        <h3 className="text-base font-semibold mt-4 mb-2">Decisões automatizadas no PopVenda:</h3>
         <ul className="list-disc pl-6 space-y-1">
-          <li>Atualmente, o VesteZap <strong>não toma decisões automatizadas</strong> baseadas exclusivamente em perfis de usuários</li>
+          <li>Atualmente, o PopVenda <strong>não toma decisões automatizadas</strong> baseadas exclusivamente em perfis de usuários</li>
         </ul>
         <h3 className="text-base font-semibold mt-4 mb-2">Como exercer:</h3>
         <ol className="list-decimal pl-6 space-y-1">
-          <li>Envie um e-mail para <strong>privacidade@vestezap.com.br</strong></li>
+          <li>Envie um e-mail para <strong>privacidade@popvenda.com.br</strong></li>
           <li>Assunto: "LGPD - Revisão de Decisão Automatizada"</li>
           <li>Descreva qual decisão deseja revisar e os motivos</li>
         </ol>
@@ -395,7 +395,7 @@ const sections: LegalSection[] = [
 
         <h3 className="text-base font-semibold mt-4 mb-2">Posso solicitar a exclusão completa da minha conta?</h3>
         <p>
-          Sim. Você pode solicitar a exclusão da sua conta e de todos os dados associados a qualquer momento. Basta enviar um e-mail para privacidade@vestezap.com.br com o assunto "LGPD - Eliminação de Dados".
+          Sim. Você pode solicitar a exclusão da sua conta e de todos os dados associados a qualquer momento. Basta enviar um e-mail para privacidade@popvenda.com.br com o assunto "LGPD - Eliminação de Dados".
         </p>
 
         <h3 className="text-base font-semibold mt-4 mb-2">Quanto tempo leva para meus dados serem excluídos?</h3>
@@ -424,8 +424,8 @@ const sections: LegalSection[] = [
           Para exercer qualquer um dos seus direitos ou tirar dúvidas, entre em contato:
         </p>
         <ul className="list-none pl-0 mt-4 space-y-2">
-          <li><strong>E-mail (geral):</strong> contato@vestezap.com.br</li>
-          <li><strong>E-mail (DPO):</strong> privacidade@vestezap.com.br</li>
+          <li><strong>E-mail (geral):</strong> contato@popvenda.com.br</li>
+          <li><strong>E-mail (DPO):</strong> privacidade@popvenda.com.br</li>
           <li><strong>Assunto sugerido:</strong> "LGPD - [Nome do Direito]"</li>
         </ul>
         <p className="mt-4">

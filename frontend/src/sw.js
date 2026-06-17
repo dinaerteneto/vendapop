@@ -11,20 +11,20 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 self.addEventListener('push', (event) => {
   console.log('[Service Worker] Push notification received');
   
-  const data = event.data ? event.data.json() : { title: 'VesteZap', body: 'Nova notificação' };
+  const data = event.data ? event.data.json() : { title: 'PopVenda', body: 'Nova notificação' };
   
   const options = {
     body: data.body || 'Nova notificação',
     icon: data.icon || '/icon-192x192.png',
     badge: data.badge || '/icon-192x192.png',
     vibrate: [200, 100, 200],
-    tag: 'vestezap-notification',
+    tag: 'popvenda-notification',
     requireInteraction: false,
     data: data.url || '/'
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'VesteZap', options)
+    self.registration.showNotification(data.title || 'PopVenda', options)
   );
 });
 

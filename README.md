@@ -1,6 +1,6 @@
-# VesteZap 🛍️
+# PopVenda 🛍️
 
-**Plataforma de E-commerce Multi-loja para Moda Feminina com Finalização via WhatsApp**
+**Plataforma de Catálogo Online Multi-loja com Finalização via WhatsApp**
 
 [![Laravel](https://img.shields.io/badge/Laravel-12-red.svg)](https://laravel.com)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org)
@@ -10,7 +10,7 @@
 
 ## 📋 Sobre o Projeto
 
-VesteZap é uma plataforma SaaS multi-tenant desenvolvida para lojistas de moda feminina. Permite que cada loja tenha seu próprio catálogo online com fluxo completo de compra, finalizando pedidos diretamente via WhatsApp.
+PopVenda é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter seu próprio catálogo online com fluxo completo de compra, finalizando pedidos diretamente via WhatsApp. Moda, eletrônicos, imobiliária, encomendas — qualquer negócio que venda pelo Instagram e WhatsApp.
 
 ### ✨ Funcionalidades Principais
 
@@ -52,7 +52,7 @@ VesteZap é uma plataforma SaaS multi-tenant desenvolvida para lojistas de moda 
 1. **Clone o repositório**
    ```bash
    git clone <repository-url>
-   cd vestezap
+   cd popvenda
    ```
 
 2. **Suba os containers**
@@ -75,7 +75,7 @@ VesteZap é uma plataforma SaaS multi-tenant desenvolvida para lojistas de moda 
    ```env
    VAPID_PUBLIC_KEY=sua_chave_publica
    VAPID_PRIVATE_KEY=sua_chave_privada
-   VAPID_SUBJECT=mailto:admin@vestezap.com.br
+   VAPID_SUBJECT=mailto:admin@popvenda.com.br
    ```
 
 5. **Acesse a aplicação**
@@ -92,7 +92,7 @@ VesteZap é uma plataforma SaaS multi-tenant desenvolvida para lojistas de moda 
 ## 📁 Estrutura do Projeto
 
 ```
-vestezap/
+popvenda/
 ├── backend/                 # API Laravel
 │   ├── app/
 │   │   ├── Models/         # Modelos Eloquent
@@ -111,7 +111,16 @@ vestezap/
 │   ├── public/            # Assets estáticos
 │   └── package.json       # Dependências Node.js
 ├── docker-compose.yaml     # Configuração Docker
-└── spec.md                # Especificações técnicas
+├── docs/                  # Documentação completa
+│   ├── SPEC.md            # Especificações técnicas
+│   ├── ROADMAP.md         # Visão do produto e features planejadas
+│   ├── RELEASE_NOTES.md   # Histórico de versões
+│   ├── DEPLOY.md          # Guia de deploy em VPS
+│   ├── todo.md            # Tarefas e notas de desenvolvimento
+│   ├── brainstorm-monetizacao.md  # Estratégia de precificação
+│   ├── estudo-concorrentes.md     # Análise competitiva
+│   └── playbook-prospeccao.md     # Guia de prospecção de clientes
+└── frontend/              # SPA React
 ```
 
 ## 🔧 Comandos Úteis
@@ -186,7 +195,7 @@ Product (1) ─── (N) OrderItem
 
 ## 🔔 Sistema de Notificações
 
-O VesteZap possui um sistema completo de notificações que alerta os administradores quando um novo pedido é criado.
+O PopVenda possui um sistema completo de notificações que alerta os administradores quando um novo pedido é criado.
 
 ### Tipos de Notificação
 
@@ -216,7 +225,7 @@ Adicione as chaves geradas ao arquivo `backend/.env`:
 ```env
 VAPID_PUBLIC_KEY=sua_chave_publica_aqui
 VAPID_PRIVATE_KEY=sua_chave_privada_aqui
-VAPID_SUBJECT=mailto:admin@vestezap.com.br
+VAPID_SUBJECT=mailto:admin@popvenda.com.br
 ```
 
 **Importante:**
@@ -293,8 +302,8 @@ docker compose exec backend php artisan tinker
 
 1. **Build das imagens**
    ```bash
-   docker build -t vestezap-backend ./backend
-   docker build -t vestezap-frontend ./frontend
+   docker build -t popvenda-backend ./backend
+   docker build -t popvenda-frontend ./frontend
    ```
 
 2. **Configurar variáveis de ambiente**
@@ -344,4 +353,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**VesteZap** - Transformando vendas de moda com WhatsApp! 💖
+**PopVenda** - Seu catálogo online. O pedido organizado no seu WhatsApp!
