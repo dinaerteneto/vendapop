@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -52,6 +52,11 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
+const InviteRedirect: React.FC = () => {
+  const { code } = useParams<{ code: string }>();
+  return <Navigate to={`/admin/register?invite=${code}`} replace />;
+};
+
 function App() {
   return (
     <Router>
@@ -62,6 +67,8 @@ function App() {
         <Route path="/termos" element={<TermsOfServicePage />} />
         <Route path="/cookies" element={<CookiePolicyPage />} />
         <Route path="/direitos-lgpd" element={<LgpdRightsPage />} />
+        <Route path="/convite/:code" element={<InviteRedirect />} />
+        <Route path="/convite/:code" element={<Navigate to={window.location.pathname.replace('/convite/', '/admin/register?invite=')} replace />} />
 
         {/* Landing Page */}
         <Route path="/" element={<Landing />} />

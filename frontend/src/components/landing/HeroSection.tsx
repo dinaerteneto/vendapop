@@ -19,7 +19,7 @@ const HeroSection: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
-                to="/admin/login"
+                to="/admin/register"
                 className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-center"
               >
                 Tenho um convite

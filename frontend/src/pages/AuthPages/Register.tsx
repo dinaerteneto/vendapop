@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const RegisterForm: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const inviteFromUrl = searchParams.get('invite') || '';
+
   const [formData, setFormData] = useState({
     store_name: '',
     store_slug: '',
     whatsapp_number: '',
     email: '',
+    invite_code: inviteFromUrl,
   });
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -42,11 +46,17 @@ const RegisterForm: React.FC = () => {
       // Executar reCAPTCHA v3
       const recaptchaToken = await executeRecaptcha('register');
       
-      await api.post('/admin/register', {
+      const payload: Record<string, any> = {
         ...formData,
         terms_accepted: true,
         recaptcha_token: recaptchaToken,
-      });
+      };
+
+      if (!formData.invite_code) {
+        delete payload.invite_code;
+      }
+
+      await api.post('/admin/register', payload);
       toast.success('Loja cadastrada com sucesso! Verifique seu e-mail para ativar sua conta e receber sua senha.');
       navigate('/admin/login');
     } catch (err: any) {
@@ -148,6 +158,31 @@ const RegisterForm: React.FC = () => {
               className="w-full rounded border px-3 py-2 focus:border-blue-500 focus:outline-none"
               required
             />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-2 block font-medium text-gray-700">
+              Código de Convite
+            </label>
+            <input
+              type="text"
+              name="invite_code"
+              value={formData.invite_code}
+              onChange={handleChange}
+              placeholder="ABC12345"
+              className="w-full rounded border px-3 py-2 focus:border-purple-500 focus:outline-none font-mono uppercase"
+              maxLength={8}
+            />
+            {formData.invite_code && (
+              <p className="mt-1 text-xs text-green-600">
+                Convite aplicado! Sua loja terá acesso Premium.
+              </p>
+            )}
+            {!formData.invite_code && (
+              <p className="mt-1 text-xs text-gray-400">
+                Opcional — se você recebeu um código de convite
+              </p>
+            )}
           </div>
 
           <div className="mb-4">
