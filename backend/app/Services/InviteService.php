@@ -72,6 +72,16 @@ class InviteService implements InviteServiceInterface
 
     public function remainingForTenant(Tenant $tenant): int
     {
+        // Only manually-selected founders (invite_source=manual) can generate invites
+        $isManualFounder = \App\Models\Subscription::where('tenant_id', $tenant->id)
+            ->where('invite_source', 'manual')
+            ->whereIn('plan_status', ['active', 'trial'])
+            ->exists();
+
+        if (!$isManualFounder) {
+            return 0;
+        }
+
         $used = Invite::where('created_by_tenant_id', $tenant->id)
             ->where('type', 'manual')
             ->count();

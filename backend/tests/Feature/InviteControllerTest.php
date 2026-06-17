@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Invite;
+use App\Models\Subscription;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,6 +25,16 @@ class InviteControllerTest extends TestCase
             'name' => 'Invite Test Store',
             'slug' => 'invite-test',
             'whatsapp_number' => '5511999999999',
+        ]);
+
+        // Mark this tenant as a manual founder so it can generate invites
+        Subscription::create([
+            'tenant_id' => $this->tenant->id,
+            'plan_type' => 'premium',
+            'plan_status' => 'active',
+            'invite_source' => 'manual',
+            'started_at' => now(),
+            'ends_at' => null,
         ]);
 
         $this->user = User::create([

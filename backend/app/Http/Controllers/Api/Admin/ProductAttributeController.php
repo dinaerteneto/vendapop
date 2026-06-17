@@ -41,14 +41,23 @@ class ProductAttributeController extends Controller
             'order' => 'nullable|integer|min:0',
         ]);
 
-        $attribute = ProductAttribute::create([
-            'tenant_id' => $tenant->id,
-            'name' => $validated['name'],
-            'order' => $validated['order'] ?? 0,
-            'is_active' => true,
-        ]);
+        $slug = \Illuminate\Support\Str::slug($validated['name']);
 
-        return response()->json($attribute, 201);
+        $attribute = ProductAttribute::firstOrCreate(
+            [
+                'tenant_id' => $tenant->id,
+                'slug' => $slug,
+            ],
+            [
+                'name' => $validated['name'],
+                'order' => $validated['order'] ?? 0,
+                'is_active' => true,
+            ]
+        );
+
+        $statusCode = $attribute->wasRecentlyCreated ? 201 : 200;
+
+        return response()->json($attribute, $statusCode);
     }
 
     /**

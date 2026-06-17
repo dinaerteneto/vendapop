@@ -134,12 +134,44 @@ class InviteServiceTest extends TestCase
     {
         $tenant = $this->createTenant('limit-test');
 
+        \App\Models\Subscription::create([
+            'tenant_id' => $tenant->id,
+            'plan_type' => 'premium',
+            'plan_status' => 'active',
+            'invite_source' => 'manual',
+            'started_at' => now(),
+            'ends_at' => null,
+        ]);
+
         $this->assertEquals(2, $this->inviteService->remainingForTenant($tenant));
 
         $this->inviteService->generateManual($tenant, 1);
         $this->assertEquals(1, $this->inviteService->remainingForTenant($tenant));
 
         $this->inviteService->generateManual($tenant, 1);
+        $this->assertEquals(0, $this->inviteService->remainingForTenant($tenant));
+    }
+
+    public function test_remaining_returns_zero_for_non_manual_founder(): void
+    {
+        $tenant = $this->createTenant('non-founder');
+
+        \App\Models\Subscription::create([
+            'tenant_id' => $tenant->id,
+            'plan_type' => 'premium',
+            'plan_status' => 'trial',
+            'invite_source' => 'public_link',
+            'started_at' => now(),
+            'ends_at' => now()->addDays(60),
+        ]);
+
+        $this->assertEquals(0, $this->inviteService->remainingForTenant($tenant));
+    }
+
+    public function test_remaining_returns_zero_without_subscription(): void
+    {
+        $tenant = $this->createTenant('no-sub');
+
         $this->assertEquals(0, $this->inviteService->remainingForTenant($tenant));
     }
 }
