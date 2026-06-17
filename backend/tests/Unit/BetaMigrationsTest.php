@@ -44,7 +44,7 @@ class BetaMigrationsTest extends TestCase
 
     public function test_invites_table_enum_type_accepts_manual_and_public(): void
     {
-        $this->assertDatabaseCount('invites', 0);
+        \Illuminate\Support\Facades\DB::table('invites')->delete();
 
         // Create a dummy tenant first for the FK
         $tenantId = \App\Models\Tenant::create([

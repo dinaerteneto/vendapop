@@ -89,7 +89,7 @@ class InviteServiceTest extends TestCase
     {
         $tenant = $this->createTenant('expire-test');
         $invite = Invite::create([
-            'code' => 'EXPIRED1',
+            'code' => 'EXPDTEST',
             'type' => 'manual',
             'created_by_tenant_id' => $tenant->id,
             'max_uses' => 1,

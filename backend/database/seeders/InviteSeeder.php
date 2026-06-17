@@ -3,81 +3,99 @@
 namespace Database\Seeders;
 
 use App\Models\Invite;
+use App\Models\Tenant;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class InviteSeeder extends Seeder
 {
     public function run(): void
     {
+        $modaChic = Tenant::where('slug', 'modachic')->first();
+
         // 1. Convite manual do admin (sem tenant associado) — Premium vitalício
-        Invite::create([
-            'code' => 'ADMIN001',
-            'type' => 'manual',
-            'created_by_tenant_id' => null,
-            'max_uses' => 1,
-            'current_uses' => 0,
-            'expires_at' => now()->addDays(30),
-        ]);
+        Invite::firstOrCreate(
+            ['code' => 'ADMIN001'],
+            [
+                'type' => 'manual',
+                'created_by_tenant_id' => null,
+                'max_uses' => 1,
+                'current_uses' => 0,
+                'expires_at' => now()->addDays(30),
+            ]
+        );
 
-        // 2. Convites de founder (tenant 19 = Moda Chic) — 60 dias trial
-        Invite::create([
-            'code' => 'CHIC001',
-            'type' => 'manual',
-            'created_by_tenant_id' => 19,
-            'max_uses' => 1,
-            'current_uses' => 0,
-            'expires_at' => now()->addDays(7),
-        ]);
+        // 2. Convites de founder (Moda Chic) — 60 dias trial
+        if ($modaChic) {
+            Invite::firstOrCreate(
+                ['code' => 'CHIC001'],
+                [
+                    'type' => 'manual',
+                    'created_by_tenant_id' => $modaChic->id,
+                    'max_uses' => 1,
+                    'current_uses' => 0,
+                    'expires_at' => now()->addDays(7),
+                ]
+            );
 
-        Invite::create([
-            'code' => 'CHIC002',
-            'type' => 'manual',
-            'created_by_tenant_id' => 19,
-            'max_uses' => 1,
-            'current_uses' => 0,
-            'expires_at' => now()->addDays(7),
-        ]);
+            Invite::firstOrCreate(
+                ['code' => 'CHIC002'],
+                [
+                    'type' => 'manual',
+                    'created_by_tenant_id' => $modaChic->id,
+                    'max_uses' => 1,
+                    'current_uses' => 0,
+                    'expires_at' => now()->addDays(7),
+                ]
+            );
+        }
 
         // 3. Link público com 3 vagas — 60 dias trial
-        Invite::create([
-            'code' => 'BETA2026',
-            'type' => 'public',
-            'created_by_tenant_id' => null,
-            'max_uses' => 3,
-            'current_uses' => 0,
-            'expires_at' => now()->addHours(72),
-        ]);
+        Invite::firstOrCreate(
+            ['code' => 'BETA2026'],
+            [
+                'type' => 'public',
+                'created_by_tenant_id' => null,
+                'max_uses' => 3,
+                'current_uses' => 0,
+                'expires_at' => now()->addHours(72),
+            ]
+        );
 
         // 4. Link público com 5 vagas — 60 dias trial
-        Invite::create([
-            'code' => 'VAGAS05',
-            'type' => 'public',
-            'created_by_tenant_id' => null,
-            'max_uses' => 5,
-            'current_uses' => 0,
-            'expires_at' => now()->addHours(48),
-        ]);
+        Invite::firstOrCreate(
+            ['code' => 'VAGAS05'],
+            [
+                'type' => 'public',
+                'created_by_tenant_id' => null,
+                'max_uses' => 5,
+                'current_uses' => 0,
+                'expires_at' => now()->addHours(48),
+            ]
+        );
 
         // 5. Convite expirado (para testar validação)
-        Invite::create([
-            'code' => 'EXPIRED1',
-            'type' => 'manual',
-            'created_by_tenant_id' => null,
-            'max_uses' => 1,
-            'current_uses' => 0,
-            'expires_at' => now()->subDay(),
-        ]);
+        Invite::firstOrCreate(
+            ['code' => 'EXPIRED1'],
+            [
+                'type' => 'manual',
+                'created_by_tenant_id' => null,
+                'max_uses' => 1,
+                'current_uses' => 0,
+                'expires_at' => now()->subDay(),
+            ]
+        );
 
         // 6. Convite esgotado (para testar mensagem "vagas esgotadas")
-        Invite::create([
-            'code' => 'CHEIO01',
-            'type' => 'public',
-            'created_by_tenant_id' => null,
-            'max_uses' => 2,
-            'current_uses' => 2,
-            'expires_at' => now()->addDays(7),
-        ]);
+        Invite::firstOrCreate(
+            ['code' => 'CHEIO01'],
+            [
+                'type' => 'public',
+                'created_by_tenant_id' => null,
+                'max_uses' => 2,
+                'current_uses' => 2,
+                'expires_at' => now()->addDays(7),
+            ]
+        );
 
         echo "Convites criados:\n";
         echo "  ADMIN001 (manual/admin - vitalício)\n";
