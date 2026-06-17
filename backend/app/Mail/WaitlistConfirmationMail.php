@@ -19,7 +19,7 @@ class WaitlistConfirmationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Você entrou na lista de espera do PopVenda!',
+            subject: 'Você entrou na lista de espera do ' . config('app.name') . '!',
         );
     }
 

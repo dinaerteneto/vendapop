@@ -61,7 +61,7 @@ const AppLayout: React.FC = () => {
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-          <Link to="/admin" className="text-2xl font-bold text-white">PopVenda Admin</Link>
+          <Link to="/admin" className="text-2xl font-bold text-white">VendaPop Admin</Link>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-white hover:text-gray-300"

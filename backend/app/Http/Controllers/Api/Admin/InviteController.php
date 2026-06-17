@@ -30,7 +30,7 @@ class InviteController extends Controller
     public function store(Request $request): JsonResponse
     {
         $tenant = $request->user()->tenant;
-        $isAdmin = $tenant->slug === 'popvenda';
+        $isAdmin = $tenant->slug === 'vendapop';
         $remaining = $isAdmin ? 999 : $this->inviteService->remainingForTenant($tenant);
 
         if (!$isAdmin && $remaining <= 0) {
@@ -50,7 +50,7 @@ class InviteController extends Controller
 
         return response()->json([
             'code' => $invite->code,
-            'url' => config('app.frontend_url', 'https://popvenda.com.br') . '/convite/' . $invite->code,
+            'url' => config('services.frontend_url') . '/convite/' . $invite->code,
             'expires_at' => $invite->expires_at,
             'remaining' => $remaining - 1,
         ], 201);
@@ -75,7 +75,7 @@ class InviteController extends Controller
 
         return response()->json([
             'code' => $invite->code,
-            'url' => config('app.frontend_url', 'https://popvenda.com.br') . '/convite/' . $invite->code,
+            'url' => config('services.frontend_url') . '/convite/' . $invite->code,
             'max_uses' => $invite->max_uses,
             'expires_at' => $invite->expires_at,
         ], 201);
@@ -93,7 +93,7 @@ class InviteController extends Controller
     public function remaining(Request $request): JsonResponse
     {
         $tenant = $request->user()->tenant;
-        $remaining = $tenant->slug === 'popvenda'
+        $remaining = $tenant->slug === 'vendapop'
             ? 999
             : $this->inviteService->remainingForTenant($tenant);
 

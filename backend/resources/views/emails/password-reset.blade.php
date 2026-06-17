@@ -3,7 +3,7 @@
 
 Olá {{ $user->name }},
 
-Você solicitou a redefinição de senha para sua conta no PopVenda.
+Você solicitou a redefinição de senha para sua conta no {{ config('app.name') }}.
 
 Clique no botão abaixo para redefinir sua senha:
 

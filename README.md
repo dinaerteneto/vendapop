@@ -1,4 +1,4 @@
-# PopVenda 🛍️
+# VendaPop 🛍️
 
 **Plataforma de Catálogo Online Multi-loja com Finalização via WhatsApp**
 
@@ -10,7 +10,7 @@
 
 ## 📋 Sobre o Projeto
 
-PopVenda é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter seu próprio catálogo online com fluxo completo de compra, finalizando pedidos diretamente via WhatsApp. Moda, eletrônicos, imobiliária, encomendas — qualquer negócio que venda pelo Instagram e WhatsApp.
+VendaPop é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter seu próprio catálogo online com fluxo completo de compra, finalizando pedidos diretamente via WhatsApp. Moda, eletrônicos, imobiliária, encomendas — qualquer negócio que venda pelo Instagram e WhatsApp.
 
 ### ✨ Funcionalidades Principais
 
@@ -52,7 +52,7 @@ PopVenda é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter 
 1. **Clone o repositório**
    ```bash
    git clone <repository-url>
-   cd popvenda
+   cd vendapop
    ```
 
 2. **Suba os containers**
@@ -75,7 +75,7 @@ PopVenda é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter 
    ```env
    VAPID_PUBLIC_KEY=sua_chave_publica
    VAPID_PRIVATE_KEY=sua_chave_privada
-   VAPID_SUBJECT=mailto:admin@popvenda.com.br
+   VAPID_SUBJECT=mailto:admin@vendapop.com.br
    ```
 
 5. **Acesse a aplicação**
@@ -92,7 +92,7 @@ PopVenda é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter 
 ## 📁 Estrutura do Projeto
 
 ```
-popvenda/
+vendapop/
 ├── backend/                 # API Laravel
 │   ├── app/
 │   │   ├── Models/         # Modelos Eloquent
@@ -195,7 +195,7 @@ Product (1) ─── (N) OrderItem
 
 ## 🔔 Sistema de Notificações
 
-O PopVenda possui um sistema completo de notificações que alerta os administradores quando um novo pedido é criado.
+O VendaPop possui um sistema completo de notificações que alerta os administradores quando um novo pedido é criado.
 
 ### Tipos de Notificação
 
@@ -225,7 +225,7 @@ Adicione as chaves geradas ao arquivo `backend/.env`:
 ```env
 VAPID_PUBLIC_KEY=sua_chave_publica_aqui
 VAPID_PRIVATE_KEY=sua_chave_privada_aqui
-VAPID_SUBJECT=mailto:admin@popvenda.com.br
+VAPID_SUBJECT=mailto:admin@vendapop.com.br
 ```
 
 **Importante:**
@@ -302,8 +302,8 @@ docker compose exec backend php artisan tinker
 
 1. **Build das imagens**
    ```bash
-   docker build -t popvenda-backend ./backend
-   docker build -t popvenda-frontend ./frontend
+   docker build -t vendapop-backend ./backend
+   docker build -t vendapop-frontend ./frontend
    ```
 
 2. **Configurar variáveis de ambiente**
@@ -353,4 +353,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**PopVenda** - Seu catálogo online. O pedido organizado no seu WhatsApp!
+**VendaPop** - Seu catálogo online. O pedido organizado no seu WhatsApp!

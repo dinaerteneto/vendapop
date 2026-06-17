@@ -2,7 +2,7 @@
 
 Olá, {{ $tenant->name }}!
 
-Seu período gratuito do plano Premium no **PopVenda** termina em **{{ $daysRemaining }} dias**.
+Seu período gratuito do plano Premium no **{{ config('app.name') }}** termina em **{{ $daysRemaining }} dias**.
 
 Aproveite enquanto pode:
 - Produtos ilimitados
@@ -12,4 +12,4 @@ Aproveite enquanto pode:
 {{ $daysRemaining <= 2 ? 'CORRE! ' : '' }}Em breve os planos pagos estarão disponíveis. Fique de olho!
 
 Atenciosamente,
-Equipe PopVenda
+Equipe {{ config('app.name') }}

@@ -31,7 +31,7 @@ class PasswordResetMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Redefinição de Senha - PopVenda',
+            subject: 'Redefinição de Senha - ' . config('app.name'),
         );
     }
 

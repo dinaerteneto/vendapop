@@ -43,7 +43,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 echo "VAPID_PUBLIC_KEY={$keys['publicKey']}\n";
 echo "VAPID_PRIVATE_KEY={$keys['privateKey']}\n";
-echo "VAPID_SUBJECT=mailto:admin@popvenda.com.br\n\n";
+echo "VAPID_SUBJECT=mailto:admin@" . parse_url(env('APP_URL', 'https://vendapop.com.br'), PHP_URL_HOST) . "\n\n";
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 echo "💡 Dicas:\n";

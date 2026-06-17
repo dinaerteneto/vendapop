@@ -9,22 +9,22 @@ use Illuminate\Support\Facades\Hash;
 
 class CreateAdminCommand extends Command
 {
-    protected $signature = 'popvenda:admin';
-    protected $description = 'Create the PopVenda admin tenant and user';
+    protected $signature = 'vendapop:admin';
+    protected $description = 'Create the VendaPop admin tenant and user';
 
     public function handle(): int
     {
         $tenant = Tenant::firstOrCreate(
-            ['slug' => 'popvenda'],
+            ['slug' => 'vendapop'],
             [
-                'name' => 'PopVenda Admin',
+                'name' => 'VendaPop Admin',
                 'whatsapp_number' => '5511999999999',
                 'primary_color' => '#7c3aed',
                 'secondary_color' => '#f3e8ff',
             ]
         );
 
-        $email = 'admin@popvenda.com.br';
+        $email = 'admin@' . parse_url(config('app.url'), PHP_URL_HOST);
         $password = $this->secret('Enter admin password (min 8 chars)');
 
         $user = User::firstOrCreate(

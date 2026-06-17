@@ -1,4 +1,4 @@
-# Todo - Fluxo de Compras PopVenda
+# Todo - Fluxo de Compras VendaPop
 
 ## Fluxo de Pedido
 

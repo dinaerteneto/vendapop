@@ -20,7 +20,7 @@ class WaitlistInviteMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Você foi convidado para o PopVenda!',
+            subject: 'Você foi convidado para o ' . config('app.name') . '!',
         );
     }
 

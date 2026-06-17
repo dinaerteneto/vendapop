@@ -1,5 +1,5 @@
 <x-mail::message>
-# Acesso ao PopVenda
+# Acesso ao {{ config('app.name') }}
 
 Você solicitou um código de acesso para o e-mail **{{ $email }}**.
 
@@ -15,7 +15,7 @@ Este código expira em **10 minutos**.
 ## Link Mágico (Acesso Direto)
 
 <x-mail::button :url="$magicLinkUrl">
-Acessar PopVenda
+Acessar {{ config('app.name') }}
 </x-mail::button>
 
 Ou copie e cole este link no seu navegador:
@@ -27,5 +27,5 @@ Este link expira em **30 minutos**.
 Se você não solicitou este código, ignore este e-mail.
 
 Obrigado,<br>
-Equipe PopVenda
+Equipe {{ config('app.name') }}
 </x-mail::message>
