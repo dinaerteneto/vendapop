@@ -12,7 +12,7 @@ const WaitlistSection: React.FC = () => {
 
     setStatus('loading');
     try {
-      const res = await api.post('/api/waitlist', { email });
+      const res = await api.post('/admin/waitlist', { email });
       setStatus('success');
       setMessage(res.data.message);
       setEmail('');

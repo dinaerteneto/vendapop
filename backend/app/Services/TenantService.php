@@ -13,6 +13,11 @@ class TenantService
         $this->tenant = $tenant;
     }
 
+    public function clearTenant(): void
+    {
+        $this->tenant = null;
+    }
+
     public function getTenant(): ?Tenant
     {
         return $this->tenant;

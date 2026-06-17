@@ -12,6 +12,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(\App\Services\TenantService::class);
+
         // Repositories
         $this->app->bind(
             \App\Repositories\Interfaces\ProductRepositoryInterface::class,

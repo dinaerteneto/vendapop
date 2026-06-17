@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invite extends Model
 {
+    protected $attributes = [
+        'is_active' => true,
+    ];
     protected $fillable = [
         'code',
         'type',
@@ -13,12 +16,14 @@ class Invite extends Model
         'max_uses',
         'current_uses',
         'expires_at',
+        'is_active',
     ];
 
     protected $casts = [
         'max_uses' => 'integer',
         'current_uses' => 'integer',
         'expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function creator()
@@ -34,6 +39,11 @@ class Invite extends Model
     public function isExhausted(): bool
     {
         return $this->current_uses >= $this->max_uses;
+    }
+
+    public function isInactive(): bool
+    {
+        return !$this->is_active;
     }
 
     public function slotsRemaining(): int

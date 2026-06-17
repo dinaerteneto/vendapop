@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import UserDropdown from '../components/admin/UserDropdown';
+import FeedbackWidget from '../components/FeedbackWidget';
 
 // Layout simples para Admin (Sidebar + Header + Content)
 const AppLayout: React.FC = () => {
@@ -150,6 +151,7 @@ const AppLayout: React.FC = () => {
             <Outlet />
           </div>
         </main>
+        <FeedbackWidget />
       </div>
     </div>
   );

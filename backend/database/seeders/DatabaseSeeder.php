@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             AfiliadosSeeder::class,
             PizzariaSeeder::class,
             InviteSeeder::class,
+            SuperAdminSeeder::class,
         ]);
     }
 }

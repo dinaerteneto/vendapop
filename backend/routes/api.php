@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Admin\RegistrationController;
 use App\Http\Controllers\Api\Admin\RotatingBannerController;
 use App\Http\Controllers\Api\Admin\StoreSettingsController;
 use App\Http\Controllers\Api\Admin\InviteController;
+use App\Http\Controllers\Api\Admin\FeedbackWidgetController;
 use App\Http\Controllers\Api\Admin\ProductAttributeController;
 use App\Http\Controllers\Api\Admin\SubscriptionController;
 use App\Http\Controllers\Api\Admin\TrackingController;
@@ -110,6 +111,9 @@ Route::prefix('admin')->group(function () {
         // Waitlist (admin)
         Route::get('/waitlist', [WaitlistAdminController::class, 'index']);
         Route::get('/waitlist/count', [WaitlistAdminController::class, 'count']);
+
+        // Feedback
+        Route::post('/feedback', [FeedbackWidgetController::class, 'store']);
 
         // Tracking
         Route::get('/trackings', [TrackingController::class, 'index']);
