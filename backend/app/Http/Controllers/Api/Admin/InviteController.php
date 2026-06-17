@@ -30,9 +30,10 @@ class InviteController extends Controller
     public function store(Request $request): JsonResponse
     {
         $tenant = $request->user()->tenant;
-        $remaining = $this->inviteService->remainingForTenant($tenant);
+        $isAdmin = $tenant->slug === 'popvenda';
+        $remaining = $isAdmin ? 999 : $this->inviteService->remainingForTenant($tenant);
 
-        if ($remaining <= 0) {
+        if (!$isAdmin && $remaining <= 0) {
             return response()->json([
                 'message' => 'Você já usou todos os seus convites.',
             ], 403);
@@ -92,7 +93,9 @@ class InviteController extends Controller
     public function remaining(Request $request): JsonResponse
     {
         $tenant = $request->user()->tenant;
-        $remaining = $this->inviteService->remainingForTenant($tenant);
+        $remaining = $tenant->slug === 'popvenda'
+            ? 999
+            : $this->inviteService->remainingForTenant($tenant);
 
         return response()->json(['remaining' => $remaining]);
     }
