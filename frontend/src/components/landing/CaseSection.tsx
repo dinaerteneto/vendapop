@@ -23,8 +23,8 @@ const cases = [
     image: '/images/stores/techstore-brasil.png',
   },
   {
-    name: 'Pizzaria Boa Massa',
-    slug: 'pizzaria-boa-massa',
+    name: 'Boa Massa',
+    slug: 'boa-massa',
     sector: 'Alimentação',
     products: 6,
     image: '/images/stores/pizzaria-boa-massa.png',
@@ -45,11 +45,11 @@ const CaseSection: React.FC = () => {
               target="_blank"
               className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition group"
             >
-              <div className="h-48 bg-gray-100 overflow-hidden">
+              <div className="h-96 bg-gray-100 overflow-hidden">
                 <img
                   src={c.image}
                   alt={`Loja ${c.name}`}
-                  className="w-full h-full object-cover object-top"
+                  style={{ objectPosition: '0 -140px' }}
                 />
               </div>
               <div className="p-4 text-left">

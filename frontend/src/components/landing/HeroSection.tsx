@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PhoneSlideshow from './PhoneSlideshow';
 
 const HeroSection: React.FC = () => {
   return (
@@ -43,19 +44,7 @@ const HeroSection: React.FC = () => {
               </a>
             </div>
           </div>
-          <div className="hidden md:flex justify-center">
-            <div className="relative">
-              <div className="w-72 h-[500px] bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
-                <div className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
-                  <img
-                    src="/images/stores/modachic.png"
-                    alt="Exemplo de loja no VendaPop"
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <PhoneSlideshow />
         </div>
       </div>
       </div>
