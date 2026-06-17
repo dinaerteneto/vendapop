@@ -49,6 +49,10 @@ const StoreSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null);
 
+  const [trackings, setTrackings] = useState<{ id: number; provider: string; tracking_code: string }[]>([]);
+  const [trackingForm, setTrackingForm] = useState({ provider: 'google_analytics', tracking_code: '' });
+  const [savingTracking, setSavingTracking] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     whatsapp_number: '',
@@ -79,6 +83,7 @@ const StoreSettings: React.FC = () => {
 
   useEffect(() => {
     loadStoreSettings();
+    loadTrackings();
   }, []);
 
   const loadStoreSettings = async () => {
@@ -120,6 +125,40 @@ const StoreSettings: React.FC = () => {
       toast.error('Erro ao carregar configurações da loja.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTrackings = async () => {
+    try {
+      const res = await api.get('/admin/trackings');
+      setTrackings(res.data);
+    } catch {
+      // tracking feature may fail silently
+    }
+  };
+
+  const handleSaveTracking = async () => {
+    if (!trackingForm.tracking_code.trim()) return;
+    setSavingTracking(true);
+    try {
+      await api.post('/admin/trackings', trackingForm);
+      setTrackingForm({ provider: 'google_analytics', tracking_code: '' });
+      toast.success('Tag de rastreamento salva!');
+      loadTrackings();
+    } catch {
+      toast.error('Erro ao salvar tag.');
+    } finally {
+      setSavingTracking(false);
+    }
+  };
+
+  const handleDeleteTracking = async (id: number) => {
+    try {
+      await api.delete(`/admin/trackings/${id}`);
+      toast.success('Tag removida.');
+      loadTrackings();
+    } catch {
+      toast.error('Erro ao remover tag.');
     }
   };
 
@@ -880,6 +919,51 @@ const StoreSettings: React.FC = () => {
                 Adicionar
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Tags de Rastreamento */}
+        <div className="mb-8">
+          <h2 className="mb-4 text-xl font-semibold text-gray-800">📊 Google Analytics & Facebook Pixel</h2>
+          <p className="text-sm text-gray-500 mb-4">Adicione suas tags de rastreamento para medir o tráfego da sua loja e criar públicos de remarketing.</p>
+
+          {trackings.length > 0 && (
+            <div className="mb-4 space-y-2">
+              {trackings.map((t) => (
+                <div key={t.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2">
+                  <div>
+                    <span className="text-xs font-medium uppercase text-gray-500">{t.provider === 'google_analytics' ? 'Google Analytics' : 'Facebook Pixel'}</span>
+                    <p className="text-sm font-mono text-gray-700">{t.tracking_code}</p>
+                  </div>
+                  <button onClick={() => handleDeleteTracking(t.id)} className="text-red-400 hover:text-red-600 text-sm">Remover</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <select
+              value={trackingForm.provider}
+              onChange={(e) => setTrackingForm({ ...trackingForm, provider: e.target.value })}
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="google_analytics">Google Analytics (GA4)</option>
+              <option value="facebook_pixel">Facebook Pixel</option>
+            </select>
+            <input
+              type="text"
+              value={trackingForm.tracking_code}
+              onChange={(e) => setTrackingForm({ ...trackingForm, tracking_code: e.target.value })}
+              placeholder={trackingForm.provider === 'google_analytics' ? 'G-XXXXXXXXXX' : '123456789012345'}
+              className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm font-mono"
+            />
+            <button
+              onClick={handleSaveTracking}
+              disabled={savingTracking || !trackingForm.tracking_code.trim()}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition disabled:opacity-50 text-sm"
+            >
+              {savingTracking ? '...' : 'Salvar'}
+            </button>
           </div>
         </div>
 

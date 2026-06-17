@@ -72,10 +72,37 @@ const PublicLayout: React.FC = () => {
                        console.log('Service Worker ready:', registration);
                    });
                }
-           })
-           .catch(err => console.error("Error fetching store info", err));
-    }
-  }, [storeSlug]);
+            })
+            .catch(err => console.error("Error fetching store info", err));
+
+        // Load tracking scripts for this store
+        const cleanScripts = () => {
+          document.querySelectorAll('script[data-tracking]').forEach(el => el.remove());
+        };
+
+        api.get(`/${storeSlug}/trackings`)
+          .then(response => {
+            cleanScripts();
+            response.data.forEach((t: { provider: string; tracking_code: string }) => {
+              const script = document.createElement('script');
+              script.setAttribute('data-tracking', t.provider);
+              if (t.provider === 'google_analytics') {
+                script.src = `https://www.googletagmanager.com/gtag/js?id=${t.tracking_code}`;
+                script.async = true;
+                document.head.appendChild(script);
+                const gtagScript = document.createElement('script');
+                gtagScript.setAttribute('data-tracking', 'google_analytics');
+                gtagScript.text = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${t.tracking_code}');`;
+                document.head.appendChild(gtagScript);
+              } else if (t.provider === 'facebook_pixel') {
+                script.text = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${t.tracking_code}');fbq('track','PageView');`;
+                document.head.appendChild(script);
+              }
+            });
+          })
+          .catch(() => {}); // tracking is optional
+     }
+   }, [storeSlug]);
 
   // Colors for dynamic theming
   const primaryColor = storeInfo?.primary_color || '#7c3aed';

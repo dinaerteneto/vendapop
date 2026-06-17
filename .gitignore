@@ -81,3 +81,5 @@ jspm_packages/
 tmp/
 temp/
 .playwright-mcp/
+
+*.pdf
