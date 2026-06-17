@@ -2,6 +2,23 @@
 
 ## 📋 Histórico de Versões
 
+### v1.10.1 (17 de Junho de 2026) — Rebrand VendaPop + Config Dinâmica
+
+**Rebranding:**
+- 🔄 Renomeado de PopVenda para VendaPop em todo o código (55 arquivos)
+- 📁 Diretório `.compozy/tasks/lancamento-popvenda` → `lancamento-vendapop`
+
+**Configuração Dinâmica:**
+- 📧 Blade templates agora usam `{{ config('app.name') }}` ao invés de nome hardcoded
+- ✉️ Subjects dos Mailables usam `config('app.name')` dinamicamente
+- 🌐 InviteController e InviteCreateCommand usam `config('services.frontend_url')`
+- 🔔 NotificationService VAPID subject usa fallback `config('mail.from.address')`
+- 👤 Emails de admin derivados de `config('app.url')`
+- 🖥️ Frontend InvitePanel usa `window.location.origin` para URLs de convite
+- 📝 Register/GoogleOnboarding usam `window.location.hostname`
+- 🔧 Service worker usa `self.location.hostname` para tag de notificação
+- 🚫 Adicionado `deploy/.gitignore` para evitar commit de `.env.production`
+
 ### v1.10.0 (17 de Junho de 2026) — Superadmin Dashboard
 
 **Painel Superadmin:**
