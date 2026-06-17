@@ -2,9 +2,11 @@
 
 namespace App\UseCases\SuperAdmin;
 
+use App\Mail\WaitlistInviteMail;
 use App\Models\Invite;
 use App\Models\WaitlistEntry;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ManageWaitlistUseCase
@@ -41,9 +43,15 @@ class ManageWaitlistUseCase
             'invite_id' => $invite->id,
         ]);
 
+        $inviteLink = config('services.frontend_url') . '/convite/' . $invite->code;
+
+        Mail::to($entry->email)->queue(new WaitlistInviteMail($invite->code, $inviteLink));
+
         return [
             'entry' => $entry->fresh(),
             'invite_code' => $invite->code,
+            'invite_link' => $inviteLink,
+            'email_sent' => true,
         ];
     }
 
