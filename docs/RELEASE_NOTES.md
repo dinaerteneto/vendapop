@@ -2,6 +2,58 @@
 
 ## 📋 Histórico de Versões
 
+### v1.10.0 (17 de Junho de 2026) — Superadmin Dashboard
+
+**Painel Superadmin:**
+- 🏢 Dashboard de gestão da plataforma (`/superadmin`)
+- 👤 Identificação via flag `is_super_admin` no modelo User existente
+- 🔐 Login/logout independente em `/api/superadmin/login`
+- 🛡️ Middleware `CheckSuperAdmin` que bypassa o escopo de tenant
+- 🌱 Seeder `SuperAdminSeeder` (superadmin@popvenda.com.br)
+
+**Gestão de Tenants:**
+- 📋 Lista paginada com busca por nome/slug
+- 🔍 Filtros por tipo de plano (free/basic/professional/premium) e status (active/trial/cancelled/expired)
+- 📄 Detalhe do tenant: assinaturas, usuários, contagem de produtos e pedidos
+- 📅 Último login dos usuários visível na listagem
+
+**Gestão de Waitlist:**
+- ✅ Aprovar/rejeitar entradas individualmente
+- 📦 Aprovação em lote com geração automática de convites
+- 🎫 Códigos de convite vinculados e exibidos após aprovação
+- 🔍 Filtros por status e data
+
+**Sistema de Feedback:**
+- 💬 Widget flutuante no painel admin do tenant (canto inferior direito)
+- 📬 Inbox no superadmin com filtro por status (unread/read/resolved)
+- ✅ Marcar como lido/resolvido com um clique
+
+**Convites Aprimorados:**
+- 🔗 Link copiável (`popvenda.com.br/convite/CODE`) em cada invite
+- 🔘 Toggle ativar/desativar invite (validação rejeita inativos)
+- 📋 Lista de convites com status: ativo, expirado, esgotado, inativo
+
+**Frontend:**
+- 🎨 Layout dedicado com sidebar (Tenants, Waitlist, Feedback, Invites)
+- 🌑 Tela de login com tema escuro
+- 📊 Tabelas com paginação, busca e filtros
+- 📱 Responsivo (sidebar colapsável em mobile)
+
+**Técnico:**
+- 🗄️ 4 novas migrations (users nullable, feedbacks, waitlist extend, invites is_active)
+- 🧪 32 novos testes (91 total, 0 falhas)
+- 🏗️ 5 novos UseCases seguindo arquitetura SOLID
+- 🛣️ Rotas isoladas em `routes/superadmin.php`
+- 🔧 `TenantService` registrado como singleton, adicionado `clearTenant()`
+- 🪝 Patch no trait `BelongsToTenant` para suportar `tenant_id = null`
+
+**Correções:**
+- 🐛 Rota da waitlist na landing page corrigida (estava com `/api/api/` duplicado)
+
+**Documentação:**
+- 📋 PRD, TechSpec e 4 ADRs em `.compozy/tasks/superadmin/`
+- 📝 13 task files com especificações detalhadas
+
 ### v1.9.0 (17 de Junho de 2026) — Lançamento Beta
 
 **Rebrand:**
