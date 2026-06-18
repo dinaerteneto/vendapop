@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Tenant;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
@@ -260,18 +261,21 @@ class ProductSeeder extends Seeder
             $name = "$adjective $productName";
             $slug = 'produto-' . $i . '-' . strtolower(str_replace(' ', '-', $name));
             
-            $product = Product::updateOrCreate(
-                ['slug' => $slug, 'tenant_id' => $tenant->id],
-                [
-                    'category_id' => $category->id,
-                    'name' => $name,
-                    'short_description' => "Produto $i - $adjective e confortável.",
-                    'description' => "Descrição detalhada do $name. Produto de alta qualidade, perfeito para o seu guarda-roupa.",
-                    'price' => $price,
-                    'promotional_price' => (rand(0, 100) > 70) ? $price * 0.8 : null, // 30% chance de ter promoção
-                    'is_active' => true,
-                ]
-            );
+            $product = Product::withoutEvents(function () use ($tenant, $slug, $category, $name, $i, $adjective, $price) {
+                return Product::firstOrCreate(
+                    ['slug' => $slug, 'tenant_id' => $tenant->id],
+                    [
+                        'category_id' => $category->id,
+                        'name' => $name,
+                        'uuid' => (string) Str::uuid(),
+                        'short_description' => "Produto $i - $adjective e confortável.",
+                        'description' => "Descrição detalhada do $name. Produto de alta qualidade, perfeito para o seu guarda-roupa.",
+                        'price' => $price,
+                        'promotional_price' => (rand(0, 100) > 70) ? $price * 0.8 : null,
+                        'is_active' => true,
+                    ]
+                );
+            });
 
             $galleryImages = [];
             for ($j = 0; $j < rand(1, 3); $j++) {
