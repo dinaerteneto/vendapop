@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import InvitePanel from '../../components/admin/InvitePanel';
+import OnboardingBanner from '../../components/onboarding/OnboardingBanner';
 
 interface DashboardStats {
   sales_today: string;
@@ -14,6 +16,34 @@ interface DashboardStats {
 const ECommerce: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const navigate = useNavigate();
+
+  const BANNER_DISMISS_KEY = 'onboarding_banner_dismissed_at';
+
+  const onboardingStep = useMemo(() => {
+    const saved = localStorage.getItem('onboarding_step');
+    return saved ? parseInt(saved, 10) : 0;
+  }, []);
+
+  const showBanner = useMemo(() => {
+    const tenantStr = localStorage.getItem('tenant');
+    if (!tenantStr) return false;
+    try {
+      const tenant = JSON.parse(tenantStr);
+      if (tenant.onboarding_completed) return false;
+    } catch { return false; }
+
+    const dismissed = localStorage.getItem(BANNER_DISMISS_KEY);
+    if (!dismissed) return true;
+    const daysAgo = (Date.now() - Number(dismissed)) / (1000 * 60 * 60 * 24);
+    return daysAgo >= 30;
+  }, []);
+
+  const handleDismissBanner = () => {
+    localStorage.setItem(BANNER_DISMISS_KEY, String(Date.now()));
+    setBannerDismissed(true);
+  };
 
   useEffect(() => {
     loadDashboardStats();
@@ -57,6 +87,14 @@ const ECommerce: React.FC = () => {
   return (
     <div>
       <h2 className="mb-6 text-2xl font-bold text-gray-900">Dashboard</h2>
+
+      {showBanner && !bannerDismissed && (
+        <OnboardingBanner
+          step={onboardingStep}
+          onContinue={() => navigate('/admin/setup')}
+          onDismiss={handleDismissBanner}
+        />
+      )}
       
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
         <div className="rounded-lg border border-gray-200 bg-white px-6 py-5 shadow-sm hover:shadow-md transition-shadow">

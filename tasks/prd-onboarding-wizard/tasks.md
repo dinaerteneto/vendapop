@@ -10,9 +10,9 @@
 | 03 | [OnboardingController + ImageProxyController + login response](03_task.md) | A — Backend | concluída |
 | 04 | [Componente ImageUploader unificado](04_task.md) | C — ImageUploader | concluída |
 | 05 | [Integrar ImageUploader nos formulários existentes](05_task.md) | C — ImageUploader | concluída |
-| 06 | [Scaffold do Wizard: rota, layout, progress bar e preview](06_task.md) | B — Wizard | pendente |
-| 07 | [Passo 1 — Identidade (logo + cor)](07_task.md) | B — Wizard | pendente |
-| 08 | [Passo 2 — Vitrine (editar produtos demo)](08_task.md) | B — Wizard | pendente |
-| 09 | [Passo 3 — WhatsApp (número + mensagem)](09_task.md) | B — Wizard | pendente |
-| 10 | [Passo 4 — Compartilhar + conclusão com confete](10_task.md) | B — Wizard | pendente |
-| 11 | [Banner de retomada no Dashboard](11_task.md) | B — Wizard | pendente |
+| 06 | [Scaffold do Wizard: rota, layout, progress bar e preview](06_task.md) | B — Wizard | concluída |
+| 07 | [Passo 1 — Identidade (logo + cor)](07_task.md) | B — Wizard | concluída |
+| 08 | [Passo 2 — Vitrine (editar produtos demo)](08_task.md) | B — Wizard | concluída |
+| 09 | [Passo 3 — WhatsApp (número + mensagem)](09_task.md) | B — Wizard | concluída |
+| 10 | [Passo 4 — Compartilhar + conclusão com confete](10_task.md) | B — Wizard | concluída |
+| 11 | [Banner de retomada no Dashboard](11_task.md) | B — Wizard | concluída |

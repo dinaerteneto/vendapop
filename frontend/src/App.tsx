@@ -32,6 +32,7 @@ import StoreSettings from './pages/Dashboard/StoreSettings/StoreSettings';
 import ChangePassword from './pages/Dashboard/ChangePassword/ChangePassword';
 import BannerList from './pages/Dashboard/Banners/BannerList';
 import BannerForm from './pages/Dashboard/Banners/BannerForm';
+import OnboardingSetup from './pages/AuthPages/OnboardingSetup';
 
 // Pages SuperAdmin
 import SuperAdminLogin from './pages/SuperAdmin/SuperAdminLogin';
@@ -101,6 +102,7 @@ function App() {
             </ProtectedRoute>
         }>
             <Route index element={<ECommerce />} />
+            <Route path="setup" element={<OnboardingSetup />} />
             <Route path="products" element={<AdminProductList />} />
             <Route path="products/new" element={<ProductForm />} />
             <Route path="products/:id" element={<ProductForm />} />

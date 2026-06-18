@@ -30,6 +30,14 @@ const SignInForm: React.FC = () => {
       if (data.tenant_slug) {
         localStorage.setItem('tenant_slug', data.tenant_slug);
       }
+      if (data.tenant) {
+        localStorage.setItem('tenant', JSON.stringify(data.tenant));
+        localStorage.setItem('onboarding_step', String(data.tenant.onboarding_step || 0));
+        if (!data.tenant.onboarding_completed) {
+          navigate('/admin/setup');
+          return;
+        }
+      }
       window.dispatchEvent(new Event('localStorageChange'));
       navigate('/admin');
     } catch (err: any) {
@@ -123,6 +131,14 @@ const SignInForm: React.FC = () => {
       localStorage.setItem('admin_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       if (data.tenant_slug) localStorage.setItem('tenant_slug', data.tenant_slug);
+      if (data.tenant) {
+        localStorage.setItem('tenant', JSON.stringify(data.tenant));
+        localStorage.setItem('onboarding_step', String(data.tenant.onboarding_step || 0));
+        if (!data.tenant.onboarding_completed) {
+          navigate('/admin/setup');
+          return;
+        }
+      }
       window.dispatchEvent(new Event('localStorageChange'));
       toast.success('Login realizado com sucesso!');
       navigate('/admin');
