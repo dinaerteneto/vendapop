@@ -49,22 +49,22 @@ class OficinaMecanicaSeeder extends Seeder
         );
 
         $catMotor = Category::updateOrCreate(
-            ['slug' => 'motor', 'tenant_id' => $tenant->id],
+            ['slug' => 'servicos-de-motor', 'tenant_id' => $tenant->id],
             ['name' => 'Serviços de Motor', 'is_active' => true, 'image_url' => 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=500&h=500&fit=crop']
         );
 
         $catFreios = Category::updateOrCreate(
-            ['slug' => 'freios-suspensao', 'tenant_id' => $tenant->id],
+            ['slug' => 'freios-e-suspensao', 'tenant_id' => $tenant->id],
             ['name' => 'Freios e Suspensão', 'is_active' => true, 'image_url' => 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?w=500&h=500&fit=crop']
         );
 
         $catPneus = Category::updateOrCreate(
-            ['slug' => 'pneus-rodas', 'tenant_id' => $tenant->id],
+            ['slug' => 'pneus-e-rodas', 'tenant_id' => $tenant->id],
             ['name' => 'Pneus e Rodas', 'is_active' => true, 'image_url' => 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=500&h=500&fit=crop']
         );
 
         $catEletrica = Category::updateOrCreate(
-            ['slug' => 'eletrica-ar', 'tenant_id' => $tenant->id],
+            ['slug' => 'eletrica-e-ar-condicionado', 'tenant_id' => $tenant->id],
             ['name' => 'Elétrica e Ar Condicionado', 'is_active' => true, 'image_url' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=500&h=500&fit=crop']
         );
 

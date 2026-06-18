@@ -52,7 +52,7 @@ class BoloCaseiroSeeder extends Seeder
 
         // Categorias
         $catBolosAniversario = Category::updateOrCreate(
-            ['slug' => 'bolos-aniversario', 'tenant_id' => $tenant->id],
+            ['slug' => 'bolos-de-aniversario', 'tenant_id' => $tenant->id],
             [
                 'name' => 'Bolos de Aniversário',
                 'is_active' => true,
@@ -61,7 +61,7 @@ class BoloCaseiroSeeder extends Seeder
         );
 
         $catBolosCasamento = Category::updateOrCreate(
-            ['slug' => 'bolos-casamento', 'tenant_id' => $tenant->id],
+            ['slug' => 'bolos-de-casamento', 'tenant_id' => $tenant->id],
             [
                 'name' => 'Bolos de Casamento',
                 'is_active' => true,

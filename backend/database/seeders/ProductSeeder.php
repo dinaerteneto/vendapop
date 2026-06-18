@@ -64,7 +64,7 @@ class ProductSeeder extends Seeder
             );
 
             $p3 = Product::updateOrCreate(
-                ['slug' => 'vestido-festa-paete', 'tenant_id' => $tenant->id],
+                ['slug' => 'vestido-de-festa-paete', 'tenant_id' => $tenant->id],
                 [
                     'category_id' => $catVestidos->id,
                     'name' => 'Vestido de Festa Paetê',
@@ -259,7 +259,7 @@ class ProductSeeder extends Seeder
             $mainImage = $imageUrls[array_rand($imageUrls)];
             
             $name = "$adjective $productName";
-            $slug = 'produto-' . $i . '-' . strtolower(str_replace(' ', '-', $name));
+            $slug = 'produto-' . $i . '-' . Str::slug($name);
             
             $product = Product::withoutEvents(function () use ($tenant, $slug, $category, $name, $i, $adjective, $price) {
                 return Product::firstOrCreate(

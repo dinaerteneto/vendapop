@@ -52,7 +52,7 @@ class EncomendasSeeder extends Seeder
 
         // Categorias
         $catPersonalizados = Category::updateOrCreate(
-            ['slug' => 'personalizados', 'tenant_id' => $tenant->id],
+            ['slug' => 'produtos-personalizados', 'tenant_id' => $tenant->id],
             [
                 'name' => 'Produtos Personalizados',
                 'is_active' => true,
