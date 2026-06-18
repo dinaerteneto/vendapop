@@ -8,6 +8,7 @@ use App\Models\Invite;
 use App\Models\Tenant;
 use App\Models\TenantSocial;
 use App\Models\User;
+use App\Services\DemoDataService;
 use App\Services\InviteService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
@@ -37,6 +38,8 @@ class RegistrationController extends Controller
 
         if (!app()->environment('local')) {
             $rules['recaptcha_token'] = 'required|string';
+        } else {
+            $rules['password'] = 'nullable|string|min:8';
         }
 
         $validated = $request->validate($rules);
@@ -81,6 +84,8 @@ class RegistrationController extends Controller
                     $this->inviteService->consume($invite, $tenant);
                 }
 
+                app(DemoDataService::class)->seedFor($tenant);
+
                 return $tenant;
             });
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -90,8 +95,8 @@ class RegistrationController extends Controller
             ], 422);
         }
 
-        // Generate random password
-        $generatedPassword = Str::random(12);
+        // Generate random password (or use provided one in local env)
+        $generatedPassword = !empty($validated['password']) ? $validated['password'] : Str::random(12);
 
         // Generate email verification token
         $verificationToken = Str::random(64);

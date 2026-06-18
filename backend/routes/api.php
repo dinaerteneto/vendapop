@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\Admin\CustomerController as AdminCustomerController
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\EmailVerificationController;
 use App\Http\Controllers\Api\Admin\GoogleAuthController;
+use App\Http\Controllers\Api\Admin\ImageProxyController;
+use App\Http\Controllers\Api\Admin\OnboardingController;
 use App\Http\Controllers\Api\Admin\OTPAuthController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\PasswordResetController;
@@ -33,6 +35,9 @@ use Illuminate\Support\Facades\Route;
 | API Routes
 |--------------------------------------------------------------------------
 */
+
+// Image proxy serving (CORS-friendly)
+Route::get('/proxy-image/{path}', [ImageProxyController::class, 'show'])->where('path', '.*');
 
 // Rotas Admin
 Route::prefix('admin')->group(function () {
@@ -119,6 +124,10 @@ Route::prefix('admin')->group(function () {
         Route::get('/trackings', [TrackingController::class, 'index']);
         Route::post('/trackings', [TrackingController::class, 'store']);
         Route::delete('/trackings/{id}', [TrackingController::class, 'destroy']);
+
+        // Onboarding
+        Route::put('/onboarding-status', [OnboardingController::class, 'update']);
+        Route::post('/image-proxy', [ImageProxyController::class, 'store']);
     });
 });
 

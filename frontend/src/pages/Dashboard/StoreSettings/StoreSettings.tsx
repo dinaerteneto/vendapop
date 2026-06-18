@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
+import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
-import ImageCropper from '../../../components/ui/ImageCropper';
+import ImageUploader from '../../../components/ui/ImageUploader';
 
 interface Social {
   id?: number;
@@ -76,11 +75,8 @@ const StoreSettings: React.FC = () => {
   const [newSocial, setNewSocial] = useState<{ name: string; username: string; url: string }>({ name: '', username: '', url: '' });
 
   // Logo upload states
-  const [logoMode, setLogoMode] = useState<'url' | 'file'>('url');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [showLogoCropper, setShowLogoCropper] = useState(false);
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
 
   useEffect(() => {
     loadStoreSettings();
@@ -114,7 +110,6 @@ const StoreSettings: React.FC = () => {
 
       if (data.logo_url) {
         setLogoPreview(data.logo_url);
-        setLogoMode('url');
       } else {
         setLogoPreview(null);
         setLogoFile(null);
@@ -200,66 +195,6 @@ const StoreSettings: React.FC = () => {
     setSocials(socials.filter((_, i) => i !== index));
   };
 
-  // Logo upload handlers
-  const onLogoDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (file) {
-      setImageToCrop(URL.createObjectURL(file));
-      setShowLogoCropper(true);
-      setLogoMode('file');
-    }
-  }, []);
-
-  const onLogoCropComplete = (croppedBlob: Blob) => {
-    const croppedFile = new File([croppedBlob], 'logo.jpg', { type: 'image/jpeg' });
-    setLogoFile(croppedFile);
-    setLogoPreview(URL.createObjectURL(croppedFile));
-    setFormData(prev => ({ ...prev, logo_url: '' }));
-    setShowLogoCropper(false);
-    setImageToCrop(null);
-  };
-
-  const onCancelLogoCrop = () => {
-    setShowLogoCropper(false);
-    setImageToCrop(null);
-  };
-
-  const handleRemoveLogo = async () => {
-    if (!confirm('Tem certeza que deseja remover o logo?')) {
-      return;
-    }
-
-    try {
-      setSaving(true);
-      // Send null logo_url to remove the logo
-      const payload = {
-        ...formData,
-        logo_url: null,
-      };
-
-      await api.put('/admin/store', payload);
-      toast.success('Logo removido com sucesso!');
-      
-      // Clear logo preview and file
-      setLogoPreview(null);
-      setLogoFile(null);
-      setFormData(prev => ({ ...prev, logo_url: '' }));
-      
-      await loadStoreSettings();
-    } catch (error: any) {
-      console.error('Erro ao remover logo', error);
-      toast.error(error.response?.data?.message || 'Erro ao remover logo.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const { getRootProps: getLogoRootProps, getInputProps: getLogoInputProps, isDragActive: isLogoDragActive } = useDropzone({
-    onDrop: onLogoDrop,
-    accept: { 'image/*': [] },
-    multiple: false
-  });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -273,7 +208,7 @@ const StoreSettings: React.FC = () => {
       setSaving(true);
 
       // If logo file is present, use FormData
-      if (logoMode === 'file' && logoFile) {
+      if (logoFile) {
         // Debug: log formData state before creating FormData
         console.log('FormData creation - formData state:', formData);
         console.log('FormData creation - name:', formData.name);
@@ -347,7 +282,7 @@ const StoreSettings: React.FC = () => {
         // Use JSON for URL-based updates
         const payload = {
           ...formData,
-          logo_url: logoMode === 'url' ? formData.logo_url : null,
+          logo_url: null,
           socials: socials.map(s => ({
             name: s.name,
             url: s.url,
@@ -378,16 +313,6 @@ const StoreSettings: React.FC = () => {
 
   return (
     <div>
-      {showLogoCropper && imageToCrop && (
-        <ImageCropper
-          imageSrc={imageToCrop}
-          onCropComplete={onLogoCropComplete}
-          onCancel={onCancelLogoCrop}
-          targetWidth={200}
-          targetHeight={200}
-        />
-      )}
-
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Minha Loja</h1>
         <p className="text-gray-600 mt-1">Configure as informações e aparência da sua loja</p>
@@ -538,135 +463,15 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Logo da Loja
-              </label>
-              
-              <div className="mb-4 flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="logoMode"
-                    checked={logoMode === 'url'}
-                    onChange={() => {
-                      setLogoMode('url');
-                      setLogoFile(null);
-                      if (storeSettings?.logo_url) {
-                        setLogoPreview(storeSettings.logo_url);
-                      }
-                    }}
-                    className="text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <span>Usar URL</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="logoMode"
-                    checked={logoMode === 'file'}
-                    onChange={() => {
-                      setLogoMode('file');
-                      setFormData(prev => ({ ...prev, logo_url: '' }));
-                    }}
-                    className="text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <span>Fazer Upload</span>
-                </label>
-              </div>
-
-              {logoMode === 'url' ? (
-                <div>
-                  <input
-                    type="url"
-                    id="logo_url"
-                    name="logo_url"
-                    value={formData.logo_url}
-                    onChange={(e) => {
-                      handleChange(e);
-                      setLogoPreview(e.target.value);
-                    }}
-                    placeholder="https://exemplo.com/logo.png"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                  {logoPreview && (
-                    <div className="mt-2 relative">
-                      <img
-                        src={logoPreview}
-                        alt="Logo preview"
-                        className="h-20 object-contain border border-gray-200 rounded"
-                        onError={() => setLogoPreview(null)}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleRemoveLogo}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                        title="Remover logo"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <div
-                    {...getLogoRootProps()}
-                    className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                      isLogoDragActive
-                        ? 'border-indigo-500 bg-indigo-50'
-                        : 'border-gray-300 hover:border-indigo-400'
-                    }`}
-                  >
-                    <input {...getLogoInputProps()} />
-                    {logoPreview ? (
-                      <div className="space-y-2 relative">
-                        <img
-                          src={logoPreview}
-                          alt="Logo preview"
-                          className="h-32 mx-auto object-contain border border-gray-200 rounded"
-                        />
-                        <div className="flex justify-center gap-2">
-                          <p className="text-sm text-gray-600">Clique ou arraste para substituir</p>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setLogoPreview(null);
-                              setLogoFile(null);
-                              setFormData(prev => ({ ...prev, logo_url: '' }));
-                            }}
-                            className="text-sm text-red-600 hover:text-red-700 underline"
-                          >
-                            Remover
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <p className="text-gray-600">
-                          {isLogoDragActive
-                            ? 'Solte a imagem aqui'
-                            : 'Clique ou arraste uma imagem aqui'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">PNG, JPG até 2MB</p>
-                      </div>
-                    )}
-                  </div>
-                  {logoFile && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLogoFile(null);
-                        setLogoPreview(null);
-                      }}
-                      className="mt-2 text-sm text-red-600 hover:text-red-700"
-                    >
-                      Remover logo
-                    </button>
-                  )}
-                </div>
-              )}
+              <ImageUploader
+                aspectRatio="1:1"
+                currentImageUrl={logoPreview ?? undefined}
+                onImageReady={(file) => {
+                  setLogoFile(file);
+                  setLogoPreview(URL.createObjectURL(file));
+                }}
+                label="Logo da loja"
+              />
             </div>
           </div>
         </div>

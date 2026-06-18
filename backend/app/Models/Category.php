@@ -12,7 +12,7 @@ class Category extends Model
 {
     use HasFactory, BelongsToTenant, HasSlug;
 
-    protected $fillable = ['name', 'slug', 'uuid', 'image_url', 'is_active', 'tenant_id'];
+    protected $fillable = ['name', 'slug', 'uuid', 'image_url', 'is_active', 'is_demo', 'tenant_id'];
 
     public function products()
     {

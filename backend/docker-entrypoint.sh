@@ -47,4 +47,4 @@ php artisan config:clear 2>/dev/null || true
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
 chmod -R 775 storage bootstrap/cache 2>/dev/null || true
 
-exec php artisan serve --host=0.0.0.0 --port=8000
+exec php -S 0.0.0.0:8000 -t public server.php

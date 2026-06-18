@@ -8,10 +8,13 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "axios": "^1.6.7",
+    "canvas-confetti": "^1.9.4",
     "react": "^18.2.0",
     "react-currency-input-field": "^4.0.3",
     "react-dom": "^18.2.0",
@@ -22,6 +25,7 @@
     "react-toastify": "^11.0.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.0",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1",
