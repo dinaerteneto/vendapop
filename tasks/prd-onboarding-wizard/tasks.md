@@ -7,7 +7,7 @@
 |---|------|-------|--------|
 | 01 | [Migrations e atualização dos Models](01_task.md) | A — Backend | concluída |
 | 02 | [DemoDataService + hook no RegistrationController](02_task.md) | A — Backend | concluída |
-| 03 | [OnboardingController + ImageProxyController + login response](03_task.md) | A — Backend | pendente |
+| 03 | [OnboardingController + ImageProxyController + login response](03_task.md) | A — Backend | concluída |
 | 04 | [Componente ImageUploader unificado](04_task.md) | C — ImageUploader | pendente |
 | 05 | [Integrar ImageUploader nos formulários existentes](05_task.md) | C — ImageUploader | pendente |
 | 06 | [Scaffold do Wizard: rota, layout, progress bar e preview](06_task.md) | B — Wizard | pendente |

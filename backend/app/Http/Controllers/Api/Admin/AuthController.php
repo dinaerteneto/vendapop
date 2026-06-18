@@ -38,7 +38,12 @@ class AuthController extends Controller
             return response()->json([
                 'token' => $token,
                 'user' => $user,
-                'tenant_slug' => $user->tenant->slug
+                'tenant_slug' => $user->tenant->slug,
+                'tenant' => [
+                    'slug' => $user->tenant->slug,
+                    'onboarding_completed' => $user->tenant->onboarding_completed,
+                    'onboarding_step' => $user->tenant->onboarding_step,
+                ],
             ]);
         }
 
