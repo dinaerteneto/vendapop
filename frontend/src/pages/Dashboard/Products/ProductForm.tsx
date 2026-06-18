@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
-import { useDropzone } from 'react-dropzone';
 import CurrencyInput from 'react-currency-input-field';
-import ImageCropper from '../../../components/ui/ImageCropper';
+import ImageUploader from '../../../components/ui/ImageUploader';
 
 interface Category {
   id: number;
@@ -60,13 +59,8 @@ const ProductForm: React.FC = () => {
   // Ref para evitar chamadas duplicadas de categorias
   const categoriesLoadedRef = useRef(false);
 
-  const [imageMode, setImageMode] = useState<'url' | 'file'>('url');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  // Image Cropping
-  const [showCropper, setShowCropper] = useState(false);
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
 
   // All product images (main + gallery)
   const [productImages, setProductImages] = useState<ProductImage[]>([]);
@@ -363,7 +357,6 @@ const ProductForm: React.FC = () => {
       
       if (mainImage) {
         setPreviewUrl(mainImage.url);
-        setImageMode('url');
       }
 
     } catch (error: any) {
@@ -699,37 +692,6 @@ const ProductForm: React.FC = () => {
     return result;
   };
 
-  // Dropzone
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      if (file) {
-          // Create object URL for cropper
-          setImageToCrop(URL.createObjectURL(file));
-          setShowCropper(true);
-          setImageMode('file');
-      }
-  }, []);
-
-  const onCropComplete = (croppedBlob: Blob) => {
-      const croppedFile = new File([croppedBlob], 'cropped-image.jpg', { type: 'image/jpeg' });
-      setImageFile(croppedFile);
-      setPreviewUrl(URL.createObjectURL(croppedFile));
-      setFormData(prev => ({ ...prev, main_image_url: '' }));
-      setShowCropper(false);
-      setImageToCrop(null);
-  };
-
-  const onCancelCrop = () => {
-      setShowCropper(false);
-      setImageToCrop(null);
-  };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
-      onDrop,
-      accept: { 'image/*': [] },
-      multiple: false
-  });
-
   // Image Handlers
   const addGalleryImage = () => {
       if (!newGalleryUrl.trim()) return;
@@ -870,7 +832,7 @@ const ProductForm: React.FC = () => {
       : [];
 
     // If file is present, use FormData
-    if (imageMode === 'file' && imageFile) {
+    if (imageFile) {
         const data = new FormData();
         data.append('name', formData.name);
         data.append('price', formData.price.toString().replace(',', '.'));
@@ -930,7 +892,7 @@ const ProductForm: React.FC = () => {
             category_id: formData.category_id ? parseInt(formData.category_id) : null,
             attributes: attributesPayload,
             variations: variationsPayload.length > 0 ? variationsPayload : undefined,
-            main_image_url: imageMode === 'url' ? formData.main_image_url : null,
+            main_image_url: null,
             action_type: formData.action_type,
             affiliate_link: formData.action_type === 'affiliate_link' ? formData.affiliate_link : null,
             whatsapp_message: formData.action_type === 'whatsapp_contact' ? (formData.whatsapp_message || null) : null,
@@ -997,14 +959,6 @@ const ProductForm: React.FC = () => {
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
         {isEditMode ? 'Editar Produto' : 'Novo Produto'}
       </h1>
-
-      {showCropper && imageToCrop && (
-          <ImageCropper 
-              imageSrc={imageToCrop} 
-              onCropComplete={onCropComplete} 
-              onCancel={onCancelCrop} 
-          />
-      )}
 
       <div className="bg-white rounded-lg shadow p-6">
         <form onSubmit={handleSubmit}>
@@ -1290,82 +1244,17 @@ const ProductForm: React.FC = () => {
               )}
             </div>
 
-            {/* Imagem: Toggle File vs URL */}
+            {/* Imagem Principal */}
             <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Imagem Principal</label>
-                
-                <div className="flex items-center gap-4 mb-3">
-                    <label className="inline-flex items-center cursor-pointer">
-                        <input 
-                            type="radio" 
-                            className="form-radio text-blue-600" 
-                            name="imageMode" 
-                            value="url" 
-                            checked={imageMode === 'url'} 
-                            onChange={() => setImageMode('url')}
-                        />
-                        <span className="ml-2">URL da Imagem</span>
-                    </label>
-                    <label className="inline-flex items-center cursor-pointer">
-                        <input 
-                            type="radio" 
-                            className="form-radio text-blue-600" 
-                            name="imageMode" 
-                            value="file" 
-                            checked={imageMode === 'file'} 
-                            onChange={() => setImageMode('file')}
-                        />
-                        <span className="ml-2">Upload de Arquivo</span>
-                    </label>
-                </div>
-
-                {imageMode === 'url' ? (
-                    <input
-                        type="url"
-                        name="main_image_url"
-                        value={formData.main_image_url}
-                        onChange={(e) => {
-                            handleChange(e);
-                            setPreviewUrl(e.target.value);
-                            // If URL is set and not in productImages, add it as main
-                            if (e.target.value && !productImages.find(img => img.url === e.target.value)) {
-                                const newMain: ProductImage = {
-                                    url: e.target.value,
-                                    is_main: true,
-                                    is_external: true,
-                                };
-                                // Remove main flag from others and add new main at the beginning
-                                const updated = productImages.map(img => ({ ...img, is_main: false }));
-                                const sorted = [newMain, ...updated].sort((a, b) => (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0));
-                                setProductImages(sorted);
-                            }
-                        }}
-                        placeholder="https://..."
-                        className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                ) : (
-                    <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}`}>
-                        <input {...getInputProps()} />
-                        {isDragActive ? (
-                            <p className="text-blue-500">Solte a imagem aqui...</p>
-                        ) : (
-                            <p className="text-gray-500">Arraste e solte uma imagem aqui, ou clique para selecionar</p>
-                        )}
-                        <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF até 2MB</p>
-                    </div>
-                )}
-
-                {/* Preview */}
-                {previewUrl && (
-                    <div className="mt-4 h-64 w-full rounded-lg border bg-gray-50 overflow-hidden relative group">
-                        <img src={previewUrl} alt="Preview" className="h-full w-full object-contain" />
-                        {isEditMode && imageMode === 'file' && !imageFile && (
-                            <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-2 text-center">
-                                Imagem Atual / Recortada
-                            </div>
-                        )}
-                    </div>
-                )}
+                <ImageUploader
+                    aspectRatio="2:3"
+                    currentImageUrl={previewUrl ?? undefined}
+                    onImageReady={(file) => {
+                        setImageFile(file);
+                        setPreviewUrl(URL.createObjectURL(file));
+                    }}
+                    label="Foto principal do produto"
+                />
             </div>
 
             {/* Galeria de Imagens */}
