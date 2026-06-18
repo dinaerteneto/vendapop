@@ -2,6 +2,32 @@
 
 ---
 
+## v1.12.1 — Correções nos Seeders
+
+**Data:** 2026-06-18 | **Branch:** `fix/product-seeder-slug-duplicate`
+
+### Correções
+
+**Slug conflicts com Spatie Sluggable (UNIQUE constraint)**
+- Modelos `Product` e `Category` usam `HasSlug` do Spatie, que regenera slugs a partir do `name`. Vários seeders usavam slugs hardcoded que não batiam com o que o sluggable produz, causando `Integrity constraint violation` em re-runs com `updateOrCreate`.
+- Corrigido nos seeders: `OficinaMecanica` (4 categorias), `BoloCaseiro` (2 categorias), `Encomendas` (1 categoria), `Product` (1 produto).
+
+**ProductSeeder: bulk products com `withoutEvents`**
+- Os 50 produtos gerados por `generateBulkProducts` usam slugs randômicos que diferem a cada execução. Substituído `updateOrCreate` por `firstOrCreate` dentro de `Product::withoutEvents()` para evitar que o sluggable interfira. UUID gerado explicitamente.
+
+**PizzariaSeeder: FK `order_items`**
+- A limpeza prévia do tenant deletava `products` antes de `order_items`, violando a FK. Agora `order_items` são deletados primeiro.
+
+### Git Log
+
+```
+052cd8a fix(seeder): delete order_items before products in PizzariaSeeder cleanup
+610675b fix(seeders): align hardcoded slugs with Spatie sluggable output
+98712a0 fix(seeder): prevent sluggable slug conflicts in ProductSeeder
+```
+
+---
+
 ## v1.12.0 — Onboarding Wizard & ImageUploader Unificado
 
 **Data:** 2026-06-18 | **Branch:** `feature/onboarding-wizard`
