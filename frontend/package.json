@@ -11,7 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "axios": "^1.6.7",
+    "canvas-confetti": "^1.9.4",
     "react": "^18.2.0",
     "react-currency-input-field": "^4.0.3",
     "react-dom": "^18.2.0",
