@@ -38,6 +38,8 @@ class RegistrationController extends Controller
 
         if (!app()->environment('local')) {
             $rules['recaptcha_token'] = 'required|string';
+        } else {
+            $rules['password'] = 'nullable|string|min:8';
         }
 
         $validated = $request->validate($rules);
@@ -93,8 +95,8 @@ class RegistrationController extends Controller
             ], 422);
         }
 
-        // Generate random password
-        $generatedPassword = Str::random(12);
+        // Generate random password (or use provided one in local env)
+        $generatedPassword = !empty($validated['password']) ? $validated['password'] : Str::random(12);
 
         // Generate email verification token
         $verificationToken = Str::random(64);

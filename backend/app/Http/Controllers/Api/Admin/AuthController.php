@@ -23,8 +23,8 @@ class AuthController extends Controller
             return response()->json(['message' => 'Credenciais inválidas'], 401);
         }
 
-        // Check if email is verified
-        if (!$user->email_verified_at) {
+        // Check if email is verified (skip in local/testing env)
+        if (!app()->environment('local') && !$user->email_verified_at) {
             return response()->json([
                 'message' => 'E-mail não verificado. Verifique seu e-mail para ativar sua conta.',
                 'email_not_verified' => true,
