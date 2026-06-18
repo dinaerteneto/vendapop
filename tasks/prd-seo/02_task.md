@@ -1,6 +1,6 @@
 # Task 02 — Componente SEOHead + HelmetProvider
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** A  
 **Dependências:** Task 01 (og-image.png precisa existir em public/)
 

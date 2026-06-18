@@ -1,6 +1,6 @@
 # Task 08 — Script de pré-render da landing
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** B  
 **Dependências:** Task 02 (SEOHead criado), Task 03 (Landing com SEOHead)
 

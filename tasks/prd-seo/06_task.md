@@ -1,6 +1,6 @@
 # Task 06 — noIndex nas páginas privadas e legais
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** A  
 **Dependências:** Task 02 (SEOHead criado)
 

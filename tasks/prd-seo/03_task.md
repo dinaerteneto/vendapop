@@ -1,6 +1,6 @@
 # Task 03 — Meta tags na Landing Page
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** A  
 **Dependências:** Task 02 (SEOHead criado)
 

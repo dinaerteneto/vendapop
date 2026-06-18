@@ -1,6 +1,6 @@
 # Task 01 — Arquivos estáticos: robots.txt, favicons e manifest
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** D  
 **Dependências:** Nenhuma
 

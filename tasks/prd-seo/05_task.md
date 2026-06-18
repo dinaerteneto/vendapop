@@ -1,6 +1,6 @@
 # Task 05 — Meta tags na página de Produto
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** A  
 **Dependências:** Task 02 (SEOHead criado)
 

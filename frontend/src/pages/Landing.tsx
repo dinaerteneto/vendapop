@@ -3,6 +3,7 @@ import HeroSection from '../components/landing/HeroSection';
 import CaseSection from '../components/landing/CaseSection';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
 import FeatureGrid from '../components/landing/FeatureGrid';
+import GoogleIndexSection from '../components/landing/GoogleIndexSection';
 import WaitlistSection from '../components/landing/WaitlistSection';
 import FooterSection from '../components/landing/FooterSection';
 
@@ -18,6 +19,7 @@ const Landing = () => {
       <CaseSection />
       <HowItWorksSection />
       <FeatureGrid />
+      <GoogleIndexSection />
       <WaitlistSection />
       <FooterSection />
     </div>

@@ -1,6 +1,6 @@
 # Task 04 — Meta tags na página de Loja
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** A  
 **Dependências:** Task 02 (SEOHead criado)
 

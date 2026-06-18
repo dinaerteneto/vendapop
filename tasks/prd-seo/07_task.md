@@ -1,6 +1,6 @@
 # Task 07 — Sitemap dinâmico no Laravel
 
-**Status:** Pendente  
+**Status:** Concluído  
 **Frente:** C  
 **Dependências:** Nenhuma (independente do frontend)
 
