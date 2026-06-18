@@ -28,10 +28,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [urlInput, setUrlInput] = useState('');
   const [urlLoading, setUrlLoading] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const displayUrl = previewUrl || currentImageUrl;
 
   const dims = DIMENSIONS[aspectRatio];
 
@@ -76,8 +73,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   const handleCropComplete = (blob: Blob) => {
     const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
     onImageReady(file);
     setShowCropper(false);
     setImageToCrop(null);
@@ -101,9 +96,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         }`}
         style={{ minHeight: '8rem' }}
       >
-        {displayUrl ? (
+        {currentImageUrl ? (
           <img
-            src={displayUrl}
+            src={currentImageUrl}
             alt="Preview"
             className="w-full h-48 object-cover rounded"
           />

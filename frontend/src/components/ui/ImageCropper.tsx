@@ -75,12 +75,14 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
             </div>
             <div className="flex gap-3">
                 <button
+                    type="button"
                     onClick={onCancel}
                     className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition"
                 >
                     Cancelar
                 </button>
                 <button
+                    type="button"
                     onClick={showCroppedImage}
                     className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 transition"
                 >
