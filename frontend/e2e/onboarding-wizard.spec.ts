@@ -59,14 +59,14 @@ test.describe('Onboarding Wizard', () => {
     await expect(page.getByTitle('Verde')).toBeVisible();
 
     // Skip and Next buttons
-    await expect(page.getByText('Pular este passo')).toBeVisible();
+    await expect(page.getByText('Pular')).toBeVisible();
     await expect(page.getByText('Próximo →')).toBeVisible();
   });
 
   test('skip advances to next step', async ({ page }) => {
     await page.goto('/admin/setup');
 
-    await page.click('text=Pular este passo');
+    await page.click('text=Pular');
     await expect(page.getByTestId('step-vitrine')).toBeVisible();
     await expect(page.getByText('Personalize sua vitrine')).toBeVisible();
   });
@@ -76,7 +76,7 @@ test.describe('Onboarding Wizard', () => {
 
     // Skip through steps 1-3
     for (let i = 0; i < 3; i++) {
-      await page.click('text=Pular este passo');
+      await page.click('text=Pular');
       await page.waitForTimeout(200);
     }
 

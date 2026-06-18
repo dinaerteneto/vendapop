@@ -12,10 +12,11 @@ interface DemoProduct {
 
 interface StepVitrineProps {
   onNext: () => void;
+  onBack: () => void;
   onSkip: () => void;
 }
 
-const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onSkip }) => {
+const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onBack, onSkip }) => {
   const [products, setProducts] = useState<DemoProduct[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
@@ -26,7 +27,11 @@ const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onSkip }) => {
     api.get('/admin/products', { params: { per_page: 50 } })
       .then(res => {
         const data = res.data.data || res.data;
-        const demo = (Array.isArray(data) ? data : []).filter((p: any) => p.is_demo).slice(0, 4);
+        const all = Array.isArray(data) ? data : [];
+        let demo = all.filter((p: any) => p.is_demo).slice(0, 4);
+        if (demo.length === 0) {
+          demo = all.filter((p: any) => p.is_active !== false).slice(0, 4);
+        }
         setProducts(demo);
       })
       .catch(console.error)
@@ -169,18 +174,23 @@ const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onSkip }) => {
         ))}
       </div>
 
-      <div className="flex items-center justify-between">
-        <button type="button" onClick={onSkip} className="text-sm text-gray-500 hover:text-gray-700">
-          Pular este passo
+      <div className="flex items-center justify-between mt-8">
+        <button type="button" onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700">
+          ← Voltar
         </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={saving}
-          className="px-6 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 transition"
-        >
-          Próximo →
-        </button>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={onSkip} className="text-sm text-gray-500 hover:text-gray-700">
+            Pular
+          </button>
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={saving}
+            className="px-6 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 transition"
+          >
+            Próximo →
+          </button>
+        </div>
       </div>
     </div>
   );

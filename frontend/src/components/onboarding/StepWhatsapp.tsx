@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 
 interface StepWhatsappProps {
   onNext: () => void;
+  onBack: () => void;
 }
 
-const StepWhatsapp: React.FC<StepWhatsappProps> = ({ onNext }) => {
+const StepWhatsapp: React.FC<StepWhatsappProps> = ({ onNext, onBack }) => {
   const [whatsapp, setWhatsapp] = useState('');
   const [message, setMessage] = useState('Olá! Vi seu produto na loja e gostaria de mais informações.');
   const [saving, setSaving] = useState(false);
+  const [storeName, setStoreName] = useState('');
+
+  useEffect(() => {
+    api.get('/admin/store').then(res => {
+      const d = res.data;
+      if (d?.whatsapp_number) setWhatsapp(formatPhoneInitial(d.whatsapp_number));
+      if (d?.whatsapp_message) setMessage(d.whatsapp_message);
+      if (d?.name) setStoreName(d.name);
+    }).catch(() => {});
+  }, []);
+
+  const formatPhoneInitial = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+  };
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, '');
@@ -22,6 +41,7 @@ const StepWhatsapp: React.FC<StepWhatsappProps> = ({ onNext }) => {
     setSaving(true);
     try {
       const formData = new FormData();
+      formData.append('name', storeName);
       formData.append('whatsapp_number', whatsapp.replace(/\D/g, ''));
       if (message) formData.append('whatsapp_message', message);
       formData.append('_method', 'PUT');
@@ -83,8 +103,8 @@ const StepWhatsapp: React.FC<StepWhatsappProps> = ({ onNext }) => {
       </div>
 
       <div className="flex items-center justify-between mt-8">
-        <button type="button" onClick={onNext} className="text-sm text-gray-500 hover:text-gray-700">
-          Pular este passo
+        <button type="button" onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700">
+          ← Voltar
         </button>
         <button
           type="button"

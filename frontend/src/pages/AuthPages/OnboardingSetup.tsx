@@ -22,6 +22,12 @@ const OnboardingSetup: React.FC = () => {
     try { localStorage.setItem('onboarding_step', String(newStep)); } catch {}
   };
 
+  const handleBack = () => {
+    const newStep = Math.max(step - 1, 1) as 1 | 2 | 3 | 4;
+    setStep(newStep);
+    setPreviewRefreshKey(k => k + 1);
+  };
+
   const handleSkip = () => {
     const newStep = Math.min(step + 1, 4) as 1 | 2 | 3 | 4;
     setStep(newStep);
@@ -34,9 +40,9 @@ const OnboardingSetup: React.FC = () => {
       <div className="flex flex-1 overflow-hidden">
         <div className="w-2/5 p-8 border-r overflow-y-auto">
           {step === 1 && <StepIdentidade onNext={handleNext} />}
-          {step === 2 && <StepVitrine onNext={handleNext} onSkip={handleSkip} />}
-          {step === 3 && <StepWhatsapp onNext={handleNext} />}
-          {step === 4 && <StepCompartilhar />}
+          {step === 2 && <StepVitrine onNext={handleNext} onBack={handleBack} onSkip={handleSkip} />}
+          {step === 3 && <StepWhatsapp onNext={handleNext} onBack={handleBack} />}
+          {step === 4 && <StepCompartilhar onBack={handleBack} />}
         </div>
         <div className="w-3/5 bg-gray-50 flex items-center justify-center p-8">
           <ShopPreview tenantSlug={tenantSlug} refreshKey={previewRefreshKey} />

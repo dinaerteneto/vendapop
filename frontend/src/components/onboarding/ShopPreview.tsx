@@ -6,7 +6,8 @@ interface ShopPreviewProps {
 }
 
 const ShopPreview: React.FC<ShopPreviewProps> = ({ tenantSlug, refreshKey }) => {
-  const shopUrl = `${import.meta.env.VITE_APP_URL || 'http://localhost:8000'}/${tenantSlug}?t=${refreshKey}`;
+  const frontendUrl = window.location.origin;
+  const shopUrl = `${frontendUrl}/${tenantSlug}?t=${refreshKey}`;
 
   return (
     <div className="flex flex-col items-center gap-3">

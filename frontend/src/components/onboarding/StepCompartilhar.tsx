@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import confetti from 'canvas-confetti';
 
-const StepCompartilhar: React.FC = () => {
+interface StepCompartilharProps {
+  onBack: () => void;
+}
+
+const StepCompartilhar: React.FC<StepCompartilharProps> = ({ onBack }) => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [completing, setCompleting] = useState(false);
@@ -32,6 +36,10 @@ const StepCompartilhar: React.FC = () => {
 
   return (
     <div data-testid="step-compartilhar" className="text-center">
+      <button type="button" onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4">
+        ← Voltar
+      </button>
+
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Sua loja está pronta!</h2>
       <p className="text-sm text-gray-500 mb-6">Compartilhe com suas clientes e comece a vender.</p>
 

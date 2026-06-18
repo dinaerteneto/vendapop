@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import ImageUploader from '../ui/ImageUploader';
 
@@ -19,25 +19,32 @@ const PRESET_COLORS = [
 
 const StepIdentidade: React.FC<StepIdentidadeProps> = ({ onNext }) => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [primaryColor, setPrimaryColor] = useState('#7c3aed');
   const [saving, setSaving] = useState(false);
+  const [storeName, setStoreName] = useState('');
+  const [storeWhatsapp, setStoreWhatsapp] = useState('');
+
+  useEffect(() => {
+    api.get('/admin/store').then(res => {
+      const d = res.data;
+      if (d?.primary_color) setPrimaryColor(d.primary_color);
+      if (d?.logo_url) setLogoPreview(d.logo_url);
+      if (d?.name) setStoreName(d.name);
+      if (d?.whatsapp_number) setStoreWhatsapp(d.whatsapp_number);
+    }).catch(() => {});
+  }, []);
 
   const handleNext = async () => {
     setSaving(true);
     try {
-      const tenantStr = localStorage.getItem('user');
-      const tenant = tenantStr ? JSON.parse(tenantStr)?.tenant : null;
-      const slug = localStorage.getItem('tenant_slug') || '';
-
-      const whatsapp = tenant?.whatsapp_number || localStorage.getItem('tenant_slug') || '';
-
-      const formData = new FormData();
-      formData.append('name', tenant?.name || slug);
-      formData.append('whatsapp_number', whatsapp);
-      formData.append('primary_color', primaryColor);
       if (logoFile) {
+        const formData = new FormData();
+        formData.append('name', storeName);
+        formData.append('whatsapp_number', storeWhatsapp);
+        formData.append('primary_color', primaryColor);
         formData.append('logo', logoFile);
-        formData.append('_method', 'PATCH');
+        formData.append('_method', 'PUT');
         await api.post('/admin/store', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       } else {
         await api.put('/admin/store', { primary_color: primaryColor });
@@ -58,7 +65,11 @@ const StepIdentidade: React.FC<StepIdentidadeProps> = ({ onNext }) => {
 
       <ImageUploader
         aspectRatio="1:1"
-        onImageReady={setLogoFile}
+        currentImageUrl={logoPreview ?? undefined}
+        onImageReady={(file) => {
+          setLogoFile(file);
+          setLogoPreview(URL.createObjectURL(file));
+        }}
         label="Logo da loja"
       />
 
