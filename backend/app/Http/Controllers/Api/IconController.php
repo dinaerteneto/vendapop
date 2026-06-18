@@ -12,7 +12,7 @@ class IconController extends Controller
         $tenant = Tenant::where('slug', $storeSlug)->firstOrFail();
 
         $size = (int) request()->query('size', 512);
-        $size = in_array($size, [192, 512]) ? $size : 512;
+        $size = in_array($size, [16, 32, 64, 180, 192, 512]) ? $size : 512;
 
         $primaryColor = $tenant->primary_color ?: '#7c3aed';
 
@@ -43,7 +43,7 @@ class IconController extends Controller
             $initials = mb_strtoupper(mb_substr($name, 0, 2));
         }
 
-        $fontPath = '/usr/share/fonts/ttf-dejavu/DejaVuSans-Bold.ttf';
+        $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
         $white = imagecolorallocate($img, 255, 255, 255);
 
         $fontSize = (int) ($size * 0.4);
