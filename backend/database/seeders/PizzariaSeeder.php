@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductVariation;
@@ -29,6 +30,7 @@ class PizzariaSeeder extends Seeder
         foreach (['primo-giuseppe', 'forno-a-lenha', 'boa-massa'] as $slug) {
             $existing = Tenant::where('slug', $slug)->first();
             if ($existing) {
+                OrderItem::whereIn('product_id', Product::where('tenant_id', $existing->id)->pluck('id'))->delete();
                 ProductVariation::whereIn('product_id', Product::where('tenant_id', $existing->id)->pluck('id'))->delete();
                 Product::where('tenant_id', $existing->id)->delete();
                 RotatingBanner::where('tenant_id', $existing->id)->delete();
