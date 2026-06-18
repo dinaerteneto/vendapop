@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import { useDropzone } from 'react-dropzone';
 
@@ -122,6 +123,7 @@ const CategoryForm: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto mb-10">
+      <SEOHead title={isEditMode ? 'Editar Categoria — VendaPop' : 'Nova Categoria — VendaPop'} noIndex />
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
         {isEditMode ? 'Editar Categoria' : 'Nova Categoria'}
       </h1>

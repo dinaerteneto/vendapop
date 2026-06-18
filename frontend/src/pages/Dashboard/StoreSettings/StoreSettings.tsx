@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import ImageUploader from '../../../components/ui/ImageUploader';
 
@@ -313,6 +314,7 @@ const StoreSettings: React.FC = () => {
 
   return (
     <div>
+      <SEOHead title="Minha Loja — VendaPop" noIndex />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Minha Loja</h1>
         <p className="text-gray-600 mt-1">Configure as informações e aparência da sua loja</p>

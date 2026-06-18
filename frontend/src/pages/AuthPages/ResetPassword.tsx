@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '../../services/api';
+import { SEOHead } from '../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 
 const ResetPassword: React.FC = () => {
@@ -64,6 +65,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <SEOHead title="Redefinir senha — VendaPop" noIndex />
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">Redefinir Senha</h2>
         <form onSubmit={handleSubmit}>

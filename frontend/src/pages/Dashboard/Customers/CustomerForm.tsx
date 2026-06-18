@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 
 interface Customer {
@@ -91,6 +92,7 @@ const CustomerForm: React.FC = () => {
 
   return (
     <div>
+      <SEOHead title={id ? 'Editar Cliente — VendaPop' : 'Novo Cliente — VendaPop'} noIndex />
       <div className="mb-6">
         <button
           onClick={() => navigate('/admin/customers')}

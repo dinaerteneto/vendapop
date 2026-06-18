@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { SEOHead } from '../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 
 const GoogleCallback: React.FC = () => {
@@ -104,6 +105,7 @@ const GoogleCallback: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <SEOHead title="VendaPop" noIndex />
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg text-center">
         <h2 className="mb-4 text-xl font-bold text-red-600">Erro</h2>
         <p className="mb-6 text-gray-600">{error}</p>

@@ -1,4 +1,5 @@
 import LegalPage from '../../components/legal/LegalPage';
+import { SEOHead } from '../../components/common/SEOHead';
 import type { LegalSection } from '../../components/legal/LegalPage';
 
 const sections: LegalSection[] = [
@@ -186,10 +187,13 @@ const sections: LegalSection[] = [
 
 export default function CookiePolicyPage() {
   return (
-    <LegalPage
+    <>
+      <SEOHead title="Política de Cookies — VendaPop" path="/cookies" />
+      <LegalPage
       title="Política de Cookies"
       lastUpdated="12 de junho de 2026"
       sections={sections}
     />
+    </>
   );
 }

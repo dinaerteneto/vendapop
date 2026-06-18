@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 import Pagination from '../../../components/ui/Pagination';
@@ -114,6 +115,7 @@ const ProductList: React.FC = () => {
 
   return (
     <div>
+      <SEOHead title="Produtos — VendaPop" noIndex />
       <ConfirmationModal 
         isOpen={!!deleteUuid}
         title="Excluir Produto"

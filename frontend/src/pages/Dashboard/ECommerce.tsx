@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { SEOHead } from '../../components/common/SEOHead';
 import InvitePanel from '../../components/admin/InvitePanel';
 import OnboardingBanner from '../../components/onboarding/OnboardingBanner';
 
@@ -86,6 +87,7 @@ const ECommerce: React.FC = () => {
 
   return (
     <div>
+      <SEOHead title="Dashboard — VendaPop" noIndex />
       <h2 className="mb-6 text-2xl font-bold text-gray-900">Dashboard</h2>
 
       {showBanner && !bannerDismissed && (

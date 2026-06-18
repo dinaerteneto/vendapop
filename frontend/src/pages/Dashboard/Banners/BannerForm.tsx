@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import ImageUploader from '../../../components/ui/ImageUploader';
 
@@ -117,6 +118,7 @@ const BannerForm: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <SEOHead title={isEditMode ? 'Editar Banner — VendaPop' : 'Novo Banner — VendaPop'} noIndex />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">
           {isEditMode ? 'Editar Banner' : 'Novo Banner'}

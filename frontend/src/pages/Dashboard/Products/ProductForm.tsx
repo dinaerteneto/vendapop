@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import CurrencyInput from 'react-currency-input-field';
 import ImageUploader from '../../../components/ui/ImageUploader';
@@ -956,6 +957,7 @@ const ProductForm: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto mb-10">
+      <SEOHead title={isEditMode ? 'Editar Produto — VendaPop' : 'Novo Produto — VendaPop'} noIndex />
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
         {isEditMode ? 'Editar Produto' : 'Novo Produto'}
       </h1>

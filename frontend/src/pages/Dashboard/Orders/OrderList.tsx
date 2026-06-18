@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import Pagination from '../../../components/ui/Pagination';
 import SortableHeader from '../../../components/ui/SortableHeader';
 
@@ -136,6 +137,7 @@ const OrderList: React.FC = () => {
 
   return (
     <div>
+      <SEOHead title="Pedidos — VendaPop" noIndex />
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>
