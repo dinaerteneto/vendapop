@@ -59,7 +59,7 @@ From the commit log, generate release notes grouped by type:
 - `fix` commits → bump PATCH
 - `feat!` or `BREAKING CHANGE` → bump MAJOR
 
-Write release notes to `RELEASE_NOTES_v{version}.md` in the project root.
+Write release notes to `RELEASE_NOTES.md` (single file, newest version first).
 
 ### 3. Tagging
 
@@ -96,7 +96,7 @@ git commit -m "feat: onboarding wizard + image uploader (v{version})
 ### 5. Post-Merge Checklist
 
 - [ ] Commits follow conventional format
-- [ ] Release notes written to `RELEASE_NOTES_v{version}.md`
+- [ ] Release notes appended to `RELEASE_NOTES.md` (newest first)
 - [ ] Version tag created and pushed
 - [ ] Merged to main/master
 - [ ] Feature branch deleted (optional)
@@ -151,35 +151,30 @@ cd /var/www/vendapop && ./deploy/deploy.sh
 
 ## Release Notes Template
 
-Save as `RELEASE_NOTES_v{MAJOR}.{MINOR}.{PATCH}.md`:
+Append to `RELEASE_NOTES.md` (newest version on top):
 
 ```markdown
-# Release Notes — v{version}
+## v{version} — {title}
 
-**Date:** {YYYY-MM-DD}
-**Branch:** feature/{name} → main
+**Data:** {YYYY-MM-DD} | **Branch:** `feature/{name}`
 
-## New Features
+### Novidades
 
-- **{Feature name}** — {brief description}
-  - Sub-item details
+- **{Feature}** — {description}
+  - Sub-item
 
-## Bug Fixes
+### Database
 
-- **{Fix name}** — {brief description}
+| Migration | Tabela | Campos |
+|-----------|--------|--------|
 
-## Technical Changes
+### Dependências
 
-- {chore/refactor details}
+- {package} — {purpose}
 
-## Migration Notes
+### Git Log
 
-- {Any DB migrations, config changes, dependency updates}
-
-## Deploy Checklist
-
-- [ ] `php artisan migrate`
-- [ ] `npm run build`
-- [ ] Cache cleared
-- [ ] Smoke test: {key flows to verify}
+```
+{commits}
+```
 ```
