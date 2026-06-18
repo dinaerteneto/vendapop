@@ -175,6 +175,7 @@ class ProductResource extends JsonResource
             })->toArray() : [],
             'is_hot' => $this->is_hot ?? false,
             'is_active' => $this->is_active,
+            'is_demo' => $this->is_demo ?? false,
             'stock_management_enabled' => $this->stock_management_enabled ?? false,
             'action_type' => $this->action_type,
             'affiliate_link' => $this->affiliate_link,

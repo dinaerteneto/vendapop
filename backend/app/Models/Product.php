@@ -27,6 +27,7 @@ class Product extends Model
         // 'images', // Removed
         'is_active',
         'is_hot',
+        'is_demo',
         'stock_management_enabled',
         'action_type',
         'affiliate_link',
@@ -42,6 +43,7 @@ class Product extends Model
         'is_active' => 'boolean',
         'is_hot' => 'boolean',
         'stock_management_enabled' => 'boolean',
+        'is_demo' => 'boolean',
         'price' => 'decimal:2',
         'promotional_price' => 'decimal:2',
     ];

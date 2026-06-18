@@ -28,10 +28,14 @@ class Tenant extends Model
         'email_contact',
         'business_sector',
         'plan_expiry_banner_dismissed_at',
+        'onboarding_completed',
+        'onboarding_step',
     ];
 
     protected $casts = [
         'logo_is_external' => 'boolean',
+        'onboarding_completed' => 'boolean',
+        'onboarding_step' => 'integer',
     ];
 
     public function users()
