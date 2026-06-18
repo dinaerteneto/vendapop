@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class ImageProxyController extends Controller
 {
+    public function show($path)
+    {
+        $fullPath = 'proxy/' . $path;
+        if (!Storage::disk('public')->exists($fullPath)) {
+            abort(404);
+        }
+        return response()->file(Storage::disk('public')->path($fullPath));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -43,7 +52,7 @@ class ImageProxyController extends Controller
         Storage::disk('public')->put($filename, $response->body());
 
         return response()->json([
-            'url'  => url(Storage::url($filename)),
+            'url'  => url('/api/proxy-image/' . basename($filename)),
             'path' => $filename,
         ]);
     }

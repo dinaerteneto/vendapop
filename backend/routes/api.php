@@ -36,6 +36,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+// Image proxy serving (CORS-friendly)
+Route::get('/proxy-image/{path}', [ImageProxyController::class, 'show'])->where('path', '.*');
+
 // Rotas Admin
 Route::prefix('admin')->group(function () {
     Route::post('/register', [RegistrationController::class, 'store']); // Nova rota de registro
