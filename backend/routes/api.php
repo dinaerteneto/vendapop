@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Admin\TrackingController;
 use App\Http\Controllers\Api\Admin\WaitlistAdminController;
 use App\Http\Controllers\Api\Admin\WaitlistController;
 use App\Http\Controllers\Api\CustomerPushSubscriptionController;
+use App\Http\Controllers\Api\IconController;
 use App\Http\Controllers\Api\ManifestController;
 use App\Http\Controllers\Api\StoreController;
 use Illuminate\Http\Request;
@@ -133,6 +134,7 @@ Route::prefix('admin')->group(function () {
 
 // Rotas Públicas da Loja (Tenant)
 Route::middleware(['tenant'])->prefix('{storeSlug}')->group(function () {
+    Route::get('/icon.png', [IconController::class, 'show']);
     Route::get('/manifest.json', [ManifestController::class, 'show']); // Dynamic PWA Manifest
     Route::get('/', [StoreController::class, 'storeInfo']); // Nova rota para info da loja
     Route::get('/banners', [StoreController::class, 'banners']); // Banners rotativos ativos

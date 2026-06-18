@@ -4,8 +4,13 @@ RUN apk add --no-cache \
     libzip-dev \
     oniguruma-dev \
     libxml2-dev \
+    freetype-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    ttf-dejavu \
     $PHPIZE_DEPS \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath zip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath zip gd \
     && apk del $PHPIZE_DEPS
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

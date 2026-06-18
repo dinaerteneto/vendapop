@@ -16,16 +16,16 @@ class ManifestController extends Controller
         $primaryColor = $tenant->primary_color ?? '#7c3aed';
         $backgroundColor = $tenant->secondary_color ?? '#ffffff';
 
-        // Use tenant logo or generate a default
-        $iconUrl = $tenant->logo_url;
-
-        // Se não tiver logo, criar um placeholder com as iniciais
-        if (!$iconUrl) {
-            $initials = strtoupper(substr($tenant->name, 0, 2));
-            $iconUrl = "https://ui-avatars.com/api/?name={$initials}&size=512&background=" . str_replace('#', '', $primaryColor) . "&color=ffffff&bold=true";
-        }
-
         $baseUrl = config('services.frontend_url', 'http://localhost:5173');
+
+        // Se tiver logo da loja, usa ela; senão gera ícone local com iniciais
+        if ($tenant->logo_url) {
+            $icon192 = $tenant->logo_url;
+            $icon512 = $tenant->logo_url;
+        } else {
+            $icon192 = "{$baseUrl}/api/{$storeSlug}/icon.png?size=192";
+            $icon512 = "{$baseUrl}/api/{$storeSlug}/icon.png?size=512";
+        }
 
         $manifest = [
             'name' => $tenant->name,
@@ -39,13 +39,13 @@ class ManifestController extends Controller
             'orientation' => 'portrait',
             'icons' => [
                 [
-                    'src' => $iconUrl,
+                    'src' => $icon192,
                     'sizes' => '192x192',
                     'type' => 'image/png',
                     'purpose' => 'any'
                 ],
                 [
-                    'src' => $iconUrl,
+                    'src' => $icon512,
                     'sizes' => '512x512',
                     'type' => 'image/png',
                     'purpose' => 'any maskable'
