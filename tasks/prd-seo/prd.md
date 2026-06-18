@@ -178,6 +178,19 @@ Garantir que qualquer link do VendaPop — da landing, de uma loja ou de um prod
 
 ---
 
+## 9. Fase 2 — Pós-implementação
+
+### 9.1 Seção "Sua loja aparece no Google" na Landing
+
+Após o SEO estar implementado e as primeiras lojas indexadas, adicionar uma seção na landing page que use isso como argumento de venda:
+
+- **Proposta:** exibir um mock visual de resultado de busca do Google com o nome, foto e preço de um produto real de uma loja VendaPop
+- **Diferencial:** a maioria dos concorrentes de catálogo pelo WhatsApp não oferece indexação orgânica no Google — isso é verificável e concreto
+- **Variação avançada:** widget dinâmico mostrando lojas ativas que já aparecem no Google (requer evidência real antes de publicar)
+- **Pré-requisito:** pelo menos uma loja indexada e aparecendo em resultados de busca reais
+
+---
+
 ## 8. Métricas de Sucesso
 
 | Métrica | Baseline | Meta |
