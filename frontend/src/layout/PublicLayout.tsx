@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useParams, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import api from '../services/api';
 import Footer from '../components/common/Footer';
 import { CartProvider } from '../context/CartContext';
@@ -46,44 +47,12 @@ const PublicLayout: React.FC = () => {
                console.log('PublicLayout: Logo URL from API:', response.data?.logo_url);
                setStoreInfo(response.data);
                
-                // Dynamically update favicon links for tenant-specific icons
-                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-                const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
-                const logoUrl = response.data?.logo_url;
-                const storeIcon = logoUrl || fallbackIcon;
-
-                const faviconSvg = document.getElementById('favicon-svg') as HTMLLinkElement;
-                if (faviconSvg) {
-                    faviconSvg.href = storeIcon;
-                }
-
-                const faviconIco = document.getElementById('favicon-ico') as HTMLLinkElement;
-                if (faviconIco) {
-                    faviconIco.href = storeIcon;
-                }
-
-                const appleTouch = document.getElementById('apple-touch-icon') as HTMLLinkElement;
-                if (appleTouch) {
-                    appleTouch.href = logoUrl ? storeIcon : `${fallbackIcon}?size=180`;
-                }
-
                 // Dynamically update manifest link for tenant-specific PWA
+                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
                 const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
                 if (manifestLink) {
                     manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
                 }
-               
-               // Update theme-color meta tag
-               const themeColorMeta = document.querySelector("meta[name='theme-color']");
-               if (themeColorMeta && response.data?.primary_color) {
-                   themeColorMeta.setAttribute('content', response.data.primary_color);
-               }
-               
-               // Update apple-mobile-web-app-title
-               const appleTitleMeta = document.querySelector("meta[name='apple-mobile-web-app-title']");
-               if (appleTitleMeta && response.data?.name) {
-                   appleTitleMeta.setAttribute('content', response.data.name);
-               }
                
                // Service Worker será registrado automaticamente pelo vite-plugin-pwa
                // Mas podemos verificar se está ativo
@@ -128,16 +97,28 @@ const PublicLayout: React.FC = () => {
   const primaryColor = storeInfo?.primary_color || '#7c3aed';
   const secondaryColor = storeInfo?.secondary_color || '#f3e8ff';
 
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+  const storeIcon = storeInfo?.logo_url || `${apiBaseUrl}/${storeSlug}/icon.png`;
+  const appleTouchIcon = storeInfo?.logo_url || `${apiBaseUrl}/${storeSlug}/icon.png?size=180`;
+
   return (
     <CartProvider storeSlug={storeSlug}>
-        <div 
+        {storeInfo && (
+          <Helmet>
+            <link rel="icon" type="image/png" href={storeIcon} />
+            <link rel="apple-touch-icon" href={appleTouchIcon} />
+            <meta name="theme-color" content={primaryColor} />
+            <meta name="apple-mobile-web-app-title" content={storeInfo.name} />
+          </Helmet>
+        )}
+        <div
             className="min-h-screen bg-gray-50 flex flex-col"
-            style={{ 
-                '--theme-primary': primaryColor, 
-                '--theme-secondary': secondaryColor 
+            style={{
+                '--theme-primary': primaryColor,
+                '--theme-secondary': secondaryColor
             } as React.CSSProperties}
         >
-        <Header 
+        <Header
           storeName={storeInfo?.name} 
           storeSlug={storeSlug} 
           primaryColor={primaryColor}

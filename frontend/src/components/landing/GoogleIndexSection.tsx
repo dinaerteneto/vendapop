@@ -1,9 +1,10 @@
+import React from 'react'
+
 const EXEMPLO_LOJA = {
   nome: 'Casa Lar Imóveis',
   slug: 'casa-lar-imoveis',
   produto: 'Apartamento 3 Quartos Vista para o Mar',
   descricao: 'Confira nosso catálogo completo. Apartamento espaçoso com 3 quartos, 2 banheiros, varanda ampla e vista para o mar...',
-  preco: 'R$ 450.000',
   imagem: '/images/stores/casa-lar-imoveis.png',
 }
 

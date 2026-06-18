@@ -36,7 +36,7 @@ async function prerender() {
   const port = 4173
 
   const server = createServer((req, res) => staticHandler(req, res, { public: distDir }))
-  await new Promise<void>((resolve) => server.listen(port, resolve))
+  await new Promise<void>((done) => server.listen(port, done))
 
   try {
     const browser = await chromium.launch({
@@ -44,7 +44,7 @@ async function prerender() {
     })
     const page = await browser.newPage()
 
-    await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle', timeout: 30_000 })
+    await page.goto(`http://localhost:${port}/`, { waitUntil: 'load', timeout: 30_000 })
     await page.waitForSelector('meta[property="og:title"]', { timeout: 10_000 })
 
     const html = await page.evaluate(() => document.documentElement.outerHTML)
@@ -53,7 +53,7 @@ async function prerender() {
     writeFileSync(resolve(distDir, 'index.html'), `<!DOCTYPE html>\n${html}`, 'utf-8')
     console.log('✓ Landing pré-renderizada com sucesso em dist/index.html')
   } finally {
-    await new Promise<void>((resolve) => server.close(() => resolve()))
+    await new Promise<void>((done) => server.close(() => done()))
   }
 }
 

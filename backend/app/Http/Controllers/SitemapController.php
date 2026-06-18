@@ -38,7 +38,7 @@ class SitemapController extends Controller
         $urls = [];
 
         foreach ($staticRoutes as $route) {
-            $urls[] = $this->urlEntry("{$baseUrl}{$route['path']}", now()->toAtomString(), $route['changefreq']);
+            $urls[] = $this->urlEntry("{$baseUrl}{$route['path']}", '2026-06-18T00:00:00+00:00', $route['changefreq']);
         }
 
         foreach ($tenants as $tenant) {

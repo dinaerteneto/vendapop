@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 
-const APP_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') ?? 'https://vendapop.com.br'
+const APP_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/api$/, '') ?? 'https://vendapop.com.br'
 
 interface SEOHeadProps {
   title: string
