@@ -46,12 +46,32 @@ const PublicLayout: React.FC = () => {
                console.log('PublicLayout: Logo URL from API:', response.data?.logo_url);
                setStoreInfo(response.data);
                
-               // Dynamically update manifest link for tenant-specific PWA
-               const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
-               if (manifestLink) {
-                   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-                   manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
-               }
+                // Dynamically update favicon links for tenant-specific icons
+                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+                const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
+                const logoUrl = response.data?.logo_url;
+                const storeIcon = logoUrl || fallbackIcon;
+
+                const faviconSvg = document.getElementById('favicon-svg') as HTMLLinkElement;
+                if (faviconSvg) {
+                    faviconSvg.href = storeIcon;
+                }
+
+                const faviconIco = document.getElementById('favicon-ico') as HTMLLinkElement;
+                if (faviconIco) {
+                    faviconIco.href = storeIcon;
+                }
+
+                const appleTouch = document.getElementById('apple-touch-icon') as HTMLLinkElement;
+                if (appleTouch) {
+                    appleTouch.href = logoUrl ? storeIcon : `${fallbackIcon}?size=180`;
+                }
+
+                // Dynamically update manifest link for tenant-specific PWA
+                const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
+                if (manifestLink) {
+                    manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
+                }
                
                // Update theme-color meta tag
                const themeColorMeta = document.querySelector("meta[name='theme-color']");
