@@ -8,6 +8,7 @@ use App\Models\Invite;
 use App\Models\Tenant;
 use App\Models\TenantSocial;
 use App\Models\User;
+use App\Services\DemoDataService;
 use App\Services\InviteService;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
@@ -80,6 +81,8 @@ class RegistrationController extends Controller
                     $this->subscriptionService->createFromInvite($tenant, $invite);
                     $this->inviteService->consume($invite, $tenant);
                 }
+
+                app(DemoDataService::class)->seedFor($tenant);
 
                 return $tenant;
             });

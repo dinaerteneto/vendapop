@@ -6,7 +6,7 @@
 | # | Task | Grupo | Status |
 |---|------|-------|--------|
 | 01 | [Migrations e atualização dos Models](01_task.md) | A — Backend | concluída |
-| 02 | [DemoDataService + hook no RegistrationController](02_task.md) | A — Backend | pendente |
+| 02 | [DemoDataService + hook no RegistrationController](02_task.md) | A — Backend | concluída |
 | 03 | [OnboardingController + ImageProxyController + login response](03_task.md) | A — Backend | pendente |
 | 04 | [Componente ImageUploader unificado](04_task.md) | C — ImageUploader | pendente |
 | 05 | [Integrar ImageUploader nos formulários existentes](05_task.md) | C — ImageUploader | pendente |
