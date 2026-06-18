@@ -2,6 +2,33 @@
 
 ---
 
+## v1.12.2 — Ícones PWA offline com iniciais
+
+**Data:** 2026-06-18 | **Branch:** `feature/offline-pwa-icons`
+
+### Novidades
+
+**Geração offline de ícones PWA com iniciais da loja**
+- Novo endpoint `GET /api/{storeSlug}/icon.png?size=192|512` gera PNG em runtime com GD/FreeType
+- Círculo preenchido com a cor primária da loja + iniciais centralizadas em branco (DejaVu Sans Bold)
+- Substitui dependência externa `ui-avatars.com` por geração local 100% offline
+- Cache de 7 dias nos headers (`max-age=604800, immutable`)
+
+**Lógica de fallback no ManifestController**
+- Loja **com** logo: manifest usa `logo_url` (comportamento mantido)
+- Loja **sem** logo: manifest aponta para o endpoint local `/api/{slug}/icon.png`
+
+**Docker: GD + FreeType**
+- `Dockerfile.backend` agora inclui `freetype-dev`, `libpng-dev`, `libjpeg-turbo-dev`, `ttf-dejavu` e extensão `gd`
+
+### Git Log
+
+```
+6afb178 feat: offline PWA icon generation with store initials using GD
+```
+
+---
+
 ## v1.12.1 — Correções nos Seeders
 
 **Data:** 2026-06-18 | **Branch:** `fix/product-seeder-slug-duplicate`
