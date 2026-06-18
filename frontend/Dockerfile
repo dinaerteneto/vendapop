@@ -2,7 +2,17 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia package.json e lock para instalar dependências
+RUN apk add --no-cache \
+    udev \
+    ttf-freefont \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates
+
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 COPY package*.json ./
 
 RUN npm install
