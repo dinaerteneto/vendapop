@@ -15,6 +15,8 @@ class Subscription extends Model
         'started_at',
         'ends_at',
         'cancelled_at',
+        'is_pending',
+        'payment_transaction_id',
     ];
 
     protected $casts = [

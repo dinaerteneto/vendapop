@@ -9,7 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->boolean('is_pending')->default(false)->after('plan_status');
             $table->string('payment_transaction_id')->nullable()->after('is_pending');
         });
     }
@@ -17,7 +16,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->dropColumn(['is_pending', 'payment_transaction_id']);
+            $table->dropColumn('payment_transaction_id');
         });
     }
 };

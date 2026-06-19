@@ -13,4 +13,8 @@ interface SubscriptionServiceInterface
     public function isActive(Tenant $tenant): bool;
     public function expiresInDays(Tenant $tenant): ?int;
     public function expireTrials(): void;
+    public function upgradeTo(Subscription $subscription, string $planType, ?string $paymentTransactionId = null): Subscription;
+    public function cancel(Subscription $subscription): Subscription;
+    public function markPending(Subscription $subscription): Subscription;
+    public function isPending(Subscription $subscription): bool;
 }

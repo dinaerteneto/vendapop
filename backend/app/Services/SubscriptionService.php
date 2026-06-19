@@ -80,4 +80,39 @@ class SubscriptionService implements SubscriptionServiceInterface
             ->where('ends_at', '<=', now())
             ->update(['plan_status' => 'expired']);
     }
+
+    public function upgradeTo(Subscription $subscription, string $planType, ?string $paymentTransactionId = null): Subscription
+    {
+        $subscription->update([
+            'plan_type' => $planType,
+            'plan_status' => 'active',
+            'is_pending' => false,
+            'payment_transaction_id' => $paymentTransactionId,
+        ]);
+
+        return $subscription->fresh();
+    }
+
+    public function cancel(Subscription $subscription): Subscription
+    {
+        $subscription->update([
+            'plan_status' => 'cancelled',
+        ]);
+
+        return $subscription->fresh();
+    }
+
+    public function markPending(Subscription $subscription): Subscription
+    {
+        $subscription->update([
+            'is_pending' => true,
+        ]);
+
+        return $subscription->fresh();
+    }
+
+    public function isPending(Subscription $subscription): bool
+    {
+        return (bool) $subscription->is_pending;
+    }
 }

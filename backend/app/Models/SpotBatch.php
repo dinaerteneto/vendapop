@@ -13,12 +13,19 @@ class SpotBatch extends Model
         'replenishes_at',
     ];
 
+    protected $appends = ['remaining'];
+
     protected $casts = [
         'total_spots' => 'integer',
         'used_spots' => 'integer',
     ];
 
     public function remaining(): int
+    {
+        return $this->getRemainingAttribute();
+    }
+
+    public function getRemainingAttribute(): int
     {
         return max(0, $this->total_spots - $this->used_spots);
     }
