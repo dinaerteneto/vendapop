@@ -2,6 +2,39 @@
 
 ## 📋 Histórico de Versões
 
+### v1.13.0 (18 de Junho de 2026) — Lançamento Beta: Landing Page, Planos e SEO
+
+**🎯 Preparo para o Beta:**
+
+O VendaPop agora está pronto para receber os primeiros usuários com uma landing page completa, página de planos e otimização de SEO. O sistema de convites foi ajustado para oferecer 90 dias de Básico grátis a cada convidado.
+
+**Landing Page — Reformulação Completa:**
+- 🧭 Navbar fixa com scroll suave e âncoras para seções (Como funciona, Planos, Cases)
+- 💰 Página de planos com 4 tiers: Grátis (R$0), Básico (R$29,90), Profissional (R$59,90), Premium (R$99,90)
+- 🎟️ Banner de incentivo: "Convidados ganham 90 dias de Básico grátis"
+- ✨ Animações de scroll-reveal em todas as seções (IntersectionObserver nativo, sem libs)
+- 🎨 Hero com fundo quente (#FDF8F6) — paleta landing independente do app (roxo)
+- 🧵 Seções alternadas com `gray-100` para contraste visual
+- 👤 Avatares de stock photo nos cards de cases (provisoriedade assumida)
+
+**SEO e Descoberta:**
+- 📊 JSON-LD com Organization, WebSite, HowTo e FAQPage schemas
+- ❓ FAQ Section com 5 perguntas frequentes (accordion + scroll-reveal)
+- 🏷️ SEOHead com OG tags, Twitter Cards, canonical e meta description
+- 📈 Título melhorado: "Monte sua loja online e receba pedidos no WhatsApp"
+
+**Tom Exclusivo (estilo Gmail):**
+- 🔐 "Somente para convidados" substitui "Acesso por convite" em toda a landing
+- 💎 "Quero ser convidado(a)" como CTA — o convite vira status, não restrição
+- 📝 "Vagas limitadas" na waitlist reforça escassez
+
+**Backend:**
+- 🔄 Convites agora concedem plano Básico (antes Premium) com 90 dias de trial (antes 60)
+- 🧪 Testes atualizados para refletir nova regra de plano e duração
+
+**Correções:**
+- 🖼️ Favicon de loja corrigido — agora atualiza ambos `favicon-svg` e `favicon-ico`
+
 ### v1.10.1 (17 de Junho de 2026) — Rebrand VendaPop + Config Dinâmica
 
 **Rebranding:**
