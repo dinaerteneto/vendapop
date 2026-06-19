@@ -33,6 +33,9 @@ import ChangePassword from './pages/Dashboard/ChangePassword/ChangePassword';
 import BannerList from './pages/Dashboard/Banners/BannerList';
 import BannerForm from './pages/Dashboard/Banners/BannerForm';
 import OnboardingSetup from './pages/AuthPages/OnboardingSetup';
+import PlanosPage from './pages/Dashboard/Plans/PlanosPage';
+import CheckoutSuccess from './pages/Dashboard/Plans/CheckoutSuccess';
+import CheckoutError from './pages/Dashboard/Plans/CheckoutError';
 
 // Pages SuperAdmin
 import SuperAdminLogin from './pages/SuperAdmin/SuperAdminLogin';
@@ -123,6 +126,10 @@ function App() {
             <Route path="banners" element={<BannerList />} />
             <Route path="banners/new" element={<BannerForm />} />
             <Route path="banners/:id" element={<BannerForm />} />
+
+            <Route path="planos" element={<PlanosPage />} />
+            <Route path="planos/sucesso" element={<CheckoutSuccess />} />
+            <Route path="planos/erro" element={<CheckoutError />} />
         </Route>
 
         {/* Rotas SuperAdmin */}

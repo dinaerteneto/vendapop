@@ -17,11 +17,34 @@ interface DashboardStats {
 
 interface SubscriptionData {
   plan_type: string;
+  status: string;
   limits: {
     max_products: number | null;
     current_products: number;
   };
+  trial_ends_at?: string | null;
+  next_billing_at?: string | null;
 }
+
+const planLabel: Record<string, string> = {
+  free: 'Grátis',
+  basic: 'Básico',
+  pro: 'Pro',
+};
+
+const statusLabel: Record<string, string> = {
+  active: 'Ativo',
+  trialing: 'Período gratuito',
+  pending: 'Pendente',
+  canceled: 'Cancelado',
+};
+
+const statusColors: Record<string, string> = {
+  active: 'bg-green-100 text-green-700',
+  trialing: 'bg-blue-100 text-blue-700',
+  pending: 'bg-amber-100 text-amber-700',
+  canceled: 'bg-red-100 text-red-700',
+};
 
 const ECommerce: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -29,10 +52,12 @@ const ECommerce: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [limitBannerDismissed, setLimitBannerDismissed] = useState(false);
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
   const navigate = useNavigate();
 
   const BANNER_DISMISS_KEY = 'onboarding_banner_dismissed_at';
   const LIMIT_BANNER_DISMISS_KEY = 'limit_banner_dismissed_at';
+  const TRIAL_BANNER_DISMISS_KEY = 'trial_banner_dismissed_at';
 
   const onboardingStep = useMemo(() => {
     const saved = localStorage.getItem('onboarding_step');
@@ -69,6 +94,25 @@ const ECommerce: React.FC = () => {
     return true;
   }, [subscriptionData]);
 
+  const trialDaysRemaining = useMemo(() => {
+    if (!subscriptionData?.trial_ends_at) return null;
+    const now = new Date();
+    const trialEnd = new Date(subscriptionData.trial_ends_at);
+    const diff = trialEnd.getTime() - now.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }, [subscriptionData]);
+
+  const shouldShowTrialBanner = useMemo(() => {
+    if (trialDaysRemaining === null || trialDaysRemaining > 7) return false;
+    if (trialBannerDismissed) return false;
+    const dismissed = localStorage.getItem(TRIAL_BANNER_DISMISS_KEY);
+    if (dismissed) {
+      const daysAgo = (Date.now() - Number(dismissed)) / (1000 * 60 * 60 * 24);
+      if (daysAgo < 7) return false;
+    }
+    return true;
+  }, [trialDaysRemaining, trialBannerDismissed]);
+
   const handleDismissBanner = () => {
     localStorage.setItem(BANNER_DISMISS_KEY, String(Date.now()));
     setBannerDismissed(true);
@@ -77,6 +121,11 @@ const ECommerce: React.FC = () => {
   const handleDismissLimitBanner = useCallback(() => {
     localStorage.setItem(LIMIT_BANNER_DISMISS_KEY, String(Date.now()));
     setLimitBannerDismissed(true);
+  }, []);
+
+  const handleDismissTrialBanner = useCallback(() => {
+    localStorage.setItem(TRIAL_BANNER_DISMISS_KEY, String(Date.now()));
+    setTrialBannerDismissed(true);
   }, []);
 
   useEffect(() => {
@@ -135,7 +184,26 @@ const ECommerce: React.FC = () => {
   return (
     <div>
       <SEOHead title="Dashboard — VendaPop" noIndex />
-      <h2 className="mb-6 text-2xl font-bold text-gray-900">Dashboard</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+
+        {subscriptionData && (
+          <div className="flex items-center gap-3">
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[subscriptionData.status] || 'bg-gray-100 text-gray-600'}`}>
+              {statusLabel[subscriptionData.status] || subscriptionData.status}
+            </span>
+            <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+              {planLabel[subscriptionData.plan_type] || subscriptionData.plan_type}
+            </span>
+            <button
+              onClick={() => navigate('/admin/planos')}
+              className="text-xs text-indigo-600 hover:text-indigo-800 underline"
+            >
+              Gerenciar
+            </button>
+          </div>
+        )}
+      </div>
 
       {showBanner && !bannerDismissed && (
         <OnboardingBanner
@@ -143,6 +211,34 @@ const ECommerce: React.FC = () => {
           onContinue={() => navigate('/admin/setup')}
           onDismiss={handleDismissBanner}
         />
+      )}
+
+      {shouldShowTrialBanner && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between mb-6">
+          <div>
+            <p className="font-medium text-blue-800">
+              Seu período gratuito termina em {trialDaysRemaining} {trialDaysRemaining === 1 ? 'dia' : 'dias'}. Assine agora.
+            </p>
+            <p className="text-sm text-blue-700">
+              Faça upgrade para não perder acesso aos recursos da sua loja.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <a
+              href="/admin/planos"
+              className="inline-block bg-blue-500 text-white px-4 py-2 rounded text-sm hover:bg-blue-600 transition"
+            >
+              Ver planos
+            </a>
+            <button
+              onClick={handleDismissTrialBanner}
+              className="text-blue-600 hover:text-blue-800 text-sm px-2"
+              aria-label="Dispensar aviso"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       )}
 
       {shouldShowLimitBanner && !limitBannerDismissed && (

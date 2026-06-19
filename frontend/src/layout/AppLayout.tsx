@@ -37,6 +37,7 @@ const AppLayout: React.FC = () => {
     { path: '/admin/orders', label: 'Pedidos', icon: '📦' },
     { path: '/admin/customers', label: 'Clientes', icon: '👥' },
     { path: '/admin/store-settings', label: 'Minha Loja', icon: '⚙️' },
+    { path: '/admin/planos', label: 'Planos', icon: '⭐' },
   ];
 
   const isActive = (path: string) => {
