@@ -10,68 +10,68 @@ interface Plan {
   badge?: string
 }
 
-const plans: Plan[] = [
-  {
-    name: 'Grátis',
-    price: 'R$ 0',
-    period: 'para sempre',
-    description: 'Ideal pra quem está começando a vender online.',
-    features: [
-      'Até 6 produtos',
-      'Variações (tamanho, cor)',
-      'Link da loja personalizado',
-      'Pedidos pelo WhatsApp',
-      'PWA — instala como app',
-    ],
-  },
-  {
-    name: 'Básico',
-    price: 'R$ 29,90',
-    period: '/mês',
-    description: 'Pra quem já tem um volume bacana de produtos.',
-    badge: '90 dias grátis para convidados',
-    features: [
-      'Até 30 produtos',
-      'Tudo do plano Grátis',
-      'Chave PIX no checkout',
-      'Sem anúncios na loja',
-      'Pedidos ilimitados',
-    ],
-  },
-  {
-    name: 'Profissional',
-    price: 'R$ 59,90',
-    period: '/mês',
-    description: 'O plano mais escolhido por lojistas que vendem todo dia.',
-    highlighted: true,
-    features: [
-      'Até 100 produtos',
-      'Tudo do plano Básico',
-      'Controle de estoque',
-      'Cupons de desconto',
-      'Carrinho abandonado',
-      'Relatórios de vendas',
-      'Suporte prioritário',
-    ],
-  },
-  {
-    name: 'Premium',
-    price: 'R$ 99,90',
-    period: '/mês',
-    description: 'Sua loja com domínio próprio e visual totalmente personalizado.',
-    features: [
-      'Produtos ilimitados',
-      'Tudo do plano Profissional',
-      'Domínio próprio',
-      'Temas premium',
-      'API e webhooks',
-      'Remoção marca VendaPop',
-    ],
-  },
-]
-
 const PlansSection: React.FC = () => {
   const { ref, inView } = useScrollReveal();
+
+  const plans: Plan[] = [
+    {
+      name: 'Grátis',
+      price: 'R$ 0',
+      period: 'para sempre',
+      description: 'Ideal pra quem está começando a vender online.',
+      features: [
+        'Até 6 produtos',
+        'Variações (tamanho, cor)',
+        'Link da loja personalizado',
+        'Pedidos pelo WhatsApp',
+        'PWA — instala como app',
+      ],
+    },
+    {
+      name: 'Básico',
+      price: 'R$ 29,90',
+      period: '/mês',
+      description: 'Pra quem já tem um volume bacana de produtos.',
+      badge: '45 dias grátis de Básico para os primeiros 100',
+      features: [
+        'Até 30 produtos',
+        'Tudo do plano Grátis',
+        'Chave PIX no checkout',
+        'Sem anúncios na loja',
+        'Pedidos ilimitados',
+      ],
+    },
+    {
+      name: 'Profissional',
+      price: 'R$ 59,90',
+      period: '/mês',
+      description: 'O plano mais escolhido por lojistas que vendem todo dia.',
+      highlighted: true,
+      features: [
+        'Até 100 produtos',
+        'Tudo do plano Básico',
+        'Controle de estoque',
+        'Cupons de desconto',
+        'Carrinho abandonado',
+        'Relatórios de vendas',
+        'Suporte prioritário',
+      ],
+    },
+    {
+      name: 'Premium',
+      price: 'R$ 99,90',
+      period: '/mês',
+      description: 'Sua loja com domínio próprio e visual totalmente personalizado.',
+      features: [
+        'Produtos ilimitados',
+        'Tudo do plano Profissional',
+        'Domínio próprio',
+        'Temas premium',
+        'API e webhooks',
+        'Remoção marca VendaPop',
+      ],
+    },
+  ];
 
   return (
     <section ref={ref} id="planos" className="bg-gray-100 py-16">
@@ -94,7 +94,7 @@ const PlansSection: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-sm text-green-800">
-              <strong>Convidados ganham 90 dias de Básico grátis.</strong>
+              <strong>Primeiros 100 lojistas ganham 45 dias de Básico grátis.</strong>
               {' '}Depois é só escolher o plano que quiser — sem surpresa, sem aumento.
             </p>
           </div>
@@ -146,7 +146,7 @@ const PlansSection: React.FC = () => {
                 href="#waitlist"
                 className="block w-full text-center px-4 py-2.5 rounded-lg font-semibold text-sm bg-gray-100 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
               >
-                Quero ser convidado(a)
+                Quero garantir minha vaga
               </a>
             </div>
           ))}

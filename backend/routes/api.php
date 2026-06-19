@@ -78,10 +78,13 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
 
-        Route::apiResource('products', AdminProductController::class);
+        Route::apiResource('products', AdminProductController::class)->except(['store', 'update']);
+        Route::post('products', [AdminProductController::class, 'store'])->middleware('check.plan.limits:products');
+        Route::put('products/{product}', [AdminProductController::class, 'update'])->middleware('check.plan.limits:products');
         Route::delete('product-images/{productImage}', [ProductImageController::class, 'destroy']);
         Route::put('product-images/{productImage}/set-as-main', [ProductImageController::class, 'setAsMain']);
-        Route::apiResource('categories', AdminCategoryController::class);
+        Route::apiResource('categories', AdminCategoryController::class)->except(['store']);
+        Route::post('categories', [AdminCategoryController::class, 'store'])->middleware('check.plan.limits:categories');
 
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);

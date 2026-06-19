@@ -1,7 +1,28 @@
 import { Link } from 'react-router-dom';
 import PhoneSlideshow from './PhoneSlideshow';
 
-const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  spotsRemaining: number | null;
+  spotsLoading: boolean;
+  spotsError: boolean;
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ spotsRemaining, spotsLoading, spotsError }) => {
+  const loaded = !spotsLoading && !spotsError;
+  const spotsAvailable = loaded && spotsRemaining !== null && spotsRemaining > 0;
+  const spotsExhausted = loaded && spotsRemaining === 0;
+
+  const badgeText = spotsAvailable
+    ? `Beta exclusivo — ${spotsRemaining} vagas restantes`
+    : spotsExhausted
+      ? 'Beta exclusivo — vagas esgotadas'
+      : 'Beta exclusivo';
+
+  const scrollToWaitlist = () => {
+    const el = document.querySelector('#waitlist');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section className="min-h-[85vh] flex flex-col pt-14" style={{ backgroundColor: '#FDF8F6' }}>
       <div className="flex-1 flex items-center">
@@ -9,7 +30,7 @@ const HeroSection: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <span className="inline-block px-3 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full mb-4">
-              Somente para convidados
+              {badgeText}
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
               Seu catálogo online.
@@ -20,18 +41,36 @@ const HeroSection: React.FC = () => {
               Monte sua loja em 5 minutos. Seus clientes navegam, escolhem variações e o pedido chega organizado no seu WhatsApp — sem calcular total na mão, sem conversa perdida.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/admin/register"
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-center"
-              >
-                Tenho um convite
-              </Link>
-              <a
-                href="#waitlist"
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-purple-400 hover:text-purple-600 transition text-center"
-              >
-                Quero ser convidado(a)
-              </a>
+              {spotsAvailable ? (
+                <Link
+                  to="/admin/register"
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-center"
+                >
+                  Criar minha loja grátis
+                </Link>
+              ) : spotsExhausted ? (
+                <button
+                  onClick={scrollToWaitlist}
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-center"
+                >
+                  Entrar na lista de espera
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/admin/register"
+                    className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition text-center"
+                  >
+                    Tenho um convite
+                  </Link>
+                  <button
+                    onClick={scrollToWaitlist}
+                    className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-purple-400 hover:text-purple-600 transition text-center"
+                  >
+                    Quero ser convidado(a)
+                  </button>
+                </>
+              )}
             </div>
           </div>
           <PhoneSlideshow />

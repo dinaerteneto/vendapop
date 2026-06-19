@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { SEOHead } from '../../components/common/SEOHead';
 import InvitePanel from '../../components/admin/InvitePanel';
 import OnboardingBanner from '../../components/onboarding/OnboardingBanner';
+import LimitBanner from '../../components/subscription/LimitBanner';
 
 interface DashboardStats {
   sales_today: string;
@@ -14,13 +15,24 @@ interface DashboardStats {
   sales_this_month: string;
 }
 
+interface SubscriptionData {
+  plan_type: string;
+  limits: {
+    max_products: number | null;
+    current_products: number;
+  };
+}
+
 const ECommerce: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [limitBannerDismissed, setLimitBannerDismissed] = useState(false);
   const navigate = useNavigate();
 
   const BANNER_DISMISS_KEY = 'onboarding_banner_dismissed_at';
+  const LIMIT_BANNER_DISMISS_KEY = 'limit_banner_dismissed_at';
 
   const onboardingStep = useMemo(() => {
     const saved = localStorage.getItem('onboarding_step');
@@ -41,22 +53,57 @@ const ECommerce: React.FC = () => {
     return daysAgo >= 30;
   }, []);
 
+  const shouldShowLimitBanner = useMemo(() => {
+    if (!subscriptionData) return false;
+    const { max_products, current_products } = subscriptionData.limits;
+    if (max_products === null) return false;
+
+    if (current_products < max_products - 1) return false;
+
+    const dismissed = localStorage.getItem(LIMIT_BANNER_DISMISS_KEY);
+    if (dismissed) {
+      const daysAgo = (Date.now() - Number(dismissed)) / (1000 * 60 * 60 * 24);
+      if (daysAgo < 30) return false;
+    }
+
+    return true;
+  }, [subscriptionData]);
+
   const handleDismissBanner = () => {
     localStorage.setItem(BANNER_DISMISS_KEY, String(Date.now()));
     setBannerDismissed(true);
   };
 
-  useEffect(() => {
-    loadDashboardStats();
+  const handleDismissLimitBanner = useCallback(() => {
+    localStorage.setItem(LIMIT_BANNER_DISMISS_KEY, String(Date.now()));
+    setLimitBannerDismissed(true);
   }, []);
 
-  const loadDashboardStats = async () => {
+  useEffect(() => {
+    if (shouldShowLimitBanner && typeof window.gtag === 'function') {
+      window.gtag('event', 'limit_warning_shown', {
+        plan_type: subscriptionData!.plan_type,
+        products_used: subscriptionData!.limits.current_products,
+        product_limit: subscriptionData!.limits.max_products,
+      });
+    }
+  }, [shouldShowLimitBanner, subscriptionData]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/admin/dashboard');
-      setStats(response.data);
+      const [dashboardRes, subscriptionRes] = await Promise.all([
+        api.get('/admin/dashboard'),
+        api.get('/admin/subscription'),
+      ]);
+      setStats(dashboardRes.data);
+      setSubscriptionData(subscriptionRes.data);
     } catch (error) {
-      console.error('Erro ao carregar estatísticas do dashboard', error);
+      console.error('Erro ao carregar dados do dashboard', error);
     } finally {
       setLoading(false);
     }
@@ -95,6 +142,15 @@ const ECommerce: React.FC = () => {
           step={onboardingStep}
           onContinue={() => navigate('/admin/setup')}
           onDismiss={handleDismissBanner}
+        />
+      )}
+
+      {shouldShowLimitBanner && !limitBannerDismissed && (
+        <LimitBanner
+          planType={subscriptionData!.plan_type}
+          current={subscriptionData!.limits.current_products}
+          limit={subscriptionData!.limits.max_products!}
+          onDismiss={handleDismissLimitBanner}
         />
       )}
       

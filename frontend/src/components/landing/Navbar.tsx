@@ -7,7 +7,13 @@ const links = [
   { label: 'Cases', href: '#cases' },
 ]
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  spotsRemaining: number | null;
+  spotsLoading: boolean;
+  spotsError: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ spotsRemaining, spotsLoading, spotsError }) => {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -19,6 +25,36 @@ const Navbar: React.FC = () => {
   const scrollTo = (href: string) => {
     const el = document.querySelector(href)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const loaded = !spotsLoading && !spotsError;
+
+  const ctaButton = () => {
+    if (!loaded) return null;
+
+    if (spotsRemaining !== null && spotsRemaining > 0) {
+      return (
+        <Link
+          to="/admin/register"
+          className="px-4 py-1.5 text-sm font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition"
+        >
+          Criar loja grátis — {spotsRemaining} vagas
+        </Link>
+      );
+    }
+
+    return (
+      <a
+        href="#waitlist"
+        onClick={(e) => {
+          e.preventDefault()
+          scrollTo('#waitlist')
+        }}
+        className="px-4 py-1.5 text-sm font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition"
+      >
+        Lista de espera
+      </a>
+    );
   }
 
   return (
@@ -47,16 +83,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#waitlist"
-            onClick={(e) => {
-              e.preventDefault()
-              scrollTo('#waitlist')
-            }}
-            className="hidden sm:inline-block px-4 py-1.5 text-sm font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition"
-          >
-            Quero ser convidado(a)
-          </a>
+          {ctaButton()}
           <Link
             to="/admin/login"
             className="text-sm text-gray-500 hover:text-purple-700 transition"

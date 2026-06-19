@@ -14,7 +14,7 @@ class CheckPlanLimits
         private PlanLimitService $planLimitService
     ) {}
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ?string $resourceType = null): Response
     {
         $tenant = app(TenantService::class)->getTenant();
 
@@ -22,7 +22,9 @@ class CheckPlanLimits
             return $next($request);
         }
 
-        $resourceType = $this->resolveResourceType($request);
+        if ($resourceType === null) {
+            $resourceType = $this->resolveResourceType($request);
+        }
 
         if (!$resourceType) {
             return $next($request);
