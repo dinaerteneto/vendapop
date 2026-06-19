@@ -15,7 +15,7 @@ info() { echo -e "${CYAN}[i]${NC} $1"; }
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║     VendaPop — Deploy v1.12.0            ║${NC}"
+echo -e "${CYAN}║     VendaPop — Deploy v1.13.0            ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -132,7 +132,7 @@ echo ""
 # 10. Conclusão
 # ---------------------------------------------------------
 echo -e "${GREEN}╔══════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     Deploy concluído! v1.12.0            ║${NC}"
+echo -e "${GREEN}║     Deploy concluído! v1.13.0            ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════╝${NC}"
 echo ""
 info "Frontend: https://${DOMAIN:-vendapop.com.br}"
