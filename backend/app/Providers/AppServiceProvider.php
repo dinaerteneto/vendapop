@@ -49,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
             \App\Contracts\SpotServiceInterface::class,
             \App\Services\SpotService::class
         );
+
+        $this->app->singleton(\App\Infrastructure\Payment\PaymentGatewayFactory::class);
     }
 
     /**

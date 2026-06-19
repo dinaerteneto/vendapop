@@ -25,6 +25,10 @@ Route::prefix('api/superadmin')->group(function () {
         Route::post('/invites', [\App\Http\Controllers\Api\SuperAdmin\InviteController::class, 'store']);
         Route::put('/invites/{id}/toggle', [\App\Http\Controllers\Api\SuperAdmin\InviteController::class, 'toggle']);
 
+        // Plan Limits
+        Route::get('/plan-limits', [\App\Http\Controllers\Api\SuperAdmin\PlanLimitController::class, 'index']);
+        Route::put('/plan-limits/{planType}', [\App\Http\Controllers\Api\SuperAdmin\PlanLimitController::class, 'update']);
+
         // Spots
         Route::get('/spots', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'index']);
         Route::get('/spots/stats', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'stats']);

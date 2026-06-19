@@ -36,7 +36,7 @@ class SpotService implements SpotServiceInterface
         SpotBatch::create([
             'total_spots' => config('spots.replenish_amount'),
             'used_spots' => 0,
-            'batch_label' => 'replenish-' . now()->format('Y-m-d'),
+            'batch_label' => 'weekly-' . now()->format('Y-m-d'),
             'replenishes_at' => now(),
         ]);
     }

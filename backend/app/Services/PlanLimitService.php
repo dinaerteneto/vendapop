@@ -66,6 +66,19 @@ class PlanLimitService
         return $tenant->products()->where('is_active', true)->count();
     }
 
+    public function countActiveCategories(Tenant $tenant): int
+    {
+        return $tenant->categories()->where('is_active', true)->count();
+    }
+
+    public function countOrdersThisMonth(Tenant $tenant): int
+    {
+        return $tenant->orders()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+    }
+
     public function resolvePlanType(Tenant $tenant): string
     {
         $subscription = $tenant->subscriptions()
@@ -76,22 +89,44 @@ class PlanLimitService
         return $subscription?->plan_type ?? 'free';
     }
 
-    public function checkLimit(Tenant $tenant): ?int
+    public function checkLimit(Tenant $tenant, string $resourceType = 'products'): ?int
     {
         $planType = $this->resolvePlanType($tenant);
-        $limit = $this->getLimit($planType);
 
-        if ($limit === null) {
+        $planLimit = $this->getLimits($planType);
+
+        if (!$planLimit) {
             return null;
         }
 
-        $count = $this->countActiveProducts($tenant);
+        $column = $this->resourceTypeToColumn($resourceType);
+        $limit = $planLimit->{$column};
+
+        if ($limit === null || $limit === 0) {
+            return null;
+        }
+
+        $count = match ($resourceType) {
+            'categories' => $this->countActiveCategories($tenant),
+            'orders' => $this->countOrdersThisMonth($tenant),
+            default => $this->countActiveProducts($tenant),
+        };
 
         if ($count >= $limit) {
             return $limit;
         }
 
         return null;
+    }
+
+    private function resourceTypeToColumn(string $resourceType): string
+    {
+        return match ($resourceType) {
+            'products' => 'max_products',
+            'categories' => 'max_categories',
+            'orders' => 'max_orders_per_month',
+            default => 'max_products',
+        };
     }
 
     public function clearCache(string $planType): void
