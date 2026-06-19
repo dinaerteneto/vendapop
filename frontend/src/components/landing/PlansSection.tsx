@@ -29,7 +29,7 @@ const plans: Plan[] = [
     price: 'R$ 29,90',
     period: '/mês',
     description: 'Pra quem já tem um volume bacana de produtos.',
-    badge: '90 dias grátis no convite',
+    badge: '90 dias grátis para convidados',
     features: [
       'Até 30 produtos',
       'Tudo do plano Grátis',
@@ -78,7 +78,7 @@ const PlansSection: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className={`text-center mb-8 transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <span className="inline-block px-3 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full mb-4">
-            Acesso por convite
+            Somente para convidados
           </span>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
             Planos que cabem no seu bolso
@@ -94,7 +94,7 @@ const PlansSection: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-sm text-green-800">
-              <strong>Quem entra com convite ganha 90 dias de Básico grátis.</strong>
+              <strong>Convidados ganham 90 dias de Básico grátis.</strong>
               {' '}Depois é só escolher o plano que quiser — sem surpresa, sem aumento.
             </p>
           </div>
@@ -146,14 +146,14 @@ const PlansSection: React.FC = () => {
                 href="#waitlist"
                 className="block w-full text-center px-4 py-2.5 rounded-lg font-semibold text-sm bg-gray-100 text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
               >
-                Quero meu convite
+                Quero ser convidado(a)
               </a>
             </div>
           ))}
         </div>
 
         <p className={`text-center text-xs text-gray-400 mt-6 transition-all duration-500 ${inView ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDelay: '700ms' }}>
-          Acesso apenas por convite. Deixe seu email abaixo para ser avisado das próximas vagas.
+          Somente convidados podem acessar. Deixe seu email abaixo para ser avisado das próximas vagas.
         </p>
       </div>
     </section>

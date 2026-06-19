@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
             }}
             className="hidden sm:inline-block px-4 py-1.5 text-sm font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition"
           >
-            Quero meu convite
+            Quero ser convidado(a)
           </a>
           <Link
             to="/admin/login"

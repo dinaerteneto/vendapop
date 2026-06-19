@@ -3,23 +3,13 @@ import PhoneSlideshow from './PhoneSlideshow';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative min-h-[85vh] flex flex-col pt-14 overflow-hidden" style={{ backgroundColor: '#FDF8F6' }}>
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse 80% 60% at 20% 80%, rgba(201,77,109,0.07) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 50% at 85% 15%, rgba(124,58,237,0.05) 0%, transparent 60%),
-            repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(201,77,109,0.015) 3px, rgba(201,77,109,0.015) 6px)
-          `,
-        }}
-      />
-      <div className="flex-1 flex items-center relative">
+    <section className="min-h-[85vh] flex flex-col pt-14" style={{ backgroundColor: '#FDF8F6' }}>
+      <div className="flex-1 flex items-center">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <span className="inline-block px-3 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full mb-4">
-              Beta exclusivo — acesso apenas por convite
+              Somente para convidados
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
               Seu catálogo online.
@@ -40,7 +30,7 @@ const HeroSection: React.FC = () => {
                 href="#waitlist"
                 className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-purple-400 hover:text-purple-600 transition text-center"
               >
-                Quero ser avisado
+                Quero ser convidado(a)
               </a>
             </div>
           </div>
