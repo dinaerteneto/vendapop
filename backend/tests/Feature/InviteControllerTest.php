@@ -30,7 +30,7 @@ class InviteControllerTest extends TestCase
         // Mark this tenant as a manual founder so it can generate invites
         Subscription::create([
             'tenant_id' => $this->tenant->id,
-            'plan_type' => 'premium',
+            'plan_type' => 'basic',
             'plan_status' => 'active',
             'invite_source' => 'manual',
             'started_at' => now(),
