@@ -22,7 +22,7 @@ class SubscriptionService implements SubscriptionServiceInterface
 
         // Determine duration
         $isLifetime = ($source === 'manual');
-        $endsAt = $isLifetime ? null : now()->addDays(90);
+        $endsAt = $isLifetime ? null : now()->addDays(config('trial.duration_days'));
 
         return Subscription::create([
             'tenant_id' => $tenant->id,

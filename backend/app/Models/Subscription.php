@@ -21,6 +21,7 @@ class Subscription extends Model
         'started_at' => 'datetime',
         'ends_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'is_pending' => 'boolean',
     ];
 
     public function tenant()
