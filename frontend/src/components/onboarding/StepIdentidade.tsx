@@ -38,17 +38,15 @@ const StepIdentidade: React.FC<StepIdentidadeProps> = ({ onNext }) => {
   const handleNext = async () => {
     setSaving(true);
     try {
+      const formData = new FormData();
+      formData.append('name', storeName);
+      formData.append('whatsapp_number', storeWhatsapp);
+      formData.append('primary_color', primaryColor);
+      formData.append('_method', 'PUT');
       if (logoFile) {
-        const formData = new FormData();
-        formData.append('name', storeName);
-        formData.append('whatsapp_number', storeWhatsapp);
-        formData.append('primary_color', primaryColor);
         formData.append('logo', logoFile);
-        formData.append('_method', 'PUT');
-        await api.post('/admin/store', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      } else {
-        await api.put('/admin/store', { primary_color: primaryColor });
       }
+      await api.post('/admin/store', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       await api.put('/admin/onboarding-status', { onboarding_step: 1 });
       onNext();
     } catch (err: any) {
@@ -111,6 +109,29 @@ const StepIdentidade: React.FC<StepIdentidadeProps> = ({ onNext }) => {
             Sua cor primária
           </div>
         )}
+      </div>
+
+      <div className="mt-6 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Nome da loja</label>
+          <input
+            type="text"
+            value={storeName}
+            onChange={(e) => setStoreName(e.target.value)}
+            placeholder="Minha Loja"
+            className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
+          <input
+            type="text"
+            value={storeWhatsapp}
+            onChange={(e) => setStoreWhatsapp(e.target.value)}
+            placeholder="5511999999999"
+            className="w-full px-3 py-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-between mt-8">

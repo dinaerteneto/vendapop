@@ -1,6 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 
+function formatCurrency(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  const padded = digits.padStart(3, '0');
+  const len = padded.length;
+  const integer = padded.slice(0, len - 2).replace(/^0+/, '') || '0';
+  const cents = padded.slice(len - 2);
+  return `${integer},${cents}`;
+}
+
+function displayPrice(value: string): string {
+  const num = parseFloat(value.replace(',', '.'));
+  if (isNaN(num)) return value;
+  return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function parseCurrency(formatted: string): number {
+  const cleaned = formatted.replace(/[^\d,]/g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+}
+
 interface DemoProduct {
   id: number;
   uuid: string;
@@ -18,8 +38,10 @@ interface StepVitrineProps {
 
 const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onBack, onSkip }) => {
   const [products, setProducts] = useState<DemoProduct[]>([]);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [editingPriceUuid, setEditingPriceUuid] = useState<string | null>(null);
+  const [editPrice, setEditPrice] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -39,36 +61,68 @@ const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onBack, onSkip }) => 
   }, []);
 
   const startEditName = (product: DemoProduct) => {
-    setEditingId(product.id);
+    setEditingUuid(product.uuid);
     setEditName(product.name);
   };
 
   const saveEditName = async () => {
-    if (editingId === null || !editName.trim()) return;
+    if (editingUuid === null || !editName.trim()) return;
     const formData = new FormData();
     formData.append('name', editName.trim());
     formData.append('_method', 'PUT');
     try {
-      await api.post(`/admin/products/${editingId}`, formData, {
+      await api.post(`/admin/products/${editingUuid}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setProducts(ps => ps.map(p => p.id === editingId ? { ...p, name: editName.trim() } : p));
+      setProducts(ps => ps.map(p => p.uuid === editingUuid ? { ...p, name: editName.trim() } : p));
     } catch (err) {
       console.error(err);
     }
-    setEditingId(null);
+    setEditingUuid(null);
   };
 
-  const handleProductImage = async (productId: number, file: File) => {
+  const startEditPrice = (product: DemoProduct) => {
+    setEditingPriceUuid(product.uuid);
+    setEditPrice(formatCurrency(product.price));
+  };
+
+  const saveEditPrice = async () => {
+    if (editingPriceUuid === null || !editPrice.trim()) return;
+    const price = parseCurrency(editPrice);
+    if (price <= 0) return;
+    const formData = new FormData();
+    formData.append('price', String(price));
+    formData.append('_method', 'PUT');
+    try {
+      await api.post(`/admin/products/${editingPriceUuid}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setProducts(ps => ps.map(p => p.uuid === editingPriceUuid ? { ...p, price: String(price) } : p));
+    } catch (err) {
+      console.error(err);
+    }
+    setEditingPriceUuid(null);
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    if (raw.length > 0 && raw !== '0') {
+      setEditPrice(formatCurrency(raw));
+    } else {
+      setEditPrice('');
+    }
+  };
+
+  const handleProductImage = async (productUuid: string, file: File) => {
     setSaving(true);
     const formData = new FormData();
     formData.append('image', file);
     formData.append('_method', 'PUT');
     try {
-      const res = await api.post(`/admin/products/${productId}`, formData, {
+      const res = await api.post(`/admin/products/${productUuid}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setProducts(ps => ps.map(p => p.id === productId
+      setProducts(ps => ps.map(p => p.uuid === productUuid
         ? { ...p, main_image_url: res.data.main_image_url || URL.createObjectURL(file) }
         : p
       ));
@@ -143,14 +197,14 @@ const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onBack, onSkip }) => 
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) handleProductImage(product.id, file);
+                  if (file) handleProductImage(product.uuid, file);
                   e.target.value = '';
                 }}
               />
             </label>
 
-            <div className="p-2">
-              {editingId === product.id ? (
+            <div className="p-2 space-y-1">
+              {editingUuid === product.uuid ? (
                 <input
                   type="text"
                   value={editName}
@@ -168,7 +222,27 @@ const StepVitrine: React.FC<StepVitrineProps> = ({ onNext, onBack, onSkip }) => 
                   {product.name}
                 </p>
               )}
-              <p className="text-xs text-gray-500">R$ {product.price}</p>
+              {editingPriceUuid === product.uuid ? (
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-400">R$</span>
+                  <input
+                    type="text"
+                    value={editPrice}
+                    onChange={handlePriceChange}
+                    onBlur={saveEditPrice}
+                    onKeyDown={(e) => { if (e.key === 'Enter') saveEditPrice(); }}
+                    className="w-20 px-2 py-1 border rounded text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 text-right"
+                    autoFocus
+                  />
+                </div>
+              ) : (
+                <p
+                  className="text-xs text-gray-500 cursor-pointer hover:text-purple-600"
+                  onClick={() => startEditPrice(product)}
+                >
+                  R$ {displayPrice(product.price)}
+                </p>
+              )}
             </div>
           </div>
         ))}
