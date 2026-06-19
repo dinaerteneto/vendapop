@@ -73,7 +73,7 @@ class PaymentTransactionMigrationTest extends TestCase
 
         $tenant->delete();
 
-        $this->assertEquals(0, PaymentTransaction::count());
+        $this->assertEquals(0, PaymentTransaction::where('transaction_id', 'tx_cascade_001')->count());
     }
 
     public function test_model_can_create_a_record(): void

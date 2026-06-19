@@ -12,6 +12,12 @@ class RegisterSpotConsumptionTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        SpotBatch::query()->delete();
+    }
+
     private function validPayload(): array
     {
         return [
