@@ -83,6 +83,11 @@ class Tenant extends Model
         return $this->hasMany(TenantTracking::class);
     }
 
+    public function trialEmailsSent()
+    {
+        return $this->hasMany(TrialEmailsSent::class);
+    }
+
     public function getLogoUrlAttribute($value)
     {
         if (empty($value)) {

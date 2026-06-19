@@ -33,6 +33,11 @@ class Subscription extends Model
         return $this->belongsTo(Invite::class);
     }
 
+    public function trialEmailsSent()
+    {
+        return $this->hasMany(TrialEmailsSent::class);
+    }
+
     public function isTrial(): bool
     {
         return $this->plan_status === 'trial';
