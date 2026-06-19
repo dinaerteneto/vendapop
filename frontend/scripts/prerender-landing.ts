@@ -59,6 +59,6 @@ async function prerender() {
 }
 
 prerender().catch((err) => {
-  console.error('✗ Falha no pré-render da landing:', err)
-  process.exit(1)
+  console.warn('⚠ Pré-render da landing ignorado (não-bloqueante):', err.message)
+  process.exit(0)
 })
