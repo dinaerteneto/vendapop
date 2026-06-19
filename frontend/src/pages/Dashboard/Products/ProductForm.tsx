@@ -5,6 +5,7 @@ import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import CurrencyInput from 'react-currency-input-field';
 import ImageUploader from '../../../components/ui/ImageUploader';
+import UpgradeModal from '../../../components/admin/UpgradeModal';
 
 interface Category {
   id: number;
@@ -62,6 +63,13 @@ const ProductForm: React.FC = () => {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const [upgradeInfo, setUpgradeInfo] = useState<{
+    planType: string;
+    current: number;
+    limit: number;
+  } | null>(null);
+
 
   // All product images (main + gallery)
   const [productImages, setProductImages] = useState<ProductImage[]>([]);
@@ -801,6 +809,20 @@ const ProductForm: React.FC = () => {
       setDraggedIndex(null);
   };
 
+  const handleSubmitError = (error: unknown) => {
+    const err = error as { response?: { status?: number; data?: { message?: string; plan_type?: string; current?: number; limit?: number } } };
+    if (err?.response?.status === 402) {
+      const data = err.response.data;
+      setUpgradeInfo({
+        planType: data?.plan_type || 'free',
+        current: data?.current || 0,
+        limit: data?.limit || 0,
+      });
+      return;
+    }
+    toast.error('Erro ao salvar produto.');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -870,7 +892,7 @@ const ProductForm: React.FC = () => {
                 navigate('/admin/products');
             } catch (error) {
                 console.error(error);
-                toast.error('Erro ao salvar produto.');
+                handleSubmitError(error);
             }
         } else {
             try {
@@ -881,7 +903,7 @@ const ProductForm: React.FC = () => {
                 navigate('/admin/products');
             } catch (error) {
                 console.error(error);
-                toast.error('Erro ao salvar produto.');
+                handleSubmitError(error);
             }
         }
     } else {
@@ -917,7 +939,7 @@ const ProductForm: React.FC = () => {
             navigate('/admin/products');
         } catch (error) {
             console.error(error);
-            toast.error('Erro ao salvar produto.');
+            handleSubmitError(error);
         }
     }
     setLoading(false);
@@ -1543,6 +1565,18 @@ const ProductForm: React.FC = () => {
           </div>
         </form>
       </div>
+
+      <UpgradeModal
+        isOpen={upgradeInfo !== null}
+        planType={upgradeInfo?.planType || 'free'}
+        current={upgradeInfo?.current || 0}
+        limit={upgradeInfo?.limit || 0}
+        upgradeUrl="/admin/planos"
+        onClose={() => {
+          setUpgradeInfo(null);
+          navigate('/admin/products');
+        }}
+      />
     </div>
   );
 };
