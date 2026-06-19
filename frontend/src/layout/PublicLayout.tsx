@@ -52,16 +52,12 @@ const PublicLayout: React.FC = () => {
                 const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
                 const storeIcon = logoUrl || fallbackIcon;
 
-                // Upsert um elemento <link> dedicado para o favicon da loja (type PNG correto)
-                let storeFavicon = document.getElementById('store-favicon') as HTMLLinkElement | null;
-                if (!storeFavicon) {
-                    storeFavicon = document.createElement('link');
-                    storeFavicon.id = 'store-favicon';
-                    storeFavicon.rel = 'icon';
-                    storeFavicon.type = 'image/png';
-                    document.head.appendChild(storeFavicon);
+                // Atualiza o elemento que o browser já rastreia — append de novo elemento não dispara refresh do favicon
+                const faviconIco = document.getElementById('favicon-ico') as HTMLLinkElement | null;
+                if (faviconIco) {
+                    faviconIco.type = 'image/png';
+                    faviconIco.href = storeIcon;
                 }
-                storeFavicon.href = storeIcon;
 
                 // Apple touch icon
                 const appleTouch = document.getElementById('apple-touch-icon') as HTMLLinkElement;
