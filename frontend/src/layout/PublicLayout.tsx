@@ -52,7 +52,13 @@ const PublicLayout: React.FC = () => {
                 const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
                 const storeIcon = logoUrl || fallbackIcon;
 
-                // Atualiza o elemento que o browser já rastreia — append de novo elemento não dispara refresh do favicon
+                // Atualiza os elementos de favicon — ambos precisam ser trocados
+                const faviconSvg = document.getElementById('favicon-svg') as HTMLLinkElement | null;
+                if (faviconSvg) {
+                    faviconSvg.type = 'image/png';
+                    faviconSvg.href = storeIcon;
+                }
+
                 const faviconIco = document.getElementById('favicon-ico') as HTMLLinkElement | null;
                 if (faviconIco) {
                     faviconIco.type = 'image/png';
