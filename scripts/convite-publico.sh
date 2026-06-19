@@ -33,7 +33,7 @@ echo ""
 cat <<MSG
 🚀 **Monte sua loja online em 5 minutos — de graça.**
 
-Criei uma ferramenta que transforma seu catálogo do Instagram numa loja de verdade. A cliente escolhe tamanho, cor, monta o carrinho e o pedido chega **organizado no seu WhatsApp**.
+Trabalho na empresa que criou essa ferramenta e consegui uns convites pra distribuir aqui no grupo. Transforma seu catálogo do Instagram numa loja de verdade: a cliente escolhe tamanho, cor, monta o carrinho e o pedido chega **organizado no seu WhatsApp**.
 
 🆓 **Plano Grátis**: até 6 produtos, sem pagar nada.
 🎁 **Convidadas ganham 90 dias de Básico grátis** (30 produtos, PIX, sem anúncios).
