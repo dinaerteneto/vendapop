@@ -43,18 +43,31 @@ class IconController extends Controller
             $initials = mb_strtoupper(mb_substr($name, 0, 2));
         }
 
-        $fontPath = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
-        $white = imagecolorallocate($img, 255, 255, 255);
+        $fontCandidates = [
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', // Debian/Ubuntu
+            '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf',           // Alpine
+        ];
+        $fontPath = null;
+        foreach ($fontCandidates as $candidate) {
+            if (file_exists($candidate)) {
+                $fontPath = $candidate;
+                break;
+            }
+        }
 
-        $fontSize = (int) ($size * 0.4);
-        $bbox = imagettfbbox($fontSize, 0, $fontPath, $initials);
-        $textWidth = $bbox[2] - $bbox[0];
-        $textHeight = $bbox[1] - $bbox[7];
+        if ($fontPath !== null) {
+            $white = imagecolorallocate($img, 255, 255, 255);
 
-        $x = (int) (($size - $textWidth) / 2);
-        $y = (int) (($size - $textHeight) / 2) - $bbox[7];
+            $fontSize = (int) ($size * 0.4);
+            $bbox = imagettfbbox($fontSize, 0, $fontPath, $initials);
+            $textWidth = $bbox[2] - $bbox[0];
+            $textHeight = $bbox[1] - $bbox[7];
 
-        imagettftext($img, $fontSize, 0, $x, $y, $white, $fontPath, $initials);
+            $x = (int) (($size - $textWidth) / 2);
+            $y = (int) (($size - $textHeight) / 2) - $bbox[7];
+
+            imagettftext($img, $fontSize, 0, $x, $y, $white, $fontPath, $initials);
+        }
 
         ob_start();
         imagepng($img);
