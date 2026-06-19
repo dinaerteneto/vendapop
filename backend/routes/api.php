@@ -43,6 +43,9 @@ Route::get('/proxy-image/{path}', [ImageProxyController::class, 'show'])->where(
 // Spots — public, no auth
 Route::get('/spots/remaining', [\App\Http\Controllers\Api\SpotController::class, 'remaining']);
 
+// Webhooks — public, no auth
+Route::post('/webhooks/payment/mercadopago', [\App\Http\Controllers\Api\PaymentWebhookController::class, 'handle']);
+
 // Rotas Admin
 Route::prefix('admin')->group(function () {
     Route::post('/register', [RegistrationController::class, 'store']); // Nova rota de registro
@@ -118,6 +121,8 @@ Route::prefix('admin')->group(function () {
 
         // Subscription
         Route::get('/subscription', [SubscriptionController::class, 'show']);
+        Route::post('/subscription/create', [SubscriptionController::class, 'createCheckout']);
+        Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel']);
         Route::post('/subscription/dismiss-banner', [SubscriptionController::class, 'dismissBanner']);
 
         // Waitlist (admin)
