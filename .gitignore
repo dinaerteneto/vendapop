@@ -85,3 +85,5 @@ temp/
 *.pdf
 
 tasks/
+
+.env.production

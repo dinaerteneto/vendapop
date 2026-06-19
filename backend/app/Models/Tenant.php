@@ -82,4 +82,12 @@ class Tenant extends Model
     {
         return $this->hasMany(TenantTracking::class);
     }
+
+    public function getLogoUrlAttribute($value)
+    {
+        if (empty($value)) {
+            return null;
+        }
+        return preg_replace('/^http:\/\//i', 'https://', $value);
+    }
 }
