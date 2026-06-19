@@ -3,17 +3,7 @@ import PhoneSlideshow from './PhoneSlideshow';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="bg-white min-h-[85vh] flex flex-col">
-      <header className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <span className="text-xl font-bold text-purple-700">VendaPop</span>
-        <Link
-          to="/admin/login"
-          className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-purple-700 transition"
-        >
-          Entrar
-        </Link>
-      </header>
-
+    <section className="bg-white min-h-[85vh] flex flex-col pt-14">
       <div className="flex-1 flex items-center">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">

@@ -1,9 +1,11 @@
 import { SEOHead } from '../components/common/SEOHead'
+import Navbar from '../components/landing/Navbar';
 import HeroSection from '../components/landing/HeroSection';
 import CaseSection from '../components/landing/CaseSection';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
 import FeatureGrid from '../components/landing/FeatureGrid';
 import GoogleIndexSection from '../components/landing/GoogleIndexSection';
+import PlansSection from '../components/landing/PlansSection';
 import WaitlistSection from '../components/landing/WaitlistSection';
 import FooterSection from '../components/landing/FooterSection';
 
@@ -15,11 +17,13 @@ const Landing = () => {
         description="Monte sua loja em 5 minutos. Seus clientes navegam, escolhem variações e o pedido chega organizado no seu WhatsApp — sem calcular total na mão."
         path="/"
       />
+      <Navbar />
       <HeroSection />
       <CaseSection />
       <HowItWorksSection />
       <FeatureGrid />
       <GoogleIndexSection />
+      <PlansSection />
       <WaitlistSection />
       <FooterSection />
     </div>

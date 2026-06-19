@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 import api from '../../services/api';
 
 const WaitlistSection: React.FC = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const { ref, inView } = useScrollReveal(0.15);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +30,8 @@ const WaitlistSection: React.FC = () => {
   };
 
   return (
-    <section id="waitlist" className="bg-purple-600 py-16">
-      <div className="container mx-auto px-4 text-center max-w-lg">
+    <section ref={ref} id="waitlist" className="bg-purple-600 py-16">
+      <div className={`container mx-auto px-4 text-center max-w-lg transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
         <h2 className="text-2xl font-bold text-white mb-2">Fique por dentro</h2>
         <p className="text-purple-200 mb-6">
           Deixe seu email para ser avisado quando abrirmos novas vagas.

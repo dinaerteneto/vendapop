@@ -1,19 +1,21 @@
-import React from 'react'
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 
 const EXEMPLO_LOJA = {
   nome: 'Casa Lar Imóveis',
   slug: 'casa-lar-imoveis',
   produto: 'Apartamento 3 Quartos Vista para o Mar',
   descricao: 'Confira nosso catálogo completo. Apartamento espaçoso com 3 quartos, 2 banheiros, varanda ampla e vista para o mar...',
+  preco: 'R$ 450.000',
   imagem: '/images/stores/casa-lar-imoveis.png',
 }
 
 const GoogleIndexSection: React.FC = () => {
+  const { ref, inView } = useScrollReveal();
+
   return (
-    <section className="bg-white py-16">
+    <section ref={ref} className="bg-white py-16">
       <div className="container mx-auto px-4 max-w-4xl">
-        
-        <div className="text-center mb-12">
+        <div className={`text-center mb-12 transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           <span className="inline-block px-3 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full mb-4">
             Indexação orgânica gratuita
           </span>
@@ -26,8 +28,7 @@ const GoogleIndexSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          
+        <div className={`max-w-2xl mx-auto transition-all duration-500 delay-300 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="flex items-center bg-white border border-gray-300 rounded-full px-4 py-2 mb-4 shadow-sm">
             <svg className="w-4 h-4 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
