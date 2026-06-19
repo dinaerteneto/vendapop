@@ -47,8 +47,29 @@ const PublicLayout: React.FC = () => {
                console.log('PublicLayout: Logo URL from API:', response.data?.logo_url);
                setStoreInfo(response.data);
                
-                // Dynamically update manifest link for tenant-specific PWA
                 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+                const logoUrl = response.data?.logo_url;
+                const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
+                const storeIcon = logoUrl || fallbackIcon;
+
+                // Upsert um elemento <link> dedicado para o favicon da loja (type PNG correto)
+                let storeFavicon = document.getElementById('store-favicon') as HTMLLinkElement | null;
+                if (!storeFavicon) {
+                    storeFavicon = document.createElement('link');
+                    storeFavicon.id = 'store-favicon';
+                    storeFavicon.rel = 'icon';
+                    storeFavicon.type = 'image/png';
+                    document.head.appendChild(storeFavicon);
+                }
+                storeFavicon.href = storeIcon;
+
+                // Apple touch icon
+                const appleTouch = document.getElementById('apple-touch-icon') as HTMLLinkElement;
+                if (appleTouch) {
+                    appleTouch.href = logoUrl ? storeIcon : `${fallbackIcon}?size=180`;
+                }
+
+                // Manifest dinâmico por loja
                 const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
                 if (manifestLink) {
                     manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
@@ -97,16 +118,10 @@ const PublicLayout: React.FC = () => {
   const primaryColor = storeInfo?.primary_color || '#7c3aed';
   const secondaryColor = storeInfo?.secondary_color || '#f3e8ff';
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-  const storeIcon = storeInfo?.logo_url || `${apiBaseUrl}/${storeSlug}/icon.png`;
-  const appleTouchIcon = storeInfo?.logo_url || `${apiBaseUrl}/${storeSlug}/icon.png?size=180`;
-
   return (
     <CartProvider storeSlug={storeSlug}>
         {storeInfo && (
           <Helmet>
-            <link rel="icon" type="image/png" href={storeIcon} />
-            <link rel="apple-touch-icon" href={appleTouchIcon} />
             <meta name="theme-color" content={primaryColor} />
             <meta name="apple-mobile-web-app-title" content={storeInfo.name} />
           </Helmet>
