@@ -3,13 +3,17 @@ backend/vendor/
 backend/.env
 backend/.env.backup
 backend/.env.local
-backend/.env.example
 backend/storage/app/*
 backend/storage/framework/cache/*
 backend/storage/framework/sessions/*
 backend/storage/framework/views/*
 backend/storage/logs/*
+backend/storage/debugbar/
 backend/bootstrap/cache/*
+backend/public/storage
+backend/public/hot
+backend/public/build/
+backend/.phpunit.result.cache
 
 # Node.js / React
 frontend/node_modules/
@@ -24,8 +28,9 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 
-# Docker
-.dockerignore
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
 
 # IDE
 .vscode/
@@ -48,7 +53,7 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage
 coverage/
 
 # Dependency directories
@@ -70,20 +75,26 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
-# IDE
-.vscode/
-.idea/
+# TypeScript
+*.tsbuildinfo
 
-# Compozy task artifacts
+# ESLint
+.eslintcache
+
+# AI / Agent tools
+.opencode/
+.agents/
+.qodo/
+.playwright-mcp/
 .compozy/
 
 # Temporary folders
 tmp/
 temp/
-.playwright-mcp/
 
 *.pdf
 
 tasks/
 
 .env.production
+
