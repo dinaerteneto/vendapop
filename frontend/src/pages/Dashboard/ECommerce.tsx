@@ -17,12 +17,12 @@ interface DashboardStats {
 
 interface SubscriptionData {
   plan_type: string;
-  status: string;
+  plan_status: string;
   limits: {
     max_products: number | null;
     current_products: number;
   };
-  trial_ends_at?: string | null;
+  ends_at?: string | null;
   next_billing_at?: string | null;
 }
 
@@ -34,16 +34,20 @@ const planLabel: Record<string, string> = {
 
 const statusLabel: Record<string, string> = {
   active: 'Ativo',
+  trial: 'Período gratuito',
   trialing: 'Período gratuito',
   pending: 'Pendente',
   canceled: 'Cancelado',
+  cancelled: 'Cancelado',
 };
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
+  trial: 'bg-blue-100 text-blue-700',
   trialing: 'bg-blue-100 text-blue-700',
   pending: 'bg-amber-100 text-amber-700',
   canceled: 'bg-red-100 text-red-700',
+  cancelled: 'bg-red-100 text-red-700',
 };
 
 const ECommerce: React.FC = () => {
@@ -95,9 +99,10 @@ const ECommerce: React.FC = () => {
   }, [subscriptionData]);
 
   const trialDaysRemaining = useMemo(() => {
-    if (!subscriptionData?.trial_ends_at) return null;
+    if (!subscriptionData?.ends_at) return null;
+    if (subscriptionData.plan_status !== 'trial' && subscriptionData.plan_status !== 'trialing') return null;
     const now = new Date();
-    const trialEnd = new Date(subscriptionData.trial_ends_at);
+    const trialEnd = new Date(subscriptionData.ends_at);
     const diff = trialEnd.getTime() - now.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }, [subscriptionData]);
@@ -189,8 +194,8 @@ const ECommerce: React.FC = () => {
 
         {subscriptionData && (
           <div className="flex items-center gap-3">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[subscriptionData.status] || 'bg-gray-100 text-gray-600'}`}>
-              {statusLabel[subscriptionData.status] || subscriptionData.status}
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[subscriptionData.plan_status] || 'bg-gray-100 text-gray-600'}`}>
+              {statusLabel[subscriptionData.plan_status] || subscriptionData.plan_status}
             </span>
             <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
               {planLabel[subscriptionData.plan_type] || subscriptionData.plan_type}
