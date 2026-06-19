@@ -16,7 +16,8 @@ class CheckPlanLimits
 
     public function handle(Request $request, Closure $next, ?string $resourceType = null): Response
     {
-        $tenant = app(TenantService::class)->getTenant();
+        $tenant = app(TenantService::class)->getTenant()
+            ?? $request->user()?->tenant;
 
         if (!$tenant) {
             return $next($request);
