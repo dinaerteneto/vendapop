@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useParams, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import api from '../services/api';
 import Footer from '../components/common/Footer';
 import { CartProvider } from '../context/CartContext';
@@ -46,24 +47,35 @@ const PublicLayout: React.FC = () => {
                console.log('PublicLayout: Logo URL from API:', response.data?.logo_url);
                setStoreInfo(response.data);
                
-               // Dynamically update manifest link for tenant-specific PWA
-               const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
-               if (manifestLink) {
-                   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-                   manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
-               }
-               
-               // Update theme-color meta tag
-               const themeColorMeta = document.querySelector("meta[name='theme-color']");
-               if (themeColorMeta && response.data?.primary_color) {
-                   themeColorMeta.setAttribute('content', response.data.primary_color);
-               }
-               
-               // Update apple-mobile-web-app-title
-               const appleTitleMeta = document.querySelector("meta[name='apple-mobile-web-app-title']");
-               if (appleTitleMeta && response.data?.name) {
-                   appleTitleMeta.setAttribute('content', response.data.name);
-               }
+                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+                const logoUrl = response.data?.logo_url;
+                const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
+                const storeIcon = logoUrl || fallbackIcon;
+
+                // Atualiza os elementos de favicon — ambos precisam ser trocados
+                const faviconSvg = document.getElementById('favicon-svg') as HTMLLinkElement | null;
+                if (faviconSvg) {
+                    faviconSvg.type = 'image/png';
+                    faviconSvg.href = storeIcon;
+                }
+
+                const faviconIco = document.getElementById('favicon-ico') as HTMLLinkElement | null;
+                if (faviconIco) {
+                    faviconIco.type = 'image/png';
+                    faviconIco.href = storeIcon;
+                }
+
+                // Apple touch icon
+                const appleTouch = document.getElementById('apple-touch-icon') as HTMLLinkElement;
+                if (appleTouch) {
+                    appleTouch.href = logoUrl ? storeIcon : `${fallbackIcon}?size=180`;
+                }
+
+                // Manifest dinâmico por loja
+                const manifestLink = document.querySelector("link[rel='manifest']") as HTMLLinkElement;
+                if (manifestLink) {
+                    manifestLink.href = `${apiBaseUrl}/${storeSlug}/manifest.json`;
+                }
                
                // Service Worker será registrado automaticamente pelo vite-plugin-pwa
                // Mas podemos verificar se está ativo
@@ -110,14 +122,20 @@ const PublicLayout: React.FC = () => {
 
   return (
     <CartProvider storeSlug={storeSlug}>
-        <div 
+        {storeInfo && (
+          <Helmet>
+            <meta name="theme-color" content={primaryColor} />
+            <meta name="apple-mobile-web-app-title" content={storeInfo.name} />
+          </Helmet>
+        )}
+        <div
             className="min-h-screen bg-gray-50 flex flex-col"
-            style={{ 
-                '--theme-primary': primaryColor, 
-                '--theme-secondary': secondaryColor 
+            style={{
+                '--theme-primary': primaryColor,
+                '--theme-secondary': secondaryColor
             } as React.CSSProperties}
         >
-        <Header 
+        <Header
           storeName={storeInfo?.name} 
           storeSlug={storeSlug} 
           primaryColor={primaryColor}

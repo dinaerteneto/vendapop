@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../services/api';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
@@ -121,6 +122,7 @@ const BannerList: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <SEOHead title="Banners — VendaPop" noIndex />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Banners Rotativos</h1>
         <Link

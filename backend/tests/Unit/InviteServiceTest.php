@@ -136,7 +136,7 @@ class InviteServiceTest extends TestCase
 
         \App\Models\Subscription::create([
             'tenant_id' => $tenant->id,
-            'plan_type' => 'premium',
+            'plan_type' => 'basic',
             'plan_status' => 'active',
             'invite_source' => 'manual',
             'started_at' => now(),
@@ -158,11 +158,11 @@ class InviteServiceTest extends TestCase
 
         \App\Models\Subscription::create([
             'tenant_id' => $tenant->id,
-            'plan_type' => 'premium',
+            'plan_type' => 'basic',
             'plan_status' => 'trial',
             'invite_source' => 'public_link',
             'started_at' => now(),
-            'ends_at' => now()->addDays(60),
+            'ends_at' => now()->addDays(90),
         ]);
 
         $this->assertEquals(0, $this->inviteService->remainingForTenant($tenant));

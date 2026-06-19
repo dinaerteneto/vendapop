@@ -1,4 +1,5 @@
 import LegalPage from '../../components/legal/LegalPage';
+import { SEOHead } from '../../components/common/SEOHead';
 import type { LegalSection } from '../../components/legal/LegalPage';
 
 const sections: LegalSection[] = [
@@ -438,10 +439,13 @@ const sections: LegalSection[] = [
 
 export default function LgpdRightsPage() {
   return (
-    <LegalPage
+    <>
+      <SEOHead title="Direitos LGPD — VendaPop" path="/direitos-lgpd" />
+      <LegalPage
       title="Seus Direitos (LGPD)"
       lastUpdated="12 de junho de 2026"
       sections={sections}
     />
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
+import { SEOHead } from '../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 
 const ForgotPassword: React.FC = () => {
@@ -64,6 +65,7 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <SEOHead title="Recuperar senha — VendaPop" noIndex />
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">Esqueci minha Senha</h2>
         <p className="mb-6 text-center text-gray-600">

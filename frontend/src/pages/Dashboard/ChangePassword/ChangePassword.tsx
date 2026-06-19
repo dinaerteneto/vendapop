@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import api from '../../../services/api';
 
@@ -51,6 +52,7 @@ const ChangePassword: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
+      <SEOHead title="Alterar Senha — VendaPop" noIndex />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Alterar Senha</h1>
         <p className="mt-1 text-sm text-gray-500">

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api';
+import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 
 interface OrderItem {
@@ -124,6 +125,7 @@ const OrderDetail: React.FC = () => {
 
   return (
     <div>
+      <SEOHead title="Detalhes do Pedido — VendaPop" noIndex />
       <div className="mb-6 flex items-center justify-between">
         <div>
           <button

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import api from '../../services/api';
+import { SEOHead } from '../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 
 const RegisterForm: React.FC = () => {
@@ -107,6 +108,7 @@ const RegisterForm: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <SEOHead title="Criar conta — VendaPop" noIndex />
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
         <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">Cadastre sua Loja</h2>
         <form onSubmit={handleSubmit}>

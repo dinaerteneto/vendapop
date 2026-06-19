@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /superadmin/
+Disallow: /convite/
+Sitemap: https://vendapop.com.br/sitemap.xml

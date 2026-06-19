@@ -5,6 +5,7 @@ import ImageCarousel from '../../components/ui/ImageCarousel';
 import Toast from '../../components/ui/Toast';
 import { useCart } from '../../context/CartContext';
 import ProductActionButton from '../../components/ecommerce/ProductActionButton';
+import { SEOHead } from '../../components/common/SEOHead';
 import { formatCurrency } from '../../utils/currency';
 
 interface ProductImage {
@@ -75,6 +76,8 @@ const ProductDetail: React.FC = () => {
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: number]: string }>({});
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedVariation, setSelectedVariation] = useState<any>(null); // Variação selecionada atual
+  const apiBase = import.meta.env.VITE_API_BASE_URL ?? ''
+
   const context = useOutletContext<{ storeInfo: any }>();
   const primaryColor = context?.storeInfo?.primary_color || '#7c3aed';
   
@@ -399,8 +402,20 @@ const ProductDetail: React.FC = () => {
   const isVariationAvailable = isAvailable();
   const stockQuantity = selectedVariation?.stock ?? null;
 
+  const productImage = product?.main_image_url
+    ?? `${apiBase}/${storeSlug}/icon.png`
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
+        {product && (
+          <SEOHead
+            title={`${product.name} — ${context?.storeInfo?.name ?? 'VendaPop'}`}
+            description={product.short_description ?? product.description}
+            image={productImage}
+            path={`/${storeSlug}/product/${product.slug}`}
+            type="product"
+          />
+        )}
         <Toast 
             isVisible={toast.isVisible} 
             message={toast.message} 

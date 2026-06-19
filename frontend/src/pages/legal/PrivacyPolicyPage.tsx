@@ -1,4 +1,5 @@
 import LegalPage from '../../components/legal/LegalPage';
+import { SEOHead } from '../../components/common/SEOHead';
 import type { LegalSection } from '../../components/legal/LegalPage';
 
 const sections: LegalSection[] = [
@@ -221,10 +222,13 @@ const sections: LegalSection[] = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalPage
+    <>
+      <SEOHead title="Política de Privacidade — VendaPop" path="/privacidade" />
+      <LegalPage
       title="Política de Privacidade"
       lastUpdated="12 de junho de 2026"
       sections={sections}
     />
+    </>
   );
 }

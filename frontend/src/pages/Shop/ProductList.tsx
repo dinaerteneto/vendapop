@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useOutletContext } from 'react-router-dom';
 import api from '../../services/api';
 import CategoryList from '../../components/ecommerce/CategoryList';
+import { SEOHead } from '../../components/common/SEOHead';
 import { formatWhatsAppNumber } from '../../utils/whatsapp';
 import { formatCurrency } from '../../utils/currency';
 
@@ -27,7 +28,7 @@ interface Category {
   image_url?: string;
 }
 
-const ProductList: React.FC = () => {
+  const ProductList: React.FC = () => {
   const { storeSlug } = useParams();
   const context = useOutletContext<{ storeInfo: any }>();
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,6 +39,10 @@ const ProductList: React.FC = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isOneColumn, setIsOneColumn] = useState(false);
+
+  const apiBase = import.meta.env.VITE_API_BASE_URL ?? ''
+  const storeImage = context?.storeInfo?.logo_url
+    ?? `${apiBase}/${storeSlug}/icon.png`
 
   // Fetch Initial Data (Categories Only)
   useEffect(() => {
@@ -75,7 +80,16 @@ const ProductList: React.FC = () => {
 
 
   return (
-    <div>
+    <>
+      {context?.storeInfo && (
+        <SEOHead
+          title={context.storeInfo.name}
+          description={context.storeInfo.description ?? `Catálogo de ${context.storeInfo.name}`}
+          image={storeImage}
+          path={`/${storeSlug}`}
+        />
+      )}
+      <div>
       {/* Categories Section */}
       <CategoryList 
          categories={categories} 
@@ -225,6 +239,7 @@ const ProductList: React.FC = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

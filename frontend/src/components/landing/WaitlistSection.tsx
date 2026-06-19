@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
 import api from '../../services/api';
 
 const WaitlistSection: React.FC = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const { ref, inView } = useScrollReveal(0.15);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,11 +30,11 @@ const WaitlistSection: React.FC = () => {
   };
 
   return (
-    <section id="waitlist" className="bg-purple-600 py-16">
-      <div className="container mx-auto px-4 text-center max-w-lg">
-        <h2 className="text-2xl font-bold text-white mb-2">Fique por dentro</h2>
+    <section ref={ref} id="waitlist" className="bg-purple-600 py-16">
+      <div className={`container mx-auto px-4 text-center max-w-lg transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+        <h2 className="text-2xl font-bold text-white mb-2">Quero ser convidado(a)</h2>
         <p className="text-purple-200 mb-6">
-          Deixe seu email para ser avisado quando abrirmos novas vagas.
+          Deixe seu email para entrar na lista de espera. As vagas são limitadas.
         </p>
         {status === 'success' ? (
           <div className="bg-white/20 rounded-lg p-4">
@@ -53,7 +55,7 @@ const WaitlistSection: React.FC = () => {
               disabled={status === 'loading'}
               className="px-6 py-3 bg-white text-purple-700 font-semibold rounded-lg hover:bg-purple-50 transition disabled:opacity-50"
             >
-              {status === 'loading' ? '...' : 'Quero ser avisado'}
+              {status === 'loading' ? '...' : 'Quero ser convidado(a)'}
             </button>
           </form>
         )}
