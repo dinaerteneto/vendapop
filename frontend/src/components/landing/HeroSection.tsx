@@ -3,8 +3,18 @@ import PhoneSlideshow from './PhoneSlideshow';
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="bg-white min-h-[85vh] flex flex-col pt-14">
-      <div className="flex-1 flex items-center">
+    <section className="relative min-h-[85vh] flex flex-col pt-14 overflow-hidden" style={{ backgroundColor: '#FDF8F6' }}>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 60% at 20% 80%, rgba(201,77,109,0.07) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 85% 15%, rgba(124,58,237,0.05) 0%, transparent 60%),
+            repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(201,77,109,0.015) 3px, rgba(201,77,109,0.015) 6px)
+          `,
+        }}
+      />
+      <div className="flex-1 flex items-center relative">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
