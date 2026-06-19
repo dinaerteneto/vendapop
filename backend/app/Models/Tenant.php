@@ -93,6 +93,9 @@ class Tenant extends Model
         if (empty($value)) {
             return null;
         }
-        return preg_replace('/^http:\/\//i', 'https://', $value);
+        if (app()->environment('production')) {
+            return preg_replace('/^http:\/\//i', 'https://', $value);
+        }
+        return $value;
     }
 }

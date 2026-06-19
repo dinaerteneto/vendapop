@@ -114,7 +114,7 @@ class StoreSettingsController extends Controller
             }
 
             $path = $request->file('logo')->store('logos', 'public');
-            $logoUrl = str_replace('http://', 'https://', url(Storage::url($path)));
+            $logoUrl = url(Storage::url($path));
 
             Log::info('StoreSettings: Logo uploaded successfully', [
                 'path' => $path,
@@ -160,7 +160,7 @@ class StoreSettingsController extends Controller
                 $validated['logo_path'] = null;
                 $validated['logo_is_external'] = false;
             } elseif (!empty($logoUrlValue) && is_string($logoUrlValue)) {
-                $logoUrl = str_replace('http://', 'https://', trim($logoUrlValue));
+                $logoUrl = trim($logoUrlValue);
                 $storageUrl = url('/storage/');
 
                 if (str_starts_with($logoUrl, $storageUrl) || str_starts_with($logoUrl, str_replace('http://', 'https://', $storageUrl))) {
