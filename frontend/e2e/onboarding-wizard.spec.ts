@@ -72,13 +72,11 @@ test.describe('Onboarding Wizard', () => {
   });
 
   test('step 4 shows sharing and confetti', async ({ page }) => {
+    // Start directly on step 4 to avoid API-dependent navigation
+    await page.addInitScript(() => {
+      window.localStorage.setItem('onboarding_step', '4');
+    });
     await page.goto('/admin/setup');
-
-    // Skip through steps 1-3
-    for (let i = 0; i < 3; i++) {
-      await page.click('text=Pular');
-      await page.waitForTimeout(200);
-    }
 
     // Should be on step 4
     await expect(page.getByTestId('step-compartilhar')).toBeVisible();
