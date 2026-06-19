@@ -2,6 +2,27 @@
 
 ---
 
+## v1.13.1 — Correção de Favicon (Mixed Content)
+
+**Data:** 2026-06-18 | **Branch:** `main`
+
+### Correções
+
+**Favicon da loja bloqueado por Mixed Content (HTTP/HTTPS)**
+- O `logo_url` estava sendo salvo com protocolo `http://` no banco, fazendo o browser bloquear o favicon em páginas HTTPS
+- **Frontend:** `PublicLayout.tsx` agora força `https://` em qualquer `logo_url` recebido da API
+- **Backend:** `StoreSettingsController` força `https://` ao gerar URL de upload de logo e ao salvar URL externa
+- **Model:** `Tenant.getLogoUrlAttribute()` accessor normaliza o protocolo para `https://` em toda leitura
+- **Database:** SQL executado em produção para migrar registros existentes (`http://` → `https://`)
+
+### Git Log
+
+```
+e6dd1e2 fix: force HTTPS on logo_url to prevent mixed content favicon errors
+```
+
+---
+
 ## v1.12.2 — Ícones PWA offline com iniciais
 
 **Data:** 2026-06-18 | **Branch:** `feature/offline-pwa-icons`
