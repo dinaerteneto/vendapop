@@ -36,9 +36,9 @@ const PlansSection: React.FC = () => {
       features: [
         'Até 30 produtos',
         'Tudo do plano Grátis',
-        'Chave PIX no checkout',
         'Sem anúncios na loja',
         'Pedidos ilimitados',
+        'Múltiplas imagens',
       ],
     },
     {
@@ -50,10 +50,8 @@ const PlansSection: React.FC = () => {
       features: [
         'Até 100 produtos',
         'Tudo do plano Básico',
-        'Controle de estoque',
-        'Cupons de desconto',
-        'Carrinho abandonado',
         'Relatórios de vendas',
+        'PIX na página de pedido',
         'Suporte prioritário',
       ],
     },

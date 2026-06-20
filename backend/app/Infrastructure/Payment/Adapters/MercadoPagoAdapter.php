@@ -19,10 +19,12 @@ class MercadoPagoAdapter implements PaymentGateway
     private LoggerInterface $logger;
 
     private array $pricing = [
-        'basic_monthly' => ['title' => 'Plano Básico (Mensal)', 'price' => 29.90],
-        'basic_annual' => ['title' => 'Plano Básico (Anual)', 'price' => 299.00],
-        'pro_monthly' => ['title' => 'Plano Pro (Mensal)', 'price' => 99.90],
-        'pro_annual' => ['title' => 'Plano Pro (Anual)', 'price' => 999.00],
+        'basic_monthly'        => ['title' => 'Plano Básico (Mensal)',        'price' => 29.90],
+        'basic_annual'         => ['title' => 'Plano Básico (Anual)',          'price' => 299.00],
+        'professional_monthly' => ['title' => 'Plano Profissional (Mensal)',   'price' => 59.90],
+        'professional_annual'  => ['title' => 'Plano Profissional (Anual)',    'price' => 599.00],
+        'premium_monthly'      => ['title' => 'Plano Premium (Mensal)',        'price' => 99.90],
+        'premium_annual'       => ['title' => 'Plano Premium (Anual)',         'price' => 999.00],
     ];
 
     public function __construct(

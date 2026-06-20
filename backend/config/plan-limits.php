@@ -15,8 +15,15 @@ return [
             'allow_checkout_pix' => true,
             'max_orders_per_month' => null,
         ],
-        'pro' => [
+        'professional' => [
             'max_products' => 100,
+            'max_categories' => null,
+            'allow_checkout_pix' => true,
+            'allow_checkout_credit_card' => true,
+            'allow_analytics' => true,
+        ],
+        'premium' => [
+            'max_products' => 0,
             'max_categories' => null,
             'allow_custom_domain' => true,
             'allow_checkout_pix' => true,

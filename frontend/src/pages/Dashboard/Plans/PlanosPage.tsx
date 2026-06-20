@@ -37,7 +37,7 @@ const PLANS: Plan[] = [
     features: [
       { text: 'Até 6 produtos', included: true },
       { text: 'Categorias ilimitadas', included: true },
-      { text: 'Pedidos ilimitados', included: true },
+      { text: 'Pedidos pelo WhatsApp', included: true },
       { text: 'Integração WhatsApp', included: true },
       { text: 'Cobrança de taxa por pedido', included: true },
     ],
@@ -55,24 +55,34 @@ const PLANS: Plan[] = [
       { text: 'Sem taxa por pedido', included: true },
       { text: 'Múltiplas imagens', included: true },
     ],
-    popular: false,
   },
   {
-    id: 'pro',
-    name: 'Pro',
+    id: 'professional',
+    name: 'Profissional',
+    monthlyPrice: 59.90,
+    annualPrice: 599,
+    features: [
+      { text: 'Até 100 produtos', included: true },
+      { text: 'Tudo do Básico', included: true },
+      { text: 'Relatórios de vendas', included: true },
+      { text: 'PIX na página de pedido', included: true },
+      { text: 'Variações de produto', included: true },
+    ],
+    popular: true,
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
     monthlyPrice: 99.90,
     annualPrice: 999,
     features: [
       { text: 'Produtos ilimitados', included: true },
-      { text: 'Categorias ilimitadas', included: true },
-      { text: 'Pedidos ilimitados', included: true },
-      { text: 'Integração WhatsApp', included: true },
-      { text: 'Sem taxa por pedido', included: true },
-      { text: 'Múltiplas imagens', included: true },
-      { text: 'Variações de produto', included: true },
-      { text: 'Suporte prioritário', included: true },
+      { text: 'Tudo do Profissional', included: true },
+      { text: 'Domínio próprio', included: true },
+      { text: 'Temas premium', included: true },
+      { text: 'API e webhooks', included: true },
+      { text: 'Remoção marca VendaPop', included: true },
     ],
-    popular: true,
   },
 ];
 
@@ -107,7 +117,8 @@ const PlanosPage: React.FC = () => {
   const planLabelMap: Record<string, string> = {
     free: 'Grátis',
     basic: 'Básico',
-    pro: 'Pro',
+    professional: 'Profissional',
+    premium: 'Premium',
   };
 
   const formatPrice = (price: number) => {
@@ -172,8 +183,8 @@ const PlanosPage: React.FC = () => {
     return (
       <div>
         <h1 className="mb-6 text-2xl font-bold text-gray-900">Planos</h1>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm animate-pulse">
               <div className="h-6 bg-gray-200 rounded w-24 mb-4"></div>
               <div className="h-8 bg-gray-200 rounded w-32 mb-4"></div>
@@ -190,7 +201,7 @@ const PlanosPage: React.FC = () => {
 
   const getCtaLabel = (plan: Plan) => {
     if (plan.id === currentPlanId) return 'Seu plano atual';
-    const planOrder = ['free', 'basic', 'pro'];
+    const planOrder = ['free', 'basic', 'professional', 'premium'];
     if (planOrder.indexOf(plan.id) < planOrder.indexOf(currentPlanId)) {
       return 'Plano anterior';
     }
@@ -243,7 +254,7 @@ const PlanosPage: React.FC = () => {
       )}
 
       {/* Plan Grid */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((plan) => {
           const isCurrentPlan = plan.id === currentPlanId;
           const ctaLabel = getCtaLabel(plan);
