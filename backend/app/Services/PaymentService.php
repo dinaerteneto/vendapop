@@ -52,6 +52,7 @@ class PaymentService
                 'subscription_id' => $subscription->id,
                 'plan_type' => $planType,
                 'transaction_id' => $response->transaction_id,
+                'return_url' => $returnUrl,
             ]);
 
             return $response;
@@ -77,13 +78,13 @@ class PaymentService
             return;
         }
 
+        $gateway = $this->factory->make();
+        $notification = $gateway->processNotification($notification);
+
         $transaction->update([
             'status' => $notification->status,
             'paid_at' => $notification->paid_at,
         ]);
-
-        $gateway = $this->factory->make();
-        $gateway->processNotification($notification);
 
         $subscription = $transaction->subscription;
 

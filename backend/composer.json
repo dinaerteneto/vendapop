@@ -11,7 +11,7 @@
         "laravel/sanctum": "^4.2",
         "laravel/socialite": "^5.27",
         "laravel/tinker": "^2.10.1",
-        "mercadopago/dx-php": "^3.0",
+        "mercadopago/dx-php": "^3.10",
         "minishlink/web-push": "^9.0",
         "spatie/laravel-sluggable": "^3.7"
     },
