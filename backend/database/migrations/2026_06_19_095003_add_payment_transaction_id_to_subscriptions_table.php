@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('subscriptions', 'payment_transaction_id')) {
+            return;
+        }
+
         Schema::table('subscriptions', function (Blueprint $table) {
             $table->string('payment_transaction_id')->nullable()->after('is_pending');
         });
