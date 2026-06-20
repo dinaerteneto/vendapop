@@ -6,7 +6,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const gaMeasurementId = env.VITE_GA_MEASUREMENT_ID
+  const gaMeasurementId = env.VITE_GA_MEASUREMENT_ID || process.env.VITE_GA_MEASUREMENT_ID || ''
 
   const gaScript = gaMeasurementId
     ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}"></script>
