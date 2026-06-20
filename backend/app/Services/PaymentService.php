@@ -69,17 +69,23 @@ class PaymentService
 
     public function handleNotification(PaymentNotification $notification): void
     {
-        $transaction = PaymentTransaction::where('transaction_id', $notification->transaction_id)->first();
+        $gateway = $this->factory->make();
+        $notification = $gateway->processNotification($notification);
+
+        // O webhook do ML envia o payment_id, não o preference_id que gravamos em transaction_id.
+        // Usamos o external_reference (tenant_id) para localizar a transação pendente.
+        $transaction = PaymentTransaction::where('tenant_id', $notification->external_reference)
+            ->where('status', PaymentStatus::Pending->value)
+            ->latest()
+            ->first();
 
         if (!$transaction) {
             $this->logger->warning('Payment transaction not found for notification', [
-                'transaction_id' => $notification->transaction_id,
+                'gateway_payment_id' => $notification->transaction_id,
+                'tenant_id' => $notification->external_reference,
             ]);
             return;
         }
-
-        $gateway = $this->factory->make();
-        $notification = $gateway->processNotification($notification);
 
         $transaction->update([
             'status' => $notification->status,

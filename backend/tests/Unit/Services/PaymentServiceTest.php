@@ -149,7 +149,8 @@ class PaymentServiceTest extends TestCase
 
     public function test_handle_notification_with_approved_status_upgrades_subscription(): void
     {
-        $txnId = 'txn_a1_' . uniqid();
+        $preferenceId = 'pref_a1_' . uniqid();
+        $gatewayPaymentId = 'pay_a1_' . uniqid();
         $slug = 'test-a1-' . uniqid();
 
         $tenant = Tenant::create([
@@ -168,41 +169,50 @@ class PaymentServiceTest extends TestCase
         PaymentTransaction::create([
             'tenant_id' => $tenant->id,
             'subscription_id' => $subscription->id,
-            'transaction_id' => $txnId,
+            'transaction_id' => $preferenceId,
             'plan_type' => 'basic_monthly',
             'status' => 'pending',
             'gateway' => 'mercadopago',
         ]);
 
-        $notification = new PaymentNotification(
-            transaction_id: $txnId,
+        // Webhook chega com o gateway payment_id (diferente do preference_id gravado no banco)
+        $incomingNotification = new PaymentNotification(
+            transaction_id: $gatewayPaymentId,
+            status: 'pending',
+        );
+
+        $processedNotification = new PaymentNotification(
+            transaction_id: $gatewayPaymentId,
             status: 'approved',
+            external_reference: (string) $tenant->id,
             paid_at: now(),
         );
 
         $this->gateway->shouldReceive('processNotification')
             ->once()
-            ->with($notification);
+            ->with($incomingNotification)
+            ->andReturn($processedNotification);
 
         $this->subscriptionService->shouldReceive('upgradeTo')
             ->once()
-            ->with(Mockery::on(fn ($s) => $s->id === $subscription->id), 'basic_monthly', $txnId);
+            ->with(Mockery::on(fn ($s) => $s->id === $subscription->id), 'basic_monthly', $gatewayPaymentId);
 
         $this->logger->shouldReceive('info')
             ->once()
             ->with('Payment approved, subscription upgraded', Mockery::any());
 
-        $this->paymentService->handleNotification($notification);
+        $this->paymentService->handleNotification($incomingNotification);
 
         $this->assertDatabaseHas('payment_transactions', [
-            'transaction_id' => $txnId,
+            'transaction_id' => $preferenceId,
             'status' => 'approved',
         ]);
     }
 
     public function test_handle_notification_with_rejected_status_marks_cancelled(): void
     {
-        $txnId = 'txn_r1_' . uniqid();
+        $preferenceId = 'pref_r1_' . uniqid();
+        $gatewayPaymentId = 'pay_r1_' . uniqid();
         $slug = 'test-r1-' . uniqid();
 
         $tenant = Tenant::create([
@@ -221,20 +231,27 @@ class PaymentServiceTest extends TestCase
         PaymentTransaction::create([
             'tenant_id' => $tenant->id,
             'subscription_id' => $subscription->id,
-            'transaction_id' => $txnId,
+            'transaction_id' => $preferenceId,
             'plan_type' => 'basic_monthly',
             'status' => 'pending',
             'gateway' => 'mercadopago',
         ]);
 
-        $notification = new PaymentNotification(
-            transaction_id: $txnId,
+        $incomingNotification = new PaymentNotification(
+            transaction_id: $gatewayPaymentId,
+            status: 'pending',
+        );
+
+        $processedNotification = new PaymentNotification(
+            transaction_id: $gatewayPaymentId,
             status: 'rejected',
+            external_reference: (string) $tenant->id,
         );
 
         $this->gateway->shouldReceive('processNotification')
             ->once()
-            ->with($notification);
+            ->with($incomingNotification)
+            ->andReturn($processedNotification);
 
         $this->subscriptionService->shouldReceive('cancel')
             ->once()
@@ -244,10 +261,10 @@ class PaymentServiceTest extends TestCase
             ->once()
             ->with('Payment rejected, subscription cancelled', Mockery::any());
 
-        $this->paymentService->handleNotification($notification);
+        $this->paymentService->handleNotification($incomingNotification);
 
         $this->assertDatabaseHas('payment_transactions', [
-            'transaction_id' => $txnId,
+            'transaction_id' => $preferenceId,
             'status' => 'rejected',
         ]);
     }
