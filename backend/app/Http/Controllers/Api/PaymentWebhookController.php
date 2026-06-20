@@ -38,7 +38,7 @@ class PaymentWebhookController extends Controller
 
         $this->handleWebhookUseCase->execute($notification);
 
-        return response()->json(['status' => 'accepted'], 202);
+        return response()->json(['status' => 'accepted'], 200);
     }
 
     private function isValidWebhook(array $payload): bool
