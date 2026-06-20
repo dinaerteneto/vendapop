@@ -2,6 +2,24 @@
 
 ---
 
+## v1.14.4 — Correção no Redirect Pós-Pagamento MercadoPago
+
+**Data:** 2026-06-20 | **Branch:** `main`
+
+### Correções
+
+**Redirect pós-pagamento ia para /admin/planos sem indicar resultado**
+- `return_url` e `cancel_url` apontavam para `/admin/planos` em ambos os casos.
+- Corrigido para `/admin/planos/sucesso` (aprovado) e `/admin/planos/erro` (falha/cancelamento).
+- A página de sucesso faz polling da assinatura aguardando ativação via webhook.
+
+**Resposta do webhook alterada de 202 para 200**
+- Facilita leitura no dashboard do ngrok durante testes locais.
+
+### Git Log
+
+---
+
 ## v1.14.2 — Correções no Fluxo de Pagamento MercadoPago
 
 **Data:** 2026-06-20 | **Branch:** `main`
