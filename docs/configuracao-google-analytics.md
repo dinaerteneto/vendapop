@@ -73,17 +73,22 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 O script do GA4 deve ser carregado no `<head>` de TODAS as paginas do VendaPop:
 
 ```html
-<!-- Google tag (gtag.js) -->
+<!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
+
+  // Desativa envio automático de page_view no admin para não poluir dados
+  var isAdminRoute = window.location.pathname.startsWith('/admin');
+  gtag('config', 'G-XXXXXXXXXX', {
+    send_page_view: !isAdminRoute
+  });
 </script>
 ```
 
-**Importante:** O script NAO deve ser injetado no painel admin (`/admin/*`) — apenas na landing page e nas lojas publicas (vitrines).
+**Importante:** Diferente de uma implementação tradicional, o script **DEVE** ser carregado globalmente no `index.html` (inclusive no painel admin). Isso ocorre porque conversões como cadastro (`signup`) e início de checkout (`begin_checkout`) acontecem em rotas que iniciam com `/admin`. Se o script for removido dessas rotas, o GA não enviará as conversões. Para não poluir as visualizações de páginas, configuramos `send_page_view: !isAdminRoute`.
 
 ### 3.4 Testar se Esta Funcionando
 
@@ -264,8 +269,7 @@ Crie um relatorio personalizado com:
 - [ ] Fluxo de dados Web criado para `vendapop.com.br`
 - [ ] Measurement ID (`G-XXXXXXXXXX`) obtido e copiado
 - [ ] `VITE_GA_MEASUREMENT_ID` configurado no `.env.production`
-- [ ] Script GA4 carregando em todas as paginas publicas (landing + lojas)
-- [ ] Script NAO carregando no painel admin
+- [ ] Script GA4 carregando globalmente (inclusive admin) com `send_page_view: false` configurado para rotas `/admin`
 - [ ] Eventos de conversao configurados (`signup`, `purchase`, `begin_checkout`)
 - [ ] Eventos marcados como conversao no GA4
 - [ ] Google Ads vinculado ao GA4 (se ja tiver conta de Ads)

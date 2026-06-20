@@ -13,18 +13,19 @@
     <meta name="apple-mobile-web-app-title" content="VendaPop" />
     <link rel="manifest" href="/manifest.json" id="pwa-manifest" />
     <title>VendaPop</title>
-    <!-- Google Analytics 4 — não carrega no painel admin -->
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK7NRGDYFL"></script>
     <script>
-      if (!window.location.pathname.startsWith('/admin')) {
-        var s = document.createElement('script');
-        s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK7NRGDYFL';
-        document.head.appendChild(s);
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-PK7NRGDYFL');
-      }
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // Para não poluir os dados do GA4 com navegação interna no painel,
+      // desativamos o envio automático de page_view no admin. Eventos manuais (como signup) continuam funcionando.
+      var isAdminRoute = window.location.pathname.startsWith('/admin');
+      gtag('config', 'G-PK7NRGDYFL', {
+        send_page_view: !isAdminRoute
+      });
     </script>
   </head>
   <body>

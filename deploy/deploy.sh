@@ -57,8 +57,7 @@ info "Construindo imagens Docker..."
 cd "$DEPLOY_DIR"
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build \
     --build-arg "VITE_API_BASE_URL=https://api.${DOMAIN:-vendapop.com.br}/api" \
-    --build-arg "VITE_RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}" \
-    --build-arg "VITE_GA_MEASUREMENT_ID=${VITE_GA_MEASUREMENT_ID:-}"
+    --build-arg "VITE_RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}"
 
 log "Imagens construídas"
 echo ""
