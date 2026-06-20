@@ -119,8 +119,8 @@ class SubscriptionController extends Controller
         $response = $this->createCheckoutUseCase->execute(
             subscriptionId: $subscription->id,
             planType: $validated['plan_type'] . '_' . $validated['billing_cycle'],
-            returnUrl: $request->input('return_url', config('app.frontend_url', config('app.url')) . '/admin/planos'),
-            cancelUrl: $request->input('cancel_url', config('app.frontend_url', config('app.url')) . '/admin/planos'),
+            returnUrl: $request->input('return_url', config('app.frontend_url', config('app.url')) . '/admin/planos/sucesso'),
+            cancelUrl: $request->input('cancel_url', config('app.frontend_url', config('app.url')) . '/admin/planos/erro'),
         );
 
         return response()->json([
