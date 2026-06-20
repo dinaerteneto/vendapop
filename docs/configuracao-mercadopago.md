@@ -88,8 +88,8 @@ MERCADOPAGO_CLIENT_SECRET=XXXXXXXXXXXXX
 3. Va em **"Webhooks"**
 4. Clique em **"Configurar"**
 5. Preencha:
-   - **URL de notificacao (producao):** `https://api.vendapop.com.br/api/webhooks/payment`
-   - **URL de notificacao (teste):** `https://seu-dominio-teste.com/api/webhooks/payment`
+   - **URL de notificacao (producao):** `https://api.vendapop.com.br/api/webhooks/payment/mercadopago`
+   - **URL de notificacao (teste local com ngrok):** `https://seu-ngrok.ngrok-free.app/api/webhooks/payment/mercadopago`
    - Eventos: selecione **"Pagos"** (payment)
 6. Clique em **"Salvar"**
 
@@ -197,7 +197,9 @@ O arquivo `config/services.php` deve conter:
 
 ## 8. Testar com Sandbox
 
-### 8.1 Configurar Ambiente Local
+### 8.1 Configurar Ambiente Local e Ngrok
+
+1. **Variaveis de Ambiente:**
 
 ```env
 # .env local
@@ -205,6 +207,13 @@ PAYMENT_GATEWAY=mercadopago
 MERCADOPAGO_ACCESS_TOKEN=TEST-XXXXXXXXXXXXX
 MERCADOPAGO_PUBLIC_KEY=TEST-XXXXXXXXXXXXX
 ```
+
+2. **Expor o servidor local com Ngrok:**
+   Para que o MercadoPago consiga enviar os webhooks para sua maquina local, inicie o ngrok apontando para a porta do seu backend (ex: 8000):
+   ```bash
+   ngrok http 8000
+   ```
+   Copie a URL gerada (ex: `https://abcd-1234.ngrok-free.app`) e use-a para configurar a URL de Notificacao no painel do MercadoPago (conforme passo 4.1).
 
 ### 8.2 Cartoes de Teste
 
