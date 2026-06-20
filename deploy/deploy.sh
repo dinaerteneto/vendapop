@@ -72,16 +72,7 @@ log "Migrations concluídas"
 echo ""
 
 # ---------------------------------------------------------
-# 5. Seeders (idempotentes — seguros de re-executar)
-# ---------------------------------------------------------
-info "Rodando seeders..."
-docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend php artisan db:seed --class=PlanLimitsSeeder --force
-docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend php artisan db:seed --class=SpotBatchesSeeder --force
-log "Seeders concluídos"
-echo ""
-
-# ---------------------------------------------------------
-# 6. Criar symlink de storage (se não existir)
+# 5. Criar symlink de storage (se não existir)
 # ---------------------------------------------------------
 info "Verificando storage symlink..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend sh -c \
@@ -89,7 +80,7 @@ docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend sh -c 
 echo ""
 
 # ---------------------------------------------------------
-# 7. Cache do Laravel
+# 6. Cache do Laravel
 # ---------------------------------------------------------
 info "Otimizando cache..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend php artisan config:cache
@@ -99,7 +90,7 @@ log "Cache otimizado"
 echo ""
 
 # ---------------------------------------------------------
-# 8. Subir serviços (rolling update)
+# 7. Subir serviços (rolling update)
 # ---------------------------------------------------------
 info "Subindo serviços..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
@@ -107,7 +98,7 @@ docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
 echo ""
 
 # ---------------------------------------------------------
-# 9. Healthcheck
+# 8. Healthcheck
 # ---------------------------------------------------------
 info "Aguardando serviços iniciarem..."
 sleep 5
@@ -132,14 +123,14 @@ docker compose -f "$COMPOSE_FILE" ps
 echo ""
 
 # ---------------------------------------------------------
-# 10. Limpeza de imagens antigas
+# 9. Limpeza de imagens antigas
 # ---------------------------------------------------------
 info "Limpando imagens antigas (3 dias)..."
 docker image prune -af --filter "until=72h" 2>/dev/null || warn "Limpeza de imagens ignorada"
 echo ""
 
 # ---------------------------------------------------------
-# 11. Conclusão
+# 10. Conclusão
 # ---------------------------------------------------------
 echo -e "${GREEN}╔══════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║     Deploy concluído! v1.14.0            ║${NC}"
