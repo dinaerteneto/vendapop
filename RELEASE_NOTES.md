@@ -2,6 +2,22 @@
 
 ---
 
+## v1.14.5 — Correção Crítica no Processamento de Webhook MercadoPago
+
+**Data:** 2026-06-20 | **Branch:** `main`
+
+### Correções
+
+**Webhook do ML nunca ativava a assinatura ("Payment transaction not found")**
+- O banco guarda o `preference_id` em `payment_transactions.transaction_id`, mas o webhook envia o `payment_id` — IDs completamente diferentes.
+- O serviço buscava por `transaction_id = payment_id`, nunca encontrava nada e retornava silenciosamente.
+- Corrigido: o gateway é chamado primeiro para obter o `external_reference` (tenant_id), depois a transação pendente é localizada por `tenant_id + status=pending`.
+- Testes unitários atualizados para refletir a distinção entre `preference_id` e `gateway_payment_id`.
+
+### Git Log
+
+---
+
 ## v1.14.4 — Correção no Redirect Pós-Pagamento MercadoPago
 
 **Data:** 2026-06-20 | **Branch:** `main`
