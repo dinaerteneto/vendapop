@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import api from '../../services/api';
 
-const WaitlistSection: React.FC = () => {
+interface WaitlistSectionProps {
+  spotsExhausted?: boolean;
+}
+
+const WaitlistSection: React.FC<WaitlistSectionProps> = ({ spotsExhausted }) => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -15,6 +19,10 @@ const WaitlistSection: React.FC = () => {
     setStatus('loading');
     try {
       const res = await api.post('/admin/waitlist', { email });
+      window.gtag?.('event', 'waitlist_signup', {
+        spots_exhausted: spotsExhausted ?? false,
+        source: new URLSearchParams(window.location.search).get('utm_source') || 'direct',
+      });
       setStatus('success');
       setMessage(res.data.message);
       setEmail('');
@@ -32,10 +40,21 @@ const WaitlistSection: React.FC = () => {
   return (
     <section ref={ref} id="waitlist" className="bg-purple-600 py-16">
       <div className={`container mx-auto px-4 text-center max-w-lg transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-        <h2 className="text-2xl font-bold text-white mb-2">Quero ser convidado(a)</h2>
-        <p className="text-purple-200 mb-6">
-          Deixe seu email para entrar na lista de espera. As vagas são limitadas.
-        </p>
+        {spotsExhausted ? (
+          <>
+            <h2 className="text-2xl font-bold text-white mb-2">Vagas esgotadas</h2>
+            <p className="text-purple-200 mb-6">
+              Vagas esgotadas no momento. Novas vagas toda segunda-feira. Deixe seu email para ser avisado.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold text-white mb-2">Quero ser convidado(a)</h2>
+            <p className="text-purple-200 mb-6">
+              Deixe seu email para entrar na lista de espera. As vagas são limitadas.
+            </p>
+          </>
+        )}
         {status === 'success' ? (
           <div className="bg-white/20 rounded-lg p-4">
             <p className="text-white font-medium">{message}</p>

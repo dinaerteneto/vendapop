@@ -24,5 +24,16 @@ Route::prefix('api/superadmin')->group(function () {
         Route::get('/invites', [\App\Http\Controllers\Api\SuperAdmin\InviteController::class, 'index']);
         Route::post('/invites', [\App\Http\Controllers\Api\SuperAdmin\InviteController::class, 'store']);
         Route::put('/invites/{id}/toggle', [\App\Http\Controllers\Api\SuperAdmin\InviteController::class, 'toggle']);
+
+        // Plan Limits
+        Route::get('/plan-limits', [\App\Http\Controllers\Api\SuperAdmin\PlanLimitController::class, 'index']);
+        Route::put('/plan-limits/{planType}', [\App\Http\Controllers\Api\SuperAdmin\PlanLimitController::class, 'update']);
+
+        // Spots
+        Route::get('/spots', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'index']);
+        Route::get('/spots/stats', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'stats']);
+        Route::post('/spots', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'store']);
+        Route::put('/spots/{id}/replenish', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'replenish']);
+        Route::delete('/spots/{id}', [\App\Http\Controllers\Api\SuperAdmin\SpotController::class, 'destroy']);
     });
 });

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Contracts\SpotServiceInterface;
+use App\Exceptions\SpotExhaustedException;
 use App\Http\Controllers\Controller;
 use App\Mail\WelcomeMail;
 use App\Models\Invite;
+use App\Models\SpotBatch;
 use App\Models\Tenant;
 use App\Models\TenantSocial;
 use App\Models\User;
@@ -22,7 +25,8 @@ class RegistrationController extends Controller
 {
     public function __construct(
         private InviteService $inviteService,
-        private SubscriptionService $subscriptionService
+        private SubscriptionService $subscriptionService,
+        private SpotServiceInterface $spotService,
     ) {}
 
     public function store(Request $request)
@@ -61,7 +65,7 @@ class RegistrationController extends Controller
             }
         }
 
-        // Create Tenant in a transaction with invite validation
+        // Create Tenant in a transaction with invite validation and spot consumption
         try {
             $invite = null;
 
@@ -69,6 +73,11 @@ class RegistrationController extends Controller
                 // Validate invite code if provided
                 if (!empty($validated['invite_code'])) {
                     $invite = $this->inviteService->validate($validated['invite_code']);
+                }
+
+                // Spot consumption check (only if spot system has batches)
+                if (!$invite && SpotBatch::exists() && !$this->spotService->consume()) {
+                    throw new SpotExhaustedException();
                 }
 
                 $tenant = Tenant::create([
@@ -88,6 +97,11 @@ class RegistrationController extends Controller
 
                 return $tenant;
             });
+        } catch (SpotExhaustedException $e) {
+            return response()->json([
+                'message' => 'Vagas esgotadas no momento.',
+                'redirect_to' => 'waitlist',
+            ], 422);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),

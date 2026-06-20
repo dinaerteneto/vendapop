@@ -11,6 +11,11 @@ class IconController extends Controller
     {
         $tenant = Tenant::where('slug', $storeSlug)->firstOrFail();
 
+        if ($tenant->logo_url) {
+            return redirect($tenant->logo_url, 302)
+                ->header('Cache-Control', 'public, max-age=604800');
+        }
+
         $size = (int) request()->query('size', 512);
         $size = in_array($size, [16, 32, 64, 180, 192, 512]) ? $size : 512;
 

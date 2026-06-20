@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { SEOHead } from '../../components/common/SEOHead';
 import InvitePanel from '../../components/admin/InvitePanel';
 import OnboardingBanner from '../../components/onboarding/OnboardingBanner';
+import LimitBanner from '../../components/subscription/LimitBanner';
 
 interface DashboardStats {
   sales_today: string;
@@ -14,13 +15,53 @@ interface DashboardStats {
   sales_this_month: string;
 }
 
+interface SubscriptionData {
+  plan_type: string;
+  plan_status: string;
+  limits: {
+    max_products: number | null;
+    current_products: number;
+  };
+  ends_at?: string | null;
+  next_billing_at?: string | null;
+}
+
+const planLabel: Record<string, string> = {
+  free: 'Grátis',
+  basic: 'Básico',
+  pro: 'Pro',
+};
+
+const statusLabel: Record<string, string> = {
+  active: 'Ativo',
+  trial: 'Período gratuito',
+  trialing: 'Período gratuito',
+  pending: 'Pendente',
+  canceled: 'Cancelado',
+  cancelled: 'Cancelado',
+};
+
+const statusColors: Record<string, string> = {
+  active: 'bg-green-100 text-green-700',
+  trial: 'bg-blue-100 text-blue-700',
+  trialing: 'bg-blue-100 text-blue-700',
+  pending: 'bg-amber-100 text-amber-700',
+  canceled: 'bg-red-100 text-red-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
+
 const ECommerce: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [limitBannerDismissed, setLimitBannerDismissed] = useState(false);
+  const [trialBannerDismissed, setTrialBannerDismissed] = useState(false);
   const navigate = useNavigate();
 
   const BANNER_DISMISS_KEY = 'onboarding_banner_dismissed_at';
+  const LIMIT_BANNER_DISMISS_KEY = 'limit_banner_dismissed_at';
+  const TRIAL_BANNER_DISMISS_KEY = 'trial_banner_dismissed_at';
 
   const onboardingStep = useMemo(() => {
     const saved = localStorage.getItem('onboarding_step');
@@ -41,22 +82,82 @@ const ECommerce: React.FC = () => {
     return daysAgo >= 30;
   }, []);
 
+  const shouldShowLimitBanner = useMemo(() => {
+    if (!subscriptionData) return false;
+    const { max_products, current_products } = subscriptionData.limits;
+    if (max_products === null) return false;
+
+    if (current_products < max_products - 1) return false;
+
+    const dismissed = localStorage.getItem(LIMIT_BANNER_DISMISS_KEY);
+    if (dismissed) {
+      const daysAgo = (Date.now() - Number(dismissed)) / (1000 * 60 * 60 * 24);
+      if (daysAgo < 30) return false;
+    }
+
+    return true;
+  }, [subscriptionData]);
+
+  const trialDaysRemaining = useMemo(() => {
+    if (!subscriptionData?.ends_at) return null;
+    if (subscriptionData.plan_status !== 'trial' && subscriptionData.plan_status !== 'trialing') return null;
+    const now = new Date();
+    const trialEnd = new Date(subscriptionData.ends_at);
+    const diff = trialEnd.getTime() - now.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }, [subscriptionData]);
+
+  const shouldShowTrialBanner = useMemo(() => {
+    if (trialDaysRemaining === null || trialDaysRemaining > 7) return false;
+    if (trialBannerDismissed) return false;
+    const dismissed = localStorage.getItem(TRIAL_BANNER_DISMISS_KEY);
+    if (dismissed) {
+      const daysAgo = (Date.now() - Number(dismissed)) / (1000 * 60 * 60 * 24);
+      if (daysAgo < 7) return false;
+    }
+    return true;
+  }, [trialDaysRemaining, trialBannerDismissed]);
+
   const handleDismissBanner = () => {
     localStorage.setItem(BANNER_DISMISS_KEY, String(Date.now()));
     setBannerDismissed(true);
   };
 
-  useEffect(() => {
-    loadDashboardStats();
+  const handleDismissLimitBanner = useCallback(() => {
+    localStorage.setItem(LIMIT_BANNER_DISMISS_KEY, String(Date.now()));
+    setLimitBannerDismissed(true);
   }, []);
 
-  const loadDashboardStats = async () => {
+  const handleDismissTrialBanner = useCallback(() => {
+    localStorage.setItem(TRIAL_BANNER_DISMISS_KEY, String(Date.now()));
+    setTrialBannerDismissed(true);
+  }, []);
+
+  useEffect(() => {
+    if (shouldShowLimitBanner && typeof window.gtag === 'function') {
+      window.gtag('event', 'limit_warning_shown', {
+        plan_type: subscriptionData!.plan_type,
+        products_used: subscriptionData!.limits.current_products,
+        product_limit: subscriptionData!.limits.max_products,
+      });
+    }
+  }, [shouldShowLimitBanner, subscriptionData]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/admin/dashboard');
-      setStats(response.data);
+      const [dashboardRes, subscriptionRes] = await Promise.all([
+        api.get('/admin/dashboard'),
+        api.get('/admin/subscription'),
+      ]);
+      setStats(dashboardRes.data);
+      setSubscriptionData(subscriptionRes.data);
     } catch (error) {
-      console.error('Erro ao carregar estatísticas do dashboard', error);
+      console.error('Erro ao carregar dados do dashboard', error);
     } finally {
       setLoading(false);
     }
@@ -88,13 +189,69 @@ const ECommerce: React.FC = () => {
   return (
     <div>
       <SEOHead title="Dashboard — VendaPop" noIndex />
-      <h2 className="mb-6 text-2xl font-bold text-gray-900">Dashboard</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+
+        {subscriptionData && (
+          <div className="flex items-center gap-3">
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[subscriptionData.plan_status] || 'bg-gray-100 text-gray-600'}`}>
+              {statusLabel[subscriptionData.plan_status] || subscriptionData.plan_status}
+            </span>
+            <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+              {planLabel[subscriptionData.plan_type] || subscriptionData.plan_type}
+            </span>
+            <button
+              onClick={() => navigate('/admin/planos')}
+              className="text-xs text-indigo-600 hover:text-indigo-800 underline"
+            >
+              Gerenciar
+            </button>
+          </div>
+        )}
+      </div>
 
       {showBanner && !bannerDismissed && (
         <OnboardingBanner
           step={onboardingStep}
           onContinue={() => navigate('/admin/setup')}
           onDismiss={handleDismissBanner}
+        />
+      )}
+
+      {shouldShowTrialBanner && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between mb-6">
+          <div>
+            <p className="font-medium text-blue-800">
+              Seu período gratuito termina em {trialDaysRemaining} {trialDaysRemaining === 1 ? 'dia' : 'dias'}. Assine agora.
+            </p>
+            <p className="text-sm text-blue-700">
+              Faça upgrade para não perder acesso aos recursos da sua loja.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <a
+              href="/admin/planos"
+              className="inline-block bg-blue-500 text-white px-4 py-2 rounded text-sm hover:bg-blue-600 transition"
+            >
+              Ver planos
+            </a>
+            <button
+              onClick={handleDismissTrialBanner}
+              className="text-blue-600 hover:text-blue-800 text-sm px-2"
+              aria-label="Dispensar aviso"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {shouldShowLimitBanner && !limitBannerDismissed && (
+        <LimitBanner
+          planType={subscriptionData!.plan_type}
+          current={subscriptionData!.limits.current_products}
+          limit={subscriptionData!.limits.max_products!}
+          onDismiss={handleDismissLimitBanner}
         />
       )}
       

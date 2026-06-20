@@ -3,8 +3,29 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
 import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
-import CurrencyInput from 'react-currency-input-field';
 import ImageUploader from '../../../components/ui/ImageUploader';
+
+function formatCurrency(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  const padded = digits.padStart(3, '0');
+  const len = padded.length;
+  const integer = padded.slice(0, len - 2).replace(/^0+/, '') || '0';
+  const cents = padded.slice(len - 2);
+  return `${integer},${cents}`;
+}
+
+function parseCurrency(formatted: string): number {
+  const cleaned = formatted.replace(/[^\d,]/g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+}
+
+function floatToCurrency(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') return '';
+  const num = parseFloat(String(value).replace(',', '.'));
+  if (isNaN(num)) return '';
+  return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+import UpgradeModal from '../../../components/admin/UpgradeModal';
 
 interface Category {
   id: number;
@@ -62,6 +83,13 @@ const ProductForm: React.FC = () => {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const [upgradeInfo, setUpgradeInfo] = useState<{
+    planType: string;
+    current: number;
+    limit: number;
+  } | null>(null);
+
 
   // All product images (main + gallery)
   const [productImages, setProductImages] = useState<ProductImage[]>([]);
@@ -188,8 +216,8 @@ const ProductForm: React.FC = () => {
 
       setFormData({
         name: data.name || '',
-        price: data.price?.toString() || '',
-        promotional_price: data.promotional_price?.toString() || '',
+        price: floatToCurrency(data.price),
+        promotional_price: floatToCurrency(data.promotional_price),
         category_id: data.category_id?.toString() || '',
         description: data.description || '',
         main_image_url: mainImage ? mainImage.url : '',
@@ -801,6 +829,25 @@ const ProductForm: React.FC = () => {
       setDraggedIndex(null);
   };
 
+  const handleSubmitError = (error: unknown) => {
+    const err = error as { response?: { status?: number; data?: { message?: string; plan_type?: string; current?: number; limit?: number } } };
+    if (err?.response?.status === 402) {
+      const data = err.response.data;
+      window.gtag?.('event', 'limit_reached', {
+        plan_type: data?.plan_type || 'free',
+        current: data?.current || 0,
+        limit: data?.limit || 0,
+      });
+      setUpgradeInfo({
+        planType: data?.plan_type || 'free',
+        current: data?.current || 0,
+        limit: data?.limit || 0,
+      });
+      return;
+    }
+    toast.error('Erro ao salvar produto.');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -836,8 +883,8 @@ const ProductForm: React.FC = () => {
     if (imageFile) {
         const data = new FormData();
         data.append('name', formData.name);
-        data.append('price', formData.price.toString().replace(',', '.'));
-        if(formData.promotional_price) data.append('promotional_price', formData.promotional_price.toString().replace(',', '.'));
+        data.append('price', String(parseCurrency(formData.price)));
+        if(formData.promotional_price) data.append('promotional_price', String(parseCurrency(formData.promotional_price)));
         
         if(formData.category_id) data.append('category_id', formData.category_id);
         data.append('attributes', JSON.stringify(attributesPayload));
@@ -870,7 +917,7 @@ const ProductForm: React.FC = () => {
                 navigate('/admin/products');
             } catch (error) {
                 console.error(error);
-                toast.error('Erro ao salvar produto.');
+                handleSubmitError(error);
             }
         } else {
             try {
@@ -881,15 +928,15 @@ const ProductForm: React.FC = () => {
                 navigate('/admin/products');
             } catch (error) {
                 console.error(error);
-                toast.error('Erro ao salvar produto.');
+                handleSubmitError(error);
             }
         }
     } else {
         // Standard JSON payload
         const payload = {
             ...formData,
-            price: parseFloat(formData.price.toString().replace(',', '.')),
-            promotional_price: formData.promotional_price ? parseFloat(formData.promotional_price.toString().replace(',', '.')) : null,
+            price: parseCurrency(formData.price),
+            promotional_price: formData.promotional_price ? parseCurrency(formData.promotional_price) : null,
             category_id: formData.category_id ? parseInt(formData.category_id) : null,
             attributes: attributesPayload,
             variations: variationsPayload.length > 0 ? variationsPayload : undefined,
@@ -917,7 +964,7 @@ const ProductForm: React.FC = () => {
             navigate('/admin/products');
         } catch (error) {
             console.error(error);
-            toast.error('Erro ao salvar produto.');
+            handleSubmitError(error);
         }
     }
     setLoading(false);
@@ -982,30 +1029,34 @@ const ProductForm: React.FC = () => {
             {/* Preço */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Preço (R$)</label>
-              <CurrencyInput
-                name="price"
-                placeholder="R$ 0,00"
-                value={formData.price}
-                decimalsLimit={2}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, price: value || '' }))}
-                prefix="R$ "
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                required
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R$</span>
+                <input
+                  type="text"
+                  name="price"
+                  placeholder="0,00"
+                  value={formData.price}
+                  onChange={(e) => setFormData(prev => ({ ...prev, price: formatCurrency(e.target.value) }))}
+                  className="w-full rounded border border-gray-300 pl-9 pr-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  required
+                />
+              </div>
             </div>
 
             {/* Preço Promocional */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Preço Promocional (Opcional)</label>
-              <CurrencyInput
-                name="promotional_price"
-                placeholder="R$ 0,00"
-                value={formData.promotional_price}
-                decimalsLimit={2}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, promotional_price: value || '' }))}
-                prefix="R$ "
-                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R$</span>
+                <input
+                  type="text"
+                  name="promotional_price"
+                  placeholder="0,00"
+                  value={formData.promotional_price}
+                  onChange={(e) => setFormData(prev => ({ ...prev, promotional_price: formatCurrency(e.target.value) }))}
+                  className="w-full rounded border border-gray-300 pl-9 pr-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
               <p className="text-xs text-gray-500 mt-1">Se preenchido, o preço original aparecerá riscado.</p>
             </div>
 
@@ -1543,6 +1594,18 @@ const ProductForm: React.FC = () => {
           </div>
         </form>
       </div>
+
+      <UpgradeModal
+        isOpen={upgradeInfo !== null}
+        planType={upgradeInfo?.planType || 'free'}
+        current={upgradeInfo?.current || 0}
+        limit={upgradeInfo?.limit || 0}
+        upgradeUrl="/admin/planos"
+        onClose={() => {
+          setUpgradeInfo(null);
+          navigate('/admin/products');
+        }}
+      />
     </div>
   );
 };

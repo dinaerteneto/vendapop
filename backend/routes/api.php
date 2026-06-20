@@ -40,6 +40,12 @@ use Illuminate\Support\Facades\Route;
 // Image proxy serving (CORS-friendly)
 Route::get('/proxy-image/{path}', [ImageProxyController::class, 'show'])->where('path', '.*');
 
+// Spots — public, no auth
+Route::get('/spots/remaining', [\App\Http\Controllers\Api\SpotController::class, 'remaining']);
+
+// Webhooks — public, no auth
+Route::post('/webhooks/payment/mercadopago', [\App\Http\Controllers\Api\PaymentWebhookController::class, 'handle']);
+
 // Rotas Admin
 Route::prefix('admin')->group(function () {
     Route::post('/register', [RegistrationController::class, 'store']); // Nova rota de registro
@@ -75,10 +81,13 @@ Route::prefix('admin')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
 
-        Route::apiResource('products', AdminProductController::class);
+        Route::apiResource('products', AdminProductController::class)->except(['store', 'update']);
+        Route::post('products', [AdminProductController::class, 'store'])->middleware('check.plan.limits:products');
+        Route::put('products/{product}', [AdminProductController::class, 'update'])->middleware('check.plan.limits:products');
         Route::delete('product-images/{productImage}', [ProductImageController::class, 'destroy']);
         Route::put('product-images/{productImage}/set-as-main', [ProductImageController::class, 'setAsMain']);
-        Route::apiResource('categories', AdminCategoryController::class);
+        Route::apiResource('categories', AdminCategoryController::class)->except(['store']);
+        Route::post('categories', [AdminCategoryController::class, 'store'])->middleware('check.plan.limits:categories');
 
         Route::get('/orders', [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}', [AdminOrderController::class, 'show']);
@@ -112,6 +121,8 @@ Route::prefix('admin')->group(function () {
 
         // Subscription
         Route::get('/subscription', [SubscriptionController::class, 'show']);
+        Route::post('/subscription/create', [SubscriptionController::class, 'createCheckout']);
+        Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel']);
         Route::post('/subscription/dismiss-banner', [SubscriptionController::class, 'dismissBanner']);
 
         // Waitlist (admin)

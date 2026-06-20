@@ -44,6 +44,13 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Interfaces\RotatingBannerRepositoryInterface::class,
             \App\Repositories\Eloquent\RotatingBannerRepository::class
         );
+
+        $this->app->bind(
+            \App\Contracts\SpotServiceInterface::class,
+            \App\Services\SpotService::class
+        );
+
+        $this->app->singleton(\App\Infrastructure\Payment\PaymentGatewayFactory::class);
     }
 
     /**

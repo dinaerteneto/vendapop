@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async'
 import { SEOHead } from '../components/common/SEOHead'
 import Navbar from '../components/landing/Navbar';
@@ -10,6 +11,7 @@ import PlansSection from '../components/landing/PlansSection';
 import FAQSection from '../components/landing/FAQSection';
 import WaitlistSection from '../components/landing/WaitlistSection';
 import FooterSection from '../components/landing/FooterSection';
+import { useSpotCounter } from '../hooks/useSpotCounter';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -109,6 +111,16 @@ const jsonLd = {
 }
 
 const Landing = () => {
+  const spot = useSpotCounter();
+
+  useEffect(() => {
+    if (!spot.isLoading && !spot.isError) {
+      window.gtag?.('event', 'spot_view', {
+        spots_remaining: spot.remaining,
+      });
+    }
+  }, [spot.isLoading, spot.isError]);
+
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
@@ -121,15 +133,23 @@ const Landing = () => {
         description="Crie seu catálogo online grátis em 5 minutos. Seus clientes navegam, escolhem variações e o pedido chega organizado no seu WhatsApp — sem calcular total na mão."
         path="/"
       />
-      <Navbar />
-      <HeroSection />
+      <Navbar
+        spotsRemaining={spot.remaining}
+        spotsLoading={spot.isLoading}
+        spotsError={spot.isError}
+      />
+      <HeroSection
+        spotsRemaining={spot.remaining}
+        spotsLoading={spot.isLoading}
+        spotsError={spot.isError}
+      />
       <CaseSection />
       <HowItWorksSection />
       <FeatureGrid />
       <GoogleIndexSection />
       <PlansSection />
       <FAQSection />
-      <WaitlistSection />
+      <WaitlistSection spotsExhausted={spot.remaining === 0 && !spot.isLoading && !spot.isError} />
       <FooterSection />
     </div>
   );

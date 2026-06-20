@@ -44,7 +44,6 @@ const RegisterForm: React.FC = () => {
     setLoading(true);
 
     try {
-      // Executar reCAPTCHA v3
       const recaptchaToken = await executeRecaptcha('register');
       
       const payload: Record<string, any> = {
@@ -58,16 +57,25 @@ const RegisterForm: React.FC = () => {
       }
 
       await api.post('/admin/register', payload);
+      window.gtag?.('event', 'signup', {
+        plan_type: 'free',
+        has_invite: !!formData.invite_code,
+        source: new URLSearchParams(window.location.search).get('utm_source') || 'direct',
+      });
       toast.success('Loja cadastrada com sucesso! Verifique seu e-mail para ativar sua conta e receber sua senha.');
       navigate('/admin/login');
     } catch (err: any) {
-      console.error('Erro completo:', err);
-      console.error('Response:', err.response);
-      console.error('Response data:', err.response?.data);
-      
+      const status = err?.response?.status;
+      const data = err?.response?.data;
+
+      if (status === 422 && data?.redirect_to === 'waitlist') {
+        window.location.href = '/#waitlist';
+        return;
+      }
+
       let errorMessage = 'Erro ao cadastrar loja.';
-      const errors = err.response?.data?.errors;
-      const message = err.response?.data?.message;
+      const errors = data?.errors;
+      const message = data?.message;
       
       if (message) {
         errorMessage = message;
@@ -81,13 +89,13 @@ const RegisterForm: React.FC = () => {
             autoClose: 5000,
           });
         });
-      } else if (!message && err.response?.status) {
-        if (err.response.status === 422) {
+      } else if (!message && status) {
+        if (status === 422) {
           errorMessage = 'Dados inválidos. Verifique os campos preenchidos.';
-        } else if (err.response.status === 500) {
+        } else if (status === 500) {
           errorMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
         } else {
-          errorMessage = `Erro ${err.response.status}: ${err.response.statusText || 'Erro desconhecido'}`;
+          errorMessage = `Erro ${status}: ${status === 422 ? 'Dados inválidos' : 'Erro desconhecido'}`;
         }
         toast.error(errorMessage, {
           autoClose: 5000,
@@ -263,4 +271,3 @@ const Register: React.FC = () => {
 };
 
 export default Register;
-

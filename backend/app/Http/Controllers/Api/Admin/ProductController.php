@@ -60,6 +60,13 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        foreach (['attributes', 'variations'] as $field) {
+            $value = $request->input($field);
+            if (is_string($value)) {
+                $request->merge([$field => json_decode($value, true) ?? []]);
+            }
+        }
+
         $validated = $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
@@ -187,6 +194,13 @@ class ProductController extends Controller
         // Ensure product belongs to tenant
         if ($product->tenant_id !== $tenant->id) {
             return response()->json(['message' => 'Product not found'], 404);
+        }
+
+        foreach (['attributes', 'variations'] as $field) {
+            $value = $request->input($field);
+            if (is_string($value)) {
+                $request->merge([$field => json_decode($value, true) ?? []]);
+            }
         }
 
         $validated = $request->validate([

@@ -162,7 +162,7 @@ class InviteServiceTest extends TestCase
             'plan_status' => 'trial',
             'invite_source' => 'public_link',
             'started_at' => now(),
-            'ends_at' => now()->addDays(90),
+            'ends_at' => now()->addDays(config('trial.duration_days')),
         ]);
 
         $this->assertEquals(0, $this->inviteService->remainingForTenant($tenant));

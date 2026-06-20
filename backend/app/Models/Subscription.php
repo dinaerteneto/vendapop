@@ -15,12 +15,15 @@ class Subscription extends Model
         'started_at',
         'ends_at',
         'cancelled_at',
+        'is_pending',
+        'payment_transaction_id',
     ];
 
     protected $casts = [
         'started_at' => 'datetime',
         'ends_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'is_pending' => 'boolean',
     ];
 
     public function tenant()
@@ -31,6 +34,11 @@ class Subscription extends Model
     public function invite()
     {
         return $this->belongsTo(Invite::class);
+    }
+
+    public function trialEmailsSent()
+    {
+        return $this->hasMany(TrialEmailsSent::class);
     }
 
     public function isTrial(): bool

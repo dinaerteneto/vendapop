@@ -48,8 +48,7 @@ const PublicLayout: React.FC = () => {
                setStoreInfo(response.data);
                
                 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-                const rawLogoUrl = response.data?.logo_url;
-                const logoUrl = rawLogoUrl ? rawLogoUrl.replace(/^http:\/\//i, 'https://') : null;
+                const logoUrl = response.data?.logo_url || null;
                 const fallbackIcon = `${apiBaseUrl}/${storeSlug}/icon.png`;
                 const storeIcon = logoUrl || fallbackIcon;
 
