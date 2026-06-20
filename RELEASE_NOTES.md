@@ -2,6 +2,42 @@
 
 ---
 
+## v1.14.2 — Correções no Fluxo de Pagamento MercadoPago
+
+**Data:** 2026-06-20 | **Branch:** `main`
+
+### Correções
+
+**Checkout falhava com "Invalid plan type"**
+- O controller enviava apenas `plan_type` (ex: `basic`) ao invés da chave composta esperada pelo adapter (`basic_monthly`). O `billing_cycle` não estava sendo concatenado. O valor `annual` também era mapeado incorretamente para `yearly`.
+
+**MercadoPago retornava 400 ao criar preferência em desenvolvimento local**
+- O campo `auto_return` só é enviado quando a `return_url` é uma URL pública (sem `localhost` ou `127.0.0.1`), evitando o erro `auto_return invalid` do sandbox.
+
+**Notificação de pagamento não atualizava a assinatura**
+- `processNotification` foi corrigido para retornar `PaymentNotification` com os dados do pagamento (status, external_reference, paid_at) em vez de `void`. O `PaymentService` agora usa esse retorno para atualizar a transação antes de acionar o gateway.
+
+**Frontend redirecionado para URL errada após pagamento**
+- Adicionada configuração `FRONTEND_URL` separada do `APP_URL`, permitindo que backend e SPA rodem em domínios distintos (necessário com ngrok ou deploy separado).
+
+### Melhorias de Desenvolvimento
+
+- Vite dev server agora permite todos os hosts (`allowedHosts: true`) para suporte a tunnels ngrok com URL dinâmica
+- Log do `return_url` adicionado ao checkout para facilitar debug
+- Documentação do MercadoPago atualizada com endpoint correto do webhook e guia de configuração local com ngrok
+
+### Git Log
+
+```
+0c05641 docs(mercadopago): atualiza URLs de webhook e adiciona guia de ngrok local
+1da90fc chore(dev): permite todos os hosts no Vite dev server para suporte a ngrok
+4851b73 fix(payment): corrige fluxo de notificação e separa URL do frontend
+1515563 fix(payment): desabilita auto_return para URLs locais e corrige processNotification
+8307054 fix(payment): corrige construção do plan_type combinando billing_cycle
+```
+
+---
+
 ## v1.14.1 — Correção de Inicialização do GA4 em SPA
 
 **Data:** 2026-06-20 | **Branch:** `fix/ga4-spa-initialization`
