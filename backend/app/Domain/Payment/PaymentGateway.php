@@ -6,7 +6,7 @@ interface PaymentGateway
 {
     public function createCheckout(CreateCheckoutRequest $request): CheckoutResponse;
 
-    public function processNotification(PaymentNotification $notification): void;
+    public function processNotification(PaymentNotification $notification): PaymentNotification;
 
     public function refund(RefundRequest $request): RefundResponse;
 }

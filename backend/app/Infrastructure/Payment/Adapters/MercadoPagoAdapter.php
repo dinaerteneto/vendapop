@@ -48,6 +48,9 @@ class MercadoPagoAdapter implements PaymentGateway
         try {
             $plan = $this->getPlanPricing($request->plan_type);
 
+            $isPublicUrl = !str_contains($request->return_url, 'localhost')
+                && !str_contains($request->return_url, '127.0.0.1');
+
             $preferenceData = [
                 'items' => [
                     [
@@ -65,13 +68,16 @@ class MercadoPagoAdapter implements PaymentGateway
                     'failure' => $request->cancel_url,
                     'pending' => $request->return_url,
                 ],
-                'auto_return' => 'approved',
                 'external_reference' => (string) $request->tenant_id,
                 'metadata' => [
                     'plan_type' => $request->plan_type,
                     'tenant_id' => $request->tenant_id,
                 ],
             ];
+
+            if ($isPublicUrl) {
+                $preferenceData['auto_return'] = 'approved';
+            }
 
             $preference = $this->sdkClient->createPreference($preferenceData);
 
@@ -97,7 +103,7 @@ class MercadoPagoAdapter implements PaymentGateway
         }
     }
 
-    public function processNotification(PaymentNotification $notification): void
+    public function processNotification(PaymentNotification $notification): PaymentNotification
     {
         try {
             $paymentId = (int) $notification->transaction_id;
@@ -108,6 +114,15 @@ class MercadoPagoAdapter implements PaymentGateway
                 'status' => $payment->status,
                 'status_detail' => $payment->status_detail,
             ]);
+
+            return new PaymentNotification(
+                transaction_id: $notification->transaction_id,
+                status: $payment->status,
+                external_reference: $payment->external_reference,
+                paid_at: $payment->status === 'approved' && isset($payment->date_approved) 
+                    ? new \DateTime($payment->date_approved) 
+                    : null,
+            );
         } catch (MPApiException $e) {
             $this->logger->error('MercadoPago API error processing notification', [
                 'transaction_id' => $notification->transaction_id,
