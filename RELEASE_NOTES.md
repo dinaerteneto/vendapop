@@ -2,6 +2,25 @@
 
 ---
 
+## v1.14.1 — Correção de Inicialização do GA4 em SPA
+
+**Data:** 2026-06-20 | **Branch:** `fix/ga4-spa-initialization`
+
+### Correções
+
+**Google Analytics não disparava page_view/eventos corretamente (SPA)**
+- Ajustada a inicialização do GA4 no `index.html` para permitir o rastreamento de eventos manuais em rotas do painel admin (onde `send_page_view` é configurado dinamicamente como false).
+- Ajustado `PublicLayout.tsx` para não reescrever a função `gtag` caso já tenha sido carregada globalmente pelo `index.html`.
+- Removido `VITE_GA_MEASUREMENT_ID` do `docker-compose.prod.yml` e `deploy.sh` (a tag G-PK7NRGDYFL agora é injetada diretamente no HTML).
+
+### Git Log
+
+```
+db4bc40 fix(analytics): fix GA4 initialization in SPA to allow event tracking on admin routes
+```
+
+---
+
 ## v1.13.1 — Correção de Favicon (Mixed Content)
 
 **Data:** 2026-06-18 | **Branch:** `main`
