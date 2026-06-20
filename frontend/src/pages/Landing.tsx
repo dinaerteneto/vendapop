@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async'
 import { SEOHead } from '../components/common/SEOHead'
 import Navbar from '../components/landing/Navbar';
@@ -111,6 +112,14 @@ const jsonLd = {
 
 const Landing = () => {
   const spot = useSpotCounter();
+
+  useEffect(() => {
+    if (!spot.isLoading && !spot.isError) {
+      window.gtag?.('event', 'spot_view', {
+        spots_remaining: spot.remaining,
+      });
+    }
+  }, [spot.isLoading, spot.isError]);
 
   return (
     <div className="min-h-screen bg-white">

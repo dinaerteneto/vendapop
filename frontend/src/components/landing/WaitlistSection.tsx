@@ -19,6 +19,10 @@ const WaitlistSection: React.FC<WaitlistSectionProps> = ({ spotsExhausted }) => 
     setStatus('loading');
     try {
       const res = await api.post('/admin/waitlist', { email });
+      window.gtag?.('event', 'waitlist_signup', {
+        spots_exhausted: spotsExhausted ?? false,
+        source: new URLSearchParams(window.location.search).get('utm_source') || 'direct',
+      });
       setStatus('success');
       setMessage(res.data.message);
       setEmail('');

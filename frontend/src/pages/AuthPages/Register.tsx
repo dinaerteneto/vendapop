@@ -57,6 +57,11 @@ const RegisterForm: React.FC = () => {
       }
 
       await api.post('/admin/register', payload);
+      window.gtag?.('event', 'signup', {
+        plan_type: 'free',
+        has_invite: !!formData.invite_code,
+        source: new URLSearchParams(window.location.search).get('utm_source') || 'direct',
+      });
       toast.success('Loja cadastrada com sucesso! Verifique seu e-mail para ativar sua conta e receber sua senha.');
       navigate('/admin/login');
     } catch (err: any) {

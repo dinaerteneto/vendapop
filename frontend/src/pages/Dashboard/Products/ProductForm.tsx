@@ -833,6 +833,11 @@ const ProductForm: React.FC = () => {
     const err = error as { response?: { status?: number; data?: { message?: string; plan_type?: string; current?: number; limit?: number } } };
     if (err?.response?.status === 402) {
       const data = err.response.data;
+      window.gtag?.('event', 'limit_reached', {
+        plan_type: data?.plan_type || 'free',
+        current: data?.current || 0,
+        limit: data?.limit || 0,
+      });
       setUpgradeInfo({
         planType: data?.plan_type || 'free',
         current: data?.current || 0,
