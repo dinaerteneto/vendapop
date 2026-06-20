@@ -2,6 +2,24 @@
 
 ---
 
+## v1.14.3 — 2026-06-20
+
+### Correções
+
+- **Planos**: alinha definição de planos entre landing page, painel admin e backend conforme `docs/estrategia-monetizacao.md`. Estrutura correta: Grátis, Básico (R$29,90), Profissional (R$59,90), Premium (R$99,90).
+- **MercadoPago**: chaves de pricing corrigidas para `professional_monthly/annual` e `premium_monthly/annual` — elimina erro "The selected plan type is invalid" no checkout.
+- **SubscriptionController**: validação `plan_type` atualizada para `in:basic,professional,premium` e `planOrder` correto.
+- **plan-limits.php**: substituído plano `pro` por `professional` (100 produtos) e `premium` (ilimitado + domínio próprio).
+- **Banco de dados**: removida linha `pro` órfã da tabela `plan_limits`; adicionadas `professional` e `premium` via seeder.
+
+### Deploy
+
+```bash
+php artisan db:seed --class=PlanLimitsSeeder
+```
+
+---
+
 ## v1.14.0 — 2026-06-20
 
 **Lançamento beta fechado**
