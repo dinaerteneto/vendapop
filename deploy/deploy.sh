@@ -15,7 +15,7 @@ info() { echo -e "${CYAN}[i]${NC} $1"; }
 
 echo ""
 echo -e "${CYAN}╔══════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║     VendaPop — Deploy v1.13.1            ║${NC}"
+echo -e "${CYAN}║     VendaPop — Deploy v1.14.0            ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -57,7 +57,8 @@ info "Construindo imagens Docker..."
 cd "$DEPLOY_DIR"
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" build \
     --build-arg "VITE_API_BASE_URL=https://api.${DOMAIN:-vendapop.com.br}/api" \
-    --build-arg "VITE_RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}"
+    --build-arg "VITE_RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}" \
+    --build-arg "VITE_GA_MEASUREMENT_ID=${VITE_GA_MEASUREMENT_ID:-}"
 
 log "Imagens construídas"
 echo ""
@@ -71,7 +72,16 @@ log "Migrations concluídas"
 echo ""
 
 # ---------------------------------------------------------
-# 5. Criar symlink de storage (se não existir)
+# 5. Seeders (idempotentes — seguros de re-executar)
+# ---------------------------------------------------------
+info "Rodando seeders..."
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend php artisan db:seed --class=PlanLimitsSeeder --force
+docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend php artisan db:seed --class=SpotBatchesSeeder --force
+log "Seeders concluídos"
+echo ""
+
+# ---------------------------------------------------------
+# 6. Criar symlink de storage (se não existir)
 # ---------------------------------------------------------
 info "Verificando storage symlink..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend sh -c \
@@ -79,7 +89,7 @@ docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend sh -c 
 echo ""
 
 # ---------------------------------------------------------
-# 6. Cache do Laravel
+# 7. Cache do Laravel
 # ---------------------------------------------------------
 info "Otimizando cache..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" run --rm backend php artisan config:cache
@@ -89,7 +99,7 @@ log "Cache otimizado"
 echo ""
 
 # ---------------------------------------------------------
-# 7. Subir serviços (rolling update)
+# 8. Subir serviços (rolling update)
 # ---------------------------------------------------------
 info "Subindo serviços..."
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
@@ -97,7 +107,7 @@ docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --remove-orphans
 echo ""
 
 # ---------------------------------------------------------
-# 8. Healthcheck
+# 9. Healthcheck
 # ---------------------------------------------------------
 info "Aguardando serviços iniciarem..."
 sleep 5
@@ -122,17 +132,17 @@ docker compose -f "$COMPOSE_FILE" ps
 echo ""
 
 # ---------------------------------------------------------
-# 9. Limpeza de imagens antigas
+# 10. Limpeza de imagens antigas
 # ---------------------------------------------------------
 info "Limpando imagens antigas (3 dias)..."
 docker image prune -af --filter "until=72h" 2>/dev/null || warn "Limpeza de imagens ignorada"
 echo ""
 
 # ---------------------------------------------------------
-# 10. Conclusão
+# 11. Conclusão
 # ---------------------------------------------------------
 echo -e "${GREEN}╔══════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║     Deploy concluído! v1.13.1            ║${NC}"
+echo -e "${GREEN}║     Deploy concluído! v1.14.0            ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════╝${NC}"
 echo ""
 info "Frontend: https://${DOMAIN:-vendapop.com.br}"
