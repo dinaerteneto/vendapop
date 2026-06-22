@@ -2,6 +2,29 @@
 
 ---
 
+## v1.14.6 — Correção na Verificação reCAPTCHA
+
+**Data:** 2026-06-22 | **Branch:** `main`
+
+### Correções
+
+**reCAPTCHA falhava silenciosamente em produção**
+- `@file_get_contents()` suprimia erros de rede, DNS, SSL e `allow_url_fopen`, retornando sempre "Verificação reCAPTCHA falhou" sem indicar a causa real.
+- Criado `RecaptchaService` centralizado usando `Http::post()` do Laravel com timeout de 5s e tratamento de exceções.
+- Loga `error_codes`, `score`, `hostname` e mensagens de exceção em `storage/logs/laravel.log` para diagnóstico.
+- Unifica a verificação nos 3 controllers: `RegistrationController`, `OTPAuthController`, `EmailVerificationController`.
+
+**MailHog descontinuado**
+- `mailhog/mailhog` substituído por `axllent/mailpit` no `docker-compose.yaml` (mesmas portas: 1025 SMTP, 8025 Web UI).
+
+### Git Log
+
+```
+352e11e fix(recaptcha): substitui file_get_contents por Laravel HTTP client com log de erros
+```
+
+---
+
 ## v1.14.5 — Correção Crítica no Processamento de Webhook MercadoPago
 
 **Data:** 2026-06-20 | **Branch:** `main`
