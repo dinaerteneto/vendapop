@@ -39,6 +39,7 @@ services:
       target: fpm
     restart: unless-stopped
     environment:
+      - APP_NAME=${APP_NAME:-VendaPop}
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_KEY=${APP_KEY:?APP_KEY is required}

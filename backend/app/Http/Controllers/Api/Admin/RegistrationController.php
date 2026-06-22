@@ -70,7 +70,9 @@ class RegistrationController extends Controller
                 }
 
                 // Spot consumption check (only if spot system has batches)
-                if (!$invite && SpotBatch::exists() && !$this->spotService->consume()) {
+                // Public invites (e.g. BETA2026) consume spots; manual/personal invites bypass
+                $shouldConsumeSpot = !$invite || ($invite->type === 'public');
+                if ($shouldConsumeSpot && SpotBatch::exists() && !$this->spotService->consume()) {
                     throw new SpotExhaustedException();
                 }
 
