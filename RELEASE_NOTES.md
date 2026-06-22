@@ -2,6 +2,42 @@
 
 ---
 
+## v1.14.7 — Correções no reCAPTCHA em Produção e Consumo de Vagas
+
+**Data:** 2026-06-22 | **Branch:** `main`
+
+### Correções
+
+**reCAPTCHA não aparecia em produção**
+- `VITE_RECAPTCHA_SITE_KEY` não estava sendo passado como build arg para o container do frontend, resultando no uso da chave de teste do Google (só funciona em localhost).
+- Confirmado via inspeção do bundle JS em produção — chave `6LeIxAcT...` (teste) em vez de `6Ldy0C0t...` (produção).
+- Rebuild do container frontend com a chave correta do `.env.production` resolveu o problema.
+
+**`APP_NAME` exibindo "Laravel" nos e-mails**
+- `APP_NAME` não estava sendo passado como variável de ambiente para o container do backend no `docker-compose.prod.yml`.
+- E-mails de boas-vindas chegavam com "Bem-vindo ao Laravel" em vez de "Bem-vindo ao VendaPop".
+- Adicionado `APP_NAME=${APP_NAME:-VendaPop}` no serviço `backend`.
+
+**Invites públicos (BETA2026) não consumiam vagas do SpotBatch**
+- Registros feitos com código de convite pulavam inteiramente o consumo de vagas, fazendo o contador da landing page não diminuir.
+- Invites do tipo `public` (abertos, como BETA2026) agora também consomem uma vaga do SpotBatch.
+- Invites do tipo `manual` (pessoais) continuam isentos do contador.
+
+### Arquivos Alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `deploy/docker-compose.prod.yml` | +`APP_NAME=${APP_NAME:-VendaPop}` no serviço backend |
+| `backend/app/Http/Controllers/Api/Admin/RegistrationController.php` | Invites `public` consomem SpotBatch |
+
+### Git Log
+
+```
+(ver commits abaixo)
+```
+
+---
+
 ## v1.14.6 — Correção na Verificação reCAPTCHA
 
 **Data:** 2026-06-22 | **Branch:** `main`
