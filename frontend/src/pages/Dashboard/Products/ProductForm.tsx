@@ -1012,7 +1012,7 @@ const ProductForm: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow p-6">
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="flex flex-col gap-5 md:grid md:grid-cols-2 md:gap-6 mb-6">
             
             {/* Nome */}
             <div className="col-span-2">
@@ -1028,34 +1028,34 @@ const ProductForm: React.FC = () => {
             </div>
 
             {/* Preço */}
-            <div>
+            <div className="w-full pb-0">
               <label className="block text-sm font-medium text-gray-700 mb-2">Preço (R$)</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R$</span>
+              <div className="flex">
+                <span className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">R$</span>
                 <input
                   type="text"
                   name="price"
                   placeholder="0,00"
                   value={formData.price}
                   onChange={(e) => setFormData(prev => ({ ...prev, price: formatCurrency(e.target.value) }))}
-                  className="w-full rounded border border-gray-300 pl-9 pr-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 min-w-0 rounded-none rounded-r-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   required
                 />
               </div>
             </div>
 
             {/* Preço Promocional */}
-            <div>
+            <div className="w-full pt-0">
               <label className="block text-sm font-medium text-gray-700 mb-2">Preço Promocional (Opcional)</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">R$</span>
+              <div className="flex">
+                <span className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-100 border border-r-0 border-gray-300 rounded-l-md">R$</span>
                 <input
                   type="text"
                   name="promotional_price"
                   placeholder="0,00"
                   value={formData.promotional_price}
                   onChange={(e) => setFormData(prev => ({ ...prev, promotional_price: formatCurrency(e.target.value) }))}
-                  className="w-full rounded border border-gray-300 pl-9 pr-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 min-w-0 rounded-none rounded-r-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">Se preenchido, o preço original aparecerá riscado.</p>
@@ -1233,7 +1233,53 @@ const ProductForm: React.FC = () => {
                     Se o preço estiver vazio, será usado o preço base do produto.
                   </p>
                   
-                  <div className="overflow-x-auto">
+                  {/* Mobile: Cards */}
+                  <div className="md:hidden space-y-4">
+                    {variations.map((variation, index) => (
+                      <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+                        <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                          {formatVariationAttributes(variation)}
+                        </span>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Estoque</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={variation.stock ?? ''}
+                              onChange={(e) => handleVariationChange(index, 'stock', e.target.value ? parseInt(e.target.value) : null)}
+                              placeholder="0"
+                              className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Preço (R$)</label>
+                            <CurrencyInput
+                              placeholder="0,00"
+                              value={variation.price?.toString() || ''}
+                              decimalsLimit={2}
+                              onValueChange={(value) => handleVariationChange(index, 'price', value ? parseFloat(value.replace(',', '.')) : null)}
+                              prefix="R$ "
+                              className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <label className="block text-xs text-gray-500 mb-1">SKU</label>
+                            <input
+                              type="text"
+                              value={variation.sku || ''}
+                              onChange={(e) => handleVariationChange(index, 'sku', e.target.value || null)}
+                              placeholder="SKU"
+                              className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop: Tabela */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200 border border-gray-300 rounded-lg">
                       <thead className="bg-gray-50">
                         <tr>
@@ -1254,14 +1300,11 @@ const ProductForm: React.FC = () => {
                       <tbody className="bg-white divide-y divide-gray-200">
                         {variations.map((variation, index) => (
                           <tr key={index} className="hover:bg-gray-50">
-                            {/* Combinação de atributos */}
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 border-r border-gray-200">
                               <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
                                 {formatVariationAttributes(variation)}
                               </span>
                             </td>
-                            
-                            {/* Estoque */}
                             <td className="px-4 py-3 whitespace-nowrap border-r border-gray-200">
                               <input
                                 type="number"
@@ -1272,8 +1315,6 @@ const ProductForm: React.FC = () => {
                                 className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                               />
                             </td>
-                            
-                            {/* Preço */}
                             <td className="px-4 py-3 whitespace-nowrap border-r border-gray-200">
                               <CurrencyInput
                                 placeholder="R$ 0,00"
@@ -1284,16 +1325,14 @@ const ProductForm: React.FC = () => {
                                 className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                               />
                             </td>
-                            
-                            {/* SKU */}
                             <td className="px-4 py-3 whitespace-nowrap">
-              <input
-                type="text"
+                              <input
+                                type="text"
                                 value={variation.sku || ''}
                                 onChange={(e) => handleVariationChange(index, 'sku', e.target.value || null)}
                                 placeholder="SKU"
                                 className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
+                              />
                             </td>
                           </tr>
                         ))}
