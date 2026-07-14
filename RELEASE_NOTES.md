@@ -2,6 +2,43 @@
 
 ---
 
+## v1.14.12 — Input-group de preço, variações em cards, preview responsivo
+
+**Data:** 2026-07-13 | **Branch:** `fix/product-form-price-mobile`
+
+### Correções
+
+**ProductForm: campos de preço com input-group estilo Bootstrap**
+- Prefixo R$ usa flex inline (span grudado no input com borda compartilhada).
+- Substitui `absolute` + `pl-9` que quebrava em telas estreitas (iPhone SE 375px).
+- Layout do form: `flex-col` em mobile, `grid` em desktop. Corrige campos ficando lado a lado em vez de empilhados abaixo de 768px.
+
+**ProductForm: variações em cards no mobile**
+- Tabela de variações (Estoque/Preço/SKU) vira cards individuais abaixo de 768px.
+- Cada card: nome da variação (badge roxo), Estoque e Preço em grid 2 colunas, SKU largura total.
+- Desktop mantém tabela original (`hidden md:table`).
+
+**Onboarding: preview do iPhone não corta bordas em mobile**
+- `ShopPreview` usava `width: 375px` fixo — com `border-[6px]` + padding do container, total excedia 375px da tela.
+- Bordas do mockup sumiam por overflow.
+- Corrigido: `w-full max-w-[375px]` + `aspectRatio` mantendo proporção. Padding reduzido (`p-3`) em mobile.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `frontend/src/pages/Dashboard/Products/ProductForm.tsx` | Input-group R$, flex-col mobile, variações em cards |
+| `frontend/src/components/onboarding/ShopPreview.tsx` | Dimensões responsivas com aspectRatio |
+| `frontend/src/pages/AuthPages/OnboardingSetup.tsx` | Padding reduzido no preview em mobile |
+
+### Commits
+
+- fix(product-form): input-group R$ estilo bootstrap e layout flex-col em mobile
+- fix(product-form): variações em cards no mobile
+- fix(onboarding): preview do iPhone cabe na tela em mobile
+
+---
+
 ## v1.14.11 — Cards mobile em listagens e correções no formulário de produto
 
 **Data:** 2026-07-13 | **Branch:** `fix/mobile-cards-and-product-form`
