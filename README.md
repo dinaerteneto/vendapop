@@ -138,16 +138,14 @@ vendapop/
 │   ├── public/            # Assets estáticos
 │   └── package.json       # Dependências Node.js
 ├── docker-compose.yaml     # Configuração Docker
-├── docs/                  # Documentação completa
-│   ├── SPEC.md            # Especificações técnicas
-│   ├── ROADMAP.md         # Visão do produto e features planejadas
-│   ├── RELEASE_NOTES.md   # Histórico de versões
-│   ├── DEPLOY.md          # Guia de deploy em VPS
-│   ├── todo.md            # Tarefas e notas de desenvolvimento
-│   ├── brainstorm-monetizacao.md  # Estratégia de precificação
-│   ├── estudo-concorrentes.md     # Análise competitiva
-│   └── playbook-prospeccao.md     # Guia de prospecção de clientes
-└── frontend/              # SPA React
+├── docs/                  # Documentação técnica
+│   ├── especificacao-tecnica.md   # Especificações técnicas
+│   ├── DEPLOY.md                  # Guia de deploy em VPS
+│   ├── configuracao-mercadopago.md
+│   ├── configuracao-google-analytics.md
+│   ├── configuracao-integrações.md
+│   └── screenshots/               # Prints usados neste README
+└── RELEASE_NOTES.md       # Histórico de versões
 ```
 
 ## 🔧 Comandos Úteis

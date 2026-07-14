@@ -82,6 +82,7 @@ jspm_packages/
 .eslintcache
 
 # AI / Agent tools
+.claude/
 .opencode/
 .agents/
 .qodo/
