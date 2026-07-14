@@ -39,14 +39,14 @@ const OnboardingSetup: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-white">
       <SEOHead title="Configurar loja — VendaPop" noIndex />
       <WizardProgressBar currentStep={step} />
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-2/5 p-8 border-r overflow-y-auto">
+      <div className="flex flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
+        <div className="w-full p-6 md:w-2/5 md:border-r md:p-8 md:overflow-y-auto">
           {step === 1 && <StepIdentidade onNext={handleNext} />}
           {step === 2 && <StepVitrine onNext={handleNext} onBack={handleBack} onSkip={handleSkip} />}
           {step === 3 && <StepWhatsapp onNext={handleNext} onBack={handleBack} />}
           {step === 4 && <StepCompartilhar onBack={handleBack} />}
         </div>
-        <div className="w-3/5 bg-gray-50 flex items-center justify-center p-8">
+        <div className="w-full bg-gray-50 flex items-center justify-center p-6 md:w-3/5 md:p-8">
           <ShopPreview tenantSlug={tenantSlug} refreshKey={previewRefreshKey} />
         </div>
       </div>

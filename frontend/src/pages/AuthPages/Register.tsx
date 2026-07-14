@@ -39,7 +39,7 @@ const RegisterForm: React.FC = () => {
       return;
     }
 
-    if (!recaptchaToken) {
+    if (RECAPTCHA_SITE_KEY && !recaptchaToken) {
       toast.error('Confirme que você não é um robô.');
       return;
     }
@@ -50,7 +50,7 @@ const RegisterForm: React.FC = () => {
       const payload: Record<string, any> = {
         ...formData,
         terms_accepted: true,
-        recaptcha_token: recaptchaToken,
+        ...(recaptchaToken ? { recaptcha_token: recaptchaToken } : {}),
       };
 
       if (!formData.invite_code) {
@@ -237,17 +237,21 @@ const RegisterForm: React.FC = () => {
           </div>
 
           <div className="mb-4">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              sitekey={RECAPTCHA_SITE_KEY}
-              onChange={(token) => setRecaptchaToken(token)}
-              onExpired={() => setRecaptchaToken(null)}
-            />
+            {RECAPTCHA_SITE_KEY ? (
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={RECAPTCHA_SITE_KEY}
+                onChange={(token) => setRecaptchaToken(token)}
+                onExpired={() => setRecaptchaToken(null)}
+              />
+            ) : (
+              <p className="text-sm text-gray-400">reCAPTCHA desabilitado (dev local).</p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={loading || !recaptchaToken}
+            disabled={loading || (!!RECAPTCHA_SITE_KEY && !recaptchaToken)}
             className="w-full rounded bg-blue-600 py-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Cadastrando...' : 'Cadastrar'}

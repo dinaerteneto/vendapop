@@ -132,7 +132,28 @@ const CustomerList: React.FC = () => {
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="divide-y divide-gray-200 md:hidden">
+            {customers.map((customer) => (
+              <button
+                key={customer.id}
+                onClick={() => navigate(`/admin/customers/${customer.uuid}`)}
+                className="block w-full p-4 text-left hover:bg-gray-50"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium text-gray-900">{customer.name}</p>
+                  <span className="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {customer.orders_count} pedido{customer.orders_count === 1 ? '' : 's'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">{customer.email || '-'}</p>
+                <p className="text-sm text-gray-500">{customer.phone || '-'}</p>
+                {customer.notes && (
+                  <p className="mt-1 text-sm text-gray-400 truncate">{customer.notes}</p>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="hidden overflow-x-auto md:block">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>

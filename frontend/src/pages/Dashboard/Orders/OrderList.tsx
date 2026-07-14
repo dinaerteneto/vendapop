@@ -166,7 +166,29 @@ const OrderList: React.FC = () => {
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="divide-y divide-gray-200 md:hidden">
+            {orders.map((order) => (
+              <button
+                key={order.id}
+                onClick={() => navigate(`/admin/orders/${order.uuid}`)}
+                className="block w-full p-4 text-left hover:bg-gray-50"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-gray-900">#{order.order_number}</p>
+                  <span className={`shrink-0 px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                    {getStatusLabel(order.status)}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-900">{order.customer.name}</p>
+                <p className="text-sm text-gray-500">{order.customer.email}</p>
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-sm text-gray-500">{formatDate(order.created_at)}</span>
+                  <span className="font-medium text-gray-900">R$ {parseFloat(order.total_amount).toFixed(2).replace('.', ',')}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+          <div className="hidden overflow-x-auto md:block">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
