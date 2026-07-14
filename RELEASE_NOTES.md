@@ -2,6 +2,41 @@
 
 ---
 
+## v1.14.9 — Migração reCAPTCHA v3 → v2 (checkbox)
+
+**Data:** 2026-07-13 | **Branch:** `main`
+
+### Correções
+
+**reCAPTCHA v3 quebrava em navegadores com bloqueio de storage de terceiros**
+- Mesmo com chave/domínio corretos (v1.14.8), cadastro/login continuava falhando com "recaptcha_token field is required" em Brave (Shields), Safari (ITP) e outros navegadores privacy-first.
+- Causa: reCAPTCHA v3 (invisível) usa `requestStorageAccess()` no iframe do Google para gerar o token; esses navegadores negam o acesso por padrão, token nunca é gerado.
+- Confirmado via console do navegador do usuário: `requestStorageAccess: Permission denied`.
+- Solução: migrado para reCAPTCHA v2 (checkbox "Não sou um robô"), que não depende de storage access para o desafio inicial.
+- Nova chave gerada no Google reCAPTCHA admin (tipo v2 checkbox, domínio `vendapop.com.br`).
+
+**Backend não usava `config()` para o secret do reCAPTCHA**
+- `RecaptchaService` lia `env('RECAPTCHA_SECRET_KEY', ...)` direto, que retorna `null` depois de `php artisan config:cache` (rodado no deploy) — verificação silenciosamente caía no fallback hardcoded.
+- Corrigido: `config('services.recaptcha.secret')`, com entrada nova em `config/services.php`.
+- Removido o gate de score (`< 0.5`) do fluxo de verificação — v2 não retorna score, só `success`.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `frontend/src/pages/AuthPages/Register.tsx` | `react-google-recaptcha-v3` → `react-google-recaptcha` (checkbox) |
+| `frontend/src/pages/AuthPages/SignIn.tsx` | Idem, nos fluxos de reenvio de verificação e envio/reenvio de OTP |
+| `frontend/package.json` | Troca de dependência |
+| `backend/app/Services/RecaptchaService.php` | `config()` em vez de `env()`, remove gate de score |
+| `backend/config/services.php` | Adiciona bloco `recaptcha.secret` |
+| `deploy/.env.production` (servidor) | Novas chaves `RECAPTCHA_SITE_KEY`/`RECAPTCHA_SECRET_KEY` (v2) |
+
+### Commits
+
+- fix(recaptcha): migra de v3 invisível para v2 checkbox
+
+---
+
 ## v1.14.8 — Fix definitivo: reCAPTCHA quebrava a cada novo deploy
 
 **Data:** 2026-07-13 | **Branch:** `main`
