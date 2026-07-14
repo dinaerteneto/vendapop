@@ -120,32 +120,44 @@ Isso deixa plugar um gateway novo (Stripe, PagSeguro etc.) sem tocar em regra de
 
 ```
 vendapop/
-├── backend/                 # API Laravel
+├── backend/                  # API Laravel
 │   ├── app/
-│   │   ├── Models/         # Modelos Eloquent
+│   │   ├── Models/          # Modelos Eloquent
 │   │   ├── Http/Controllers/Api/  # Controllers da API
-│   │   └── Services/       # Lógica de negócio
+│   │   ├── Services/        # Lógica de negócio (camada de aplicação)
+│   │   ├── Domain/          # Interfaces de domínio (ex: PaymentGateway)
+│   │   ├── Infrastructure/  # Implementações concretas (Adapters, Factories)
+│   │   ├── UseCases/        # Casos de uso isolados por contexto
+│   │   ├── Repositories/    # Repositórios (Eloquent + interfaces)
+│   │   └── Contracts/       # Interfaces de serviço
 │   ├── database/
-│   │   ├── migrations/     # Migrations do banco
-│   │   └── seeders/        # Seeds para dados iniciais
-│   └── routes/api.php      # Rotas da API
-├── frontend/                # SPA React
+│   │   ├── migrations/      # Migrations do banco
+│   │   └── seeders/         # Seeds para dados iniciais
+│   ├── tests/                # Testes Feature + Unit (PHPUnit)
+│   └── routes/api.php        # Rotas da API
+├── frontend/                 # SPA React
 │   ├── src/
-│   │   ├── components/     # Componentes reutilizáveis
-│   │   ├── pages/         # Páginas da aplicação
-│   │   ├── services/      # Serviços de API
-│   │   └── layout/        # Layouts e templates
-│   ├── public/            # Assets estáticos
-│   └── package.json       # Dependências Node.js
-├── docker-compose.yaml     # Configuração Docker
-├── docs/                  # Documentação técnica
-│   ├── especificacao-tecnica.md   # Especificações técnicas
-│   ├── DEPLOY.md                  # Guia de deploy em VPS
+│   │   ├── components/      # Componentes reutilizáveis
+│   │   ├── pages/           # Páginas da aplicação
+│   │   ├── services/        # Serviços de API
+│   │   └── layout/          # Layouts e templates
+│   ├── e2e/                  # Testes end-to-end (Playwright)
+│   ├── public/                # Assets estáticos
+│   └── package.json          # Dependências Node.js
+├── deploy/                   # Deploy de produção (Docker Compose + Nginx)
+│   ├── docker-compose.prod.yml
+│   ├── Dockerfile.backend / Dockerfile.frontend
+│   ├── deploy.sh              # Script de deploy
+│   └── nginx/
+├── docker-compose.yaml       # Configuração Docker (desenvolvimento)
+├── docs/                     # Documentação técnica
+│   ├── especificacao-tecnica.md
+│   ├── DEPLOY.md
 │   ├── configuracao-mercadopago.md
 │   ├── configuracao-google-analytics.md
 │   ├── configuracao-integrações.md
-│   └── screenshots/               # Prints usados neste README
-└── RELEASE_NOTES.md       # Histórico de versões
+│   └── screenshots/           # Prints usados neste README
+└── RELEASE_NOTES.md          # Histórico de versões
 ```
 
 ## 🔧 Comandos Úteis
@@ -334,31 +346,18 @@ docker compose exec backend php artisan tinker
 
 ## 🚀 Deploy
 
-### Produção
+Produção roda via Docker Compose, com script próprio em `deploy/`:
 
-1. **Build das imagens**
-   ```bash
-   docker build -t vendapop-backend ./backend
-   docker build -t vendapop-frontend ./frontend
-   ```
+```bash
+# Configurar variáveis de ambiente
+cp deploy/.env.production.example deploy/.env.production
+# editar deploy/.env.production com os valores reais
 
-2. **Configurar variáveis de ambiente**
-   - Copie `.env.example` para `.env`
-   - Configure banco de dados de produção
-   - Configure URLs de produção
+# Rodar o deploy
+./deploy/deploy.sh
+```
 
-3. **Deploy com Docker Compose**
-   ```bash
-   docker compose -f docker-compose.prod.yml up -d
-   ```
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+O script builda as imagens (`deploy/Dockerfile.backend`, `deploy/Dockerfile.frontend`), sobe com `deploy/docker-compose.prod.yml` e roda migrations. Guia detalhado de setup de VPS em [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ## 📝 Convenções de Commit
 
@@ -374,11 +373,15 @@ Usamos [Conventional Commits](https://conventionalcommits.org/):
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+Código-fonte disponível para leitura/portfólio. Todos os direitos reservados — uso, cópia ou redistribuição comercial requerem autorização do autor.
 
 ## 👥 Autores
 
 - **Dinaerte Neto** - Desenvolvimento
+
+## ☕ Apoie o projeto
+
+Curtiu? Um café ajuda a manter o projeto vivo — PIX (CNPJ): `58.520.274/0001-91`
 
 ## 🙏 Agradecimentos
 
