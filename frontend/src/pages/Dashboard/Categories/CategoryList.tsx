@@ -115,28 +115,28 @@ const CategoryList: React.FC = () => {
         onCancel={() => setDeleteUuid(null)}
       />
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label htmlFor="perPage" className="text-sm text-gray-600">Itens por página:</label>
-            <select
-              id="perPage"
-              value={perPage}
-              onChange={handlePerPageChange}
-              className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-          </div>
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
           <Link 
             to="/admin/categories/new" 
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors shadow-sm"
           >
             + Nova Categoria
           </Link>
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="perPage" className="text-sm text-gray-600">Itens por página:</label>
+          <select
+            id="perPage"
+            value={perPage}
+            onChange={handlePerPageChange}
+            className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
         </div>
       </div>
 
