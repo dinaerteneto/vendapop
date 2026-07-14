@@ -2,6 +2,32 @@
 
 ---
 
+## v1.14.10 — Seeder de pedidos fictícios por tenant
+
+**Data:** 2026-07-13 | **Branch:** `fix/add-order-seeder`
+
+### Novas funcionalidades
+
+**OrderSeeder: geração de pedidos, clientes e items por tenant**
+- Adiciona `OrderSeeder` com 8 tenants, cada um com 4 clientes e 6 pedidos em status variados.
+- Prefixos de número de pedido por tenant (ex: `MODA-2026-000001`, `IMOV-2026-000001`).
+- Clientes criados via `firstOrCreate` — idempotente em múltiplas execuções.
+- Produtos selecionados aleatoriamente do tenant, 1-3 items por pedido.
+- Registrado no `DatabaseSeeder` para rodar junto com os demais seeders.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `backend/database/seeders/OrderSeeder.php` | Novo seeder com pedidos, clientes e items fictícios |
+| `backend/database/seeders/DatabaseSeeder.php` | Adiciona `OrderSeeder::class` na sequência |
+
+### Commits
+
+- feat(seeders): adiciona OrderSeeder com pedidos ficticios por tenant
+
+---
+
 ## v1.14.9 — Migração reCAPTCHA v3 → v2 (checkbox)
 
 **Data:** 2026-07-13 | **Branch:** `main`

@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             EncomendasSeeder::class,
             AfiliadosSeeder::class,
             PizzariaSeeder::class,
+            OrderSeeder::class,
             InviteSeeder::class,
             SuperAdminSeeder::class,
         ]);
