@@ -2,6 +2,28 @@
 
 ---
 
+## v1.14.16 — README: corrige estrutura, deploy e licença
+
+**Data:** 2026-07-14 | **Branch:** `main`
+
+### Documentação
+
+**README revisado por completo contra o estado real do repositório**
+- Árvore de "Estrutura do Projeto" atualizada: faltavam `Domain/`, `Infrastructure/`, `UseCases/`, `Repositories/`, `Contracts/` — a mesma arquitetura já anunciada na seção de Factory+Adapter. Adiciona `deploy/`, `tests/`, `e2e/`.
+- Seção "Deploy" corrigida: apontava `docker-compose.prod.yml` e Dockerfiles em paths que não existem na raiz. Corrigido para `deploy/deploy.sh` e `deploy/docker-compose.prod.yml`, com link pro `docs/DEPLOY.md`.
+- Licença corrigida: README e `backend/composer.json` afirmavam MIT sem arquivo `LICENSE` existir — e MIT contradiz a intenção comercial do projeto. Ajustado para "todos os direitos reservados" (`composer.json` → `proprietary`).
+- Removida seção "Contribuição" (fork/PR) que só fazia sentido pra projeto opensource formal.
+- Adicionada seção de apoio via PIX.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `README.md` | Estrutura, deploy, licença, contribuição, apoio |
+| `backend/composer.json` | `name`, `description`, `license` corrigidos |
+
+---
+
 ## v1.14.15 — Limpeza de histórico: remove docs internos e configs sensíveis
 
 **Data:** 2026-07-14 | **Branch:** `main`
