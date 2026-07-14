@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import ReCAPTCHA from 'react-google-recaptcha';
 import api from '../../services/api';
 import { SEOHead } from '../../components/common/SEOHead';
 import { toast } from 'react-toastify';
+
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '';
 
 const RegisterForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +20,8 @@ const RegisterForm: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,16 +39,14 @@ const RegisterForm: React.FC = () => {
       return;
     }
 
-    if (!executeRecaptcha) {
-      toast.error('reCAPTCHA não está pronto. Aguarde um momento.');
+    if (!recaptchaToken) {
+      toast.error('Confirme que você não é um robô.');
       return;
     }
-    
+
     setLoading(true);
 
     try {
-      const recaptchaToken = await executeRecaptcha('register');
-      
       const payload: Record<string, any> = {
         ...formData,
         terms_accepted: true,
@@ -109,6 +110,9 @@ const RegisterForm: React.FC = () => {
           autoClose: 5000,
         });
       }
+
+      recaptchaRef.current?.reset();
+      setRecaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -232,9 +236,18 @@ const RegisterForm: React.FC = () => {
             </label>
           </div>
 
+          <div className="mb-4">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={RECAPTCHA_SITE_KEY}
+              onChange={(token) => setRecaptchaToken(token)}
+              onExpired={() => setRecaptchaToken(null)}
+            />
+          </div>
+
           <button
             type="submit"
-            disabled={loading || !executeRecaptcha}
+            disabled={loading || !recaptchaToken}
             className="w-full rounded bg-blue-600 py-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Cadastrando...' : 'Cadastrar'}
@@ -252,22 +265,6 @@ const RegisterForm: React.FC = () => {
   );
 };
 
-const Register: React.FC = () => {
-  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
-  
-  return (
-    <GoogleReCaptchaProvider
-      reCaptchaKey={siteKey}
-      scriptProps={{
-        async: false,
-        defer: false,
-        appendTo: "head",
-        nonce: undefined,
-      }}
-    >
-      <RegisterForm />
-    </GoogleReCaptchaProvider>
-  );
-};
+const Register: React.FC = () => <RegisterForm />;
 
 export default Register;

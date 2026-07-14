@@ -52,6 +52,10 @@ return [
         'client_secret' => env('MERCADOPAGO_CLIENT_SECRET'),
     ],
 
+    'recaptcha' => [
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Frontend URL

@@ -9,7 +9,13 @@ class RecaptchaService
 {
     public function verify(string $token): bool
     {
-        $secret = env('RECAPTCHA_SECRET_KEY', '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe');
+        $secret = config('services.recaptcha.secret');
+
+        if (empty($secret)) {
+            Log::error('RECAPTCHA_SECRET_KEY não configurado');
+
+            return false;
+        }
 
         try {
             $response = Http::timeout(5)
@@ -29,22 +35,11 @@ class RecaptchaService
             }
 
             $data = $response->json();
-            $score = $data['score'] ?? 0;
 
             if (empty($data['success'])) {
                 Log::warning('reCAPTCHA verification unsuccessful', [
                     'error_codes' => $data['error-codes'] ?? [],
-                    'score' => $score,
                     'hostname' => $data['hostname'] ?? null,
-                ]);
-
-                return false;
-            }
-
-            if ($score < 0.5) {
-                Log::info('reCAPTCHA low score', [
-                    'score' => $score,
-                    'action' => $data['action'] ?? null,
                 ]);
 
                 return false;
