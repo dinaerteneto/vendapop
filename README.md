@@ -8,6 +8,8 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-orange.svg)](https://www.mysql.com)
 
+🔗 **Demo ao vivo:** [vendapop.com.br](https://vendapop.com.br) (loja `/modachic`, dados de seed) · [Histórico de versões](RELEASE_NOTES.md)
+
 ## 📋 Sobre o Projeto
 
 VendaPop é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter seu próprio catálogo online com fluxo completo de compra, finalizando pedidos diretamente via WhatsApp. Moda, eletrônicos, imobiliária, encomendas — qualquer negócio que venda pelo Instagram e WhatsApp.
@@ -39,6 +41,31 @@ VendaPop é uma plataforma SaaS multi-tenant que permite a qualquer lojista ter 
 ### Infraestrutura
 - **Docker & Docker Compose** - Containerização
 - **Nginx** - Servidor web (produção)
+
+## 🔌 Integrações
+
+| Integração | Uso |
+|---|---|
+| Mercado Pago | Checkout e cobrança de assinatura dos planos |
+| Google OAuth | Login social do lojista |
+| ReCAPTCHA | Proteção anti-bot em formulários públicos |
+| WhatsApp | Finalização de pedido e notificação de admin |
+| Web Push (VAPID) | Notificações push pro admin |
+| Google Analytics 4 | Métricas de loja |
+
+## 🏗️ Arquitetura: Factory + Adapter no gateway de pagamento
+
+O pagamento é abstraído atrás de uma interface de domínio (`App\Domain\Payment\PaymentGateway`), implementada por um Adapter por gateway (`MercadoPagoAdapter`). A `PaymentGatewayFactory` escolhe a implementação certa em runtime via config (`services.payment.gateway`).
+
+```
+App\Domain\Payment\PaymentGateway        (interface)
+        ↑ implements
+App\Infrastructure\Payment\Adapters\MercadoPagoAdapter
+        ↑ instanciado por
+App\Infrastructure\Payment\PaymentGatewayFactory
+```
+
+Isso deixa plugar um gateway novo (Stripe, PagSeguro etc.) sem tocar em regra de negócio — só criar o Adapter e registrar na Factory.
 
 ## 🛠️ Instalação e Execução
 
@@ -295,6 +322,17 @@ docker compose exec backend php artisan tinker
 **WhatsApp não funciona:**
 - Verifique se o número do WhatsApp está configurado no tenant
 - O link é apenas gerado, não enviado automaticamente (requer integração com API do WhatsApp)
+
+## 📸 Screenshots
+
+`modachic` é a loja de exemplo (seed), sem dado real de cliente. Login admin: `admin@modachic.com` / `password`.
+
+| | Desktop | Mobile |
+|---|---|---|
+| **Loja** | ![home desktop](docs/screenshots/01-loja-home.png) | ![home mobile](docs/screenshots/01m-loja-home.png) |
+| **Carrinho** | ![carrinho desktop](docs/screenshots/02-carrinho.png) | ![carrinho mobile](docs/screenshots/02m-carrinho.png) |
+| **Checkout** | ![checkout desktop](docs/screenshots/03-checkout.png) | ![checkout mobile](docs/screenshots/03m-checkout.png) |
+| **Admin** | ![admin desktop](docs/screenshots/04-admin-dashboard.png) | ![admin mobile](docs/screenshots/04m-admin-dashboard.png) |
 
 ## 🚀 Deploy
 
