@@ -2,6 +2,32 @@
 
 ---
 
+## v1.14.8 — Fix definitivo: reCAPTCHA quebrava a cada novo deploy
+
+**Data:** 2026-07-13 | **Branch:** `main`
+
+### Correções
+
+**`deploy.sh` não exportava variáveis de `.env.production` para o shell antes do build**
+- Causa raiz do bug de reCAPTCHA "resolvido" em v1.14.7 (aquele fix foi só um rebuild manual, não corrigia a causa).
+- `docker compose build --build-arg VITE_RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}` é expandido pelo **bash**, não pelo `--env-file` do compose. Como `RECAPTCHA_SITE_KEY` nunca era exportado no shell, o build-arg ia vazio a cada `./deploy.sh`.
+- Frontend caía no fallback hardcoded (`6LeIxAcT...`, chave de teste sem domínio `vendapop.com.br` autorizado), então `executeRecaptcha` nunca gerava token válido e o cadastro falhava com "The recaptcha token field is required".
+- Mesmo bug afetava `VITE_API_BASE_URL`, mascarado pelo fallback correto de `DOMAIN`.
+- Fix: `set -a; source "$ENV_FILE"; set +a` logo após a checagem de existência do `.env.production` em `deploy.sh`, exportando todas as vars antes do passo de build.
+- Confirmado em produção: bundle JS agora contém a chave `6Ldy0C0t...` correta.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `deploy/deploy.sh` | Exporta `.env.production` para o shell antes do build das imagens |
+
+### Commits
+
+- fix(deploy): exporta .env.production antes do build para corrigir build-args vazios
+
+---
+
 ## v1.14.7 — Correções no reCAPTCHA em Produção e Consumo de Vagas
 
 **Data:** 2026-06-22 | **Branch:** `main`
