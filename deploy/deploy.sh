@@ -26,6 +26,13 @@ command -v docker >/dev/null 2>&1 || err "Docker não instalado."
 command -v docker compose >/dev/null 2>&1 || err "Docker Compose não instalado."
 [ -f "$ENV_FILE" ] || err ".env.production não encontrado em $ENV_FILE"
 
+# Exporta variáveis do .env.production para o shell, necessário pois
+# --build-arg é expandido pelo bash antes do docker compose rodar
+# (--env-file só afeta substituição dentro do próprio compose file)
+set -a
+source "$ENV_FILE"
+set +a
+
 # Verifica rede externa 'web' (necessária para o reverse proxy)
 if ! docker network inspect web >/dev/null 2>&1; then
     warn "Rede 'web' não existe. Criando..."
