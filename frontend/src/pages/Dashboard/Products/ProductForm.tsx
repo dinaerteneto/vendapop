@@ -1374,12 +1374,12 @@ const ProductForm: React.FC = () => {
                                 addGalleryImage();
                             }
                         }}
-                        className="flex-grow rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="min-w-0 flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                     <button 
                         type="button" 
                         onClick={addGalleryImage}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        className="shrink-0 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 whitespace-nowrap"
                     >
                         Adicionar URL
                     </button>
