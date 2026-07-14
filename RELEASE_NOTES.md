@@ -2,6 +2,33 @@
 
 ---
 
+## v1.14.13 — Layout mobile: itens por página em linha separada
+
+**Data:** 2026-07-13 | **Branch:** `fix/list-perpage-mobile`
+
+### Correções
+
+**Header das listagens reorganizado para mobile**
+- ProductList, CategoryList, CustomerList, OrderList: container do header alterado de `flex justify-between` (linha única) para `flex-col gap-3` (duas linhas).
+- Linha 1: título + botão de ação (ex: "+ Novo Produto").
+- Linha 2: controle "Itens por página" isolado.
+- Em telas estreitas (iPhone SE 375px), o label "Itens por página:" + select + botão comprimiam o título e transbordavam da tela.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `frontend/src/pages/Dashboard/Products/ProductList.tsx` | Header em flex-col |
+| `frontend/src/pages/Dashboard/Categories/CategoryList.tsx` | Header em flex-col |
+| `frontend/src/pages/Dashboard/Customers/CustomerList.tsx` | Header em flex-col |
+| `frontend/src/pages/Dashboard/Orders/OrderList.tsx` | Header em flex-col |
+
+### Commits
+
+- fix(lists): itens por página em linha separada no mobile
+
+---
+
 ## v1.14.12 — Input-group de preço, variações em cards, preview responsivo
 
 **Data:** 2026-07-13 | **Branch:** `fix/product-form-price-mobile`

@@ -105,7 +105,7 @@ const CustomerList: React.FC = () => {
     <div>
       <SEOHead title="Clientes — VendaPop" noIndex />
       <div className="mb-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-3">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Clientes</h1>
             <p className="text-gray-600 mt-1">Gerencie seus clientes e leads</p>
