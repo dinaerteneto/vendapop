@@ -2,6 +2,27 @@
 
 ---
 
+## v1.14.14 — README: demo ao vivo, integrações e arquitetura de pagamento
+
+**Data:** 2026-07-14 | **Branch:** `main`
+
+### Documentação
+
+**README voltado para portfólio (repositório agora público)**
+- Link de demo ao vivo (`vendapop.com.br/modachic`, loja seed) e link para `RELEASE_NOTES.md` no topo.
+- Nova seção "Integrações" com tabela dos serviços externos usados (Mercado Pago, Google OAuth, ReCAPTCHA, WhatsApp, Web Push, GA4).
+- Nova seção "Arquitetura: Factory + Adapter no gateway de pagamento" documentando `PaymentGateway` (interface), `MercadoPagoAdapter` e `PaymentGatewayFactory`.
+- Nova seção "Screenshots" (desktop + mobile) da loja, carrinho, checkout e admin, capturados via Playwright contra produção usando a loja de exemplo `modachic` (dados de seed). Credenciais de acesso admin documentadas.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `README.md` | +3 seções (demo, integrações/arquitetura, screenshots) |
+| `docs/screenshots/*.png` | 8 novos prints (4 desktop + 4 mobile) |
+
+---
+
 ## v1.14.13 — Layout mobile: itens por página em linha separada
 
 **Data:** 2026-07-13 | **Branch:** `fix/list-perpage-mobile`
