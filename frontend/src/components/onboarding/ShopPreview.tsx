@@ -13,10 +13,10 @@ const ShopPreview: React.FC<ShopPreviewProps> = ({ tenantSlug, refreshKey }) => 
     <div className="flex flex-col items-center gap-3">
       <p className="text-xs text-gray-400 uppercase tracking-wide">Prévia da sua loja</p>
       <div
-        className="border-[6px] border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl bg-white"
-        style={{ width: 375, height: 667 }}
+        className="border-[6px] border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl bg-white w-full max-w-[375px]"
+        style={{ aspectRatio: '375 / 667' }}
       >
-        <iframe src={shopUrl} width="375" height="667" title="Prévia" className="border-none" />
+        <iframe src={shopUrl} width="375" height="667" title="Prévia" className="border-none w-full h-full" style={{ maxWidth: '100%' }} />
       </div>
     </div>
   );

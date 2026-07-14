@@ -46,7 +46,7 @@ const OnboardingSetup: React.FC = () => {
           {step === 3 && <StepWhatsapp onNext={handleNext} onBack={handleBack} />}
           {step === 4 && <StepCompartilhar onBack={handleBack} />}
         </div>
-        <div className="w-full bg-gray-50 flex items-center justify-center p-6 md:w-3/5 md:p-8">
+        <div className="w-full bg-gray-50 flex items-center justify-center p-3 md:w-3/5 md:p-8">
           <ShopPreview tenantSlug={tenantSlug} refreshKey={previewRefreshKey} />
         </div>
       </div>
