@@ -61,7 +61,7 @@ const SignInForm: React.FC = () => {
   };
 
   const handleResend = useCallback(async () => {
-    if (!recaptchaToken) {
+    if (RECAPTCHA_SITE_KEY && !recaptchaToken) {
       toast.error('Confirme que você não é um robô.');
       return;
     }
@@ -70,7 +70,7 @@ const SignInForm: React.FC = () => {
     try {
       await api.post('/admin/resend-verification', {
         email,
-        recaptcha_token: recaptchaToken,
+        ...(recaptchaToken ? { recaptcha_token: recaptchaToken } : {}),
       });
       toast.success('Novo e-mail de verificação enviado! Verifique sua caixa de entrada.');
       setEmailNotVerified(false);
@@ -85,7 +85,7 @@ const SignInForm: React.FC = () => {
   }, [email, recaptchaToken]);
 
   const handleOtpSend = async () => {
-    if (!recaptchaToken) {
+    if (RECAPTCHA_SITE_KEY && !recaptchaToken) {
       toast.error('Confirme que você não é um robô.');
       return;
     }
@@ -94,7 +94,7 @@ const SignInForm: React.FC = () => {
     try {
       await api.post('/admin/otp/send', {
         email,
-        recaptcha_token: recaptchaToken,
+        ...(recaptchaToken ? { recaptcha_token: recaptchaToken } : {}),
       });
       toast.success('Código enviado para seu e-mail.');
       setOtpStep('code');
@@ -180,16 +180,20 @@ const SignInForm: React.FC = () => {
         {!otpMode && emailNotVerified && (
           <div className="mb-4">
             <div className="mb-3">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={RECAPTCHA_SITE_KEY}
-                onChange={(token) => setRecaptchaToken(token)}
-                onExpired={() => setRecaptchaToken(null)}
-              />
+              {RECAPTCHA_SITE_KEY ? (
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setRecaptchaToken(token)}
+                  onExpired={() => setRecaptchaToken(null)}
+                />
+              ) : (
+                <p className="text-sm text-gray-400">reCAPTCHA desabilitado (dev local).</p>
+              )}
             </div>
             <button
               onClick={handleResend}
-              disabled={resending || !recaptchaToken}
+              disabled={resending || (!!RECAPTCHA_SITE_KEY && !recaptchaToken)}
               className="w-full rounded bg-orange-500 py-2 text-white transition hover:bg-orange-600 disabled:opacity-50"
             >
               {resending ? 'Enviando...' : 'Reenviar e-mail de verificação'}
@@ -275,16 +279,20 @@ const SignInForm: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={RECAPTCHA_SITE_KEY}
-                    onChange={(token) => setRecaptchaToken(token)}
-                    onExpired={() => setRecaptchaToken(null)}
-                  />
+                  {RECAPTCHA_SITE_KEY ? (
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={RECAPTCHA_SITE_KEY}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-400">reCAPTCHA desabilitado (dev local).</p>
+                  )}
                 </div>
                 <button
                   onClick={handleOtpSend}
-                  disabled={otpSending || !email || !recaptchaToken}
+                  disabled={otpSending || !email || (!!RECAPTCHA_SITE_KEY && !recaptchaToken)}
                   className="w-full rounded bg-blue-600 py-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
                 >
                   {otpSending ? 'Enviando...' : 'Enviar código'}
@@ -317,16 +325,20 @@ const SignInForm: React.FC = () => {
                   <p className="text-center text-gray-500">Verificando...</p>
                 )}
                 <div className="mt-3 mb-1">
-                  <ReCAPTCHA
-                    ref={recaptchaRef}
-                    sitekey={RECAPTCHA_SITE_KEY}
-                    onChange={(token) => setRecaptchaToken(token)}
-                    onExpired={() => setRecaptchaToken(null)}
-                  />
+                  {RECAPTCHA_SITE_KEY ? (
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={RECAPTCHA_SITE_KEY}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-400">reCAPTCHA desabilitado (dev local).</p>
+                  )}
                 </div>
                 <button
                   onClick={handleOtpSend}
-                  disabled={otpSending || !recaptchaToken}
+                  disabled={otpSending || (!!RECAPTCHA_SITE_KEY && !recaptchaToken)}
                   className="w-full rounded border border-gray-300 bg-white py-2 text-gray-600 text-sm transition hover:bg-gray-50"
                 >
                   {otpSending ? 'Enviando...' : 'Reenviar código'}

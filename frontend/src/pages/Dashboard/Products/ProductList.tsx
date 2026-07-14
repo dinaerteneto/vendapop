@@ -150,7 +150,46 @@ const ProductList: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 md:hidden">
+          {products.map((product) => (
+            <div key={product.id} className="flex gap-3 p-4">
+              <div className="h-16 w-16 shrink-0 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+                {product.main_image_url ? (
+                  <img src={product.main_image_url} alt={product.name} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-xs text-gray-400">Sem IMG</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-gray-900">{product.name}</p>
+                  <span className={`shrink-0 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {product.is_active ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">{product.category?.name || '-'}</p>
+                <div className="mt-1">
+                  {product.promotional_price && parseFloat(String(product.promotional_price)) > 0 ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-green-600 font-bold">R$ {parseFloat(String(product.promotional_price)).toFixed(2).replace('.',',')}</span>
+                      <span className="text-xs text-gray-400 line-through">R$ {parseFloat(String(product.price)).toFixed(2).replace('.',',')}</span>
+                    </div>
+                  ) : (
+                    <span className="font-medium">R$ {parseFloat(String(product.price)).toFixed(2).replace('.',',')}</span>
+                  )}
+                </div>
+                <div className="mt-2 flex gap-4 text-sm font-medium">
+                  <Link to={`/admin/products/${product.uuid}`} className="text-indigo-600 hover:text-indigo-900">Editar</Link>
+                  <button onClick={() => confirmDelete(product.uuid)} className="text-red-600 hover:text-red-900">Excluir</button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {products.length === 0 && (
+            <div className="px-6 py-4 text-center text-gray-500">Nenhum produto cadastrado.</div>
+          )}
+        </div>
+        <table className="hidden min-w-full divide-y divide-gray-200 md:table">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagem</th>

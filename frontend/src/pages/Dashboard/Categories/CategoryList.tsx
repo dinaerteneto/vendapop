@@ -141,7 +141,35 @@ const CategoryList: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+        <div className="divide-y divide-gray-200 md:hidden">
+          {categories.map((category) => (
+            <div key={category.id} className="flex items-center gap-3 p-4">
+              <div className="h-10 w-10 shrink-0 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border">
+                {category.image_url ? (
+                  <img src={category.image_url} alt={category.name} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-xs font-bold text-gray-400">{category.name.substring(0, 2).toUpperCase()}</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium text-gray-900">{category.name}</p>
+                  <span className={`shrink-0 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${category.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {category.is_active ? 'Ativa' : 'Inativa'}
+                  </span>
+                </div>
+                <div className="mt-1 flex gap-4 text-sm font-medium">
+                  <Link to={`/admin/categories/${category.uuid}`} className="text-indigo-600 hover:text-indigo-900">Editar</Link>
+                  <button onClick={() => confirmDelete(category.uuid)} className="text-red-600 hover:text-red-900">Excluir</button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {categories.length === 0 && (
+            <div className="px-6 py-4 text-center text-gray-500">Nenhuma categoria cadastrada.</div>
+          )}
+        </div>
+        <table className="hidden min-w-full divide-y divide-gray-200 md:table">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagem</th>

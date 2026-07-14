@@ -4,6 +4,7 @@ import api from '../../../services/api';
 import { SEOHead } from '../../../components/common/SEOHead';
 import { toast } from 'react-toastify';
 import ImageUploader from '../../../components/ui/ImageUploader';
+import CurrencyInput from 'react-currency-input-field';
 
 function formatCurrency(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -1096,6 +1097,12 @@ const ProductForm: React.FC = () => {
                           setShowAttributeSelect(true);
                         }}
                         onFocus={() => setShowAttributeSelect(true)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddAttribute();
+                          }
+                        }}
                         placeholder="Busque um atributo existente ou digite um novo nome"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
