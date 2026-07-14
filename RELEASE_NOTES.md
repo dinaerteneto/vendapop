@@ -2,6 +2,24 @@
 
 ---
 
+## v1.14.15 — Limpeza de histórico: remove docs internos e configs sensíveis
+
+**Data:** 2026-07-14 | **Branch:** `main`
+
+### Segurança / Higiene do repositório
+
+**Histórico do git reescrito (todas branches e tags) para repositório público**
+- Removidos de todo o histórico: `.claude/settings.json` (config local do Claude Code CLI), `image.png` e `bitbucket-pipelines.yml` (raiz, resíduos do Bitbucket antigo).
+- Removidos docs internos de estratégia de negócio e QA que não deveriam ser públicos: `docs/analise-concorrentes.md`, `docs/backlog.md`, `docs/estrategia-monetizacao.md`, `docs/plano-lancamento-beta.md`, `docs/playbook-prospeccao.md`, `docs/roadmap.md` (+ variante `ROADMAP.md` histórica em outros paths), `docs/teste-manual-beta.md`, `docs/testes-manuais.md`, `docs/README.md`, `docs/brainstorm-monetizacao.md`, `docs/estudo-concorrentes.md`.
+- Nenhum segredo/credencial real foi encontrado nesses arquivos (checado antes da remoção); a limpeza foi por prudência de negócio, não por vazamento de chave.
+- Reescrita feita com `git-filter-repo`, force-push em todas as 18 branches e 39 tags.
+- `.claude/` adicionado ao `.gitignore`.
+- README atualizado para refletir a nova estrutura de `docs/`.
+
+**Nota para colaboradores:** SHAs de commit mudaram em toda a árvore a partir do início do projeto. Qualquer clone/fork anterior a esta versão está obsoleto — reclone o repositório.
+
+---
+
 ## v1.14.14 — README: demo ao vivo, integrações e arquitetura de pagamento
 
 **Data:** 2026-07-14 | **Branch:** `main`
