@@ -2,6 +2,80 @@
 
 ---
 
+## v1.14.11 — Cards mobile em listagens e correções no formulário de produto
+
+**Data:** 2026-07-13 | **Branch:** `fix/mobile-cards-and-product-form`
+
+### Correções
+
+**Listagens responsivas: tabela → cards em mobile**
+- ProductList, CategoryList, CustomerList, OrderList: abaixo do breakpoint `md` (768px), tabela vira lista de cards verticais.
+- Tabela horizontal cortava colunas em telas pequenas, ilegível.
+- Cards mostram mesmas informações da linha de tabela, empilhadas verticalmente.
+
+**OnboardingSetup: layout empilhado em mobile**
+- Divisão fixa 40/60 (formulário/preview) esmagava os dois painéis em telas pequenas.
+- Agora empilha verticalmente abaixo do breakpoint `md`.
+
+**reCAPTCHA v2: widget opcional quando VITE_RECAPTCHA_SITE_KEY ausente**
+- Crash de página inteira (`register/login`) quando env var `VITE_RECAPTCHA_SITE_KEY` não estava definida (dev local).
+- Widget agora é condicional: só renderiza quando a chave existe.
+- Alinhado com o skip que o backend já faz quando `APP_ENV=local`.
+
+**ProductForm: Enter no campo "Adicionar Atributo" submetia o formulário**
+- `onKeyDown` sem `preventDefault()` — o Enter submetia o `<form>` inteiro da página.
+- Corrigido: evento prevenido no keydown do campo de atributo.
+
+**ProductForm: CurrencyInput não importado na tabela de variações**
+- `ReferenceError` em runtime, `TS2304` no typecheck ao gerar variação.
+- `CurrencyInput` nunca estava no import — campo de preço quebrava a página.
+- Adicionado ao import do componente.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `frontend/src/pages/Dashboard/Products/ProductList.tsx` | Tabela → cards em mobile |
+| `frontend/src/pages/Dashboard/Categories/CategoryList.tsx` | Tabela → cards em mobile |
+| `frontend/src/pages/Dashboard/Customers/CustomerList.tsx` | Tabela → cards em mobile |
+| `frontend/src/pages/Dashboard/Orders/OrderList.tsx` | Tabela → cards em mobile |
+| `frontend/src/pages/AuthPages/OnboardingSetup.tsx` | Layout empilhado em mobile |
+| `frontend/src/pages/AuthPages/Register.tsx` | reCAPTCHA v2 condicional |
+| `frontend/src/pages/AuthPages/SignIn.tsx` | reCAPTCHA v2 condicional |
+| `frontend/src/pages/Dashboard/Products/ProductForm.tsx` | Fix Enter + import CurrencyInput |
+
+### Commits
+
+- fix(admin): cards mobile em listagens e corrige crashes no formulário de produto
+
+---
+
+## v1.14.10 — Seeder de pedidos fictícios por tenant
+
+**Data:** 2026-07-13 | **Branch:** `fix/add-order-seeder`
+
+### Novas funcionalidades
+
+**OrderSeeder: geração de pedidos, clientes e items por tenant**
+- Adiciona `OrderSeeder` com 8 tenants, cada um com 4 clientes e 6 pedidos em status variados.
+- Prefixos de número de pedido por tenant (ex: `MODA-2026-000001`, `IMOV-2026-000001`).
+- Clientes criados via `firstOrCreate` — idempotente em múltiplas execuções.
+- Produtos selecionados aleatoriamente do tenant, 1-3 items por pedido.
+- Registrado no `DatabaseSeeder` para rodar junto com os demais seeders.
+
+### Arquivos alterados
+
+| Arquivo | Mudança |
+|---|---|
+| `backend/database/seeders/OrderSeeder.php` | Novo seeder com pedidos, clientes e items fictícios |
+| `backend/database/seeders/DatabaseSeeder.php` | Adiciona `OrderSeeder::class` na sequência |
+
+### Commits
+
+- feat(seeders): adiciona OrderSeeder com pedidos ficticios por tenant
+
+---
+
 ## v1.14.9 — Migração reCAPTCHA v3 → v2 (checkbox)
 
 **Data:** 2026-07-13 | **Branch:** `main`
